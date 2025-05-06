@@ -58,3 +58,19 @@ Corneal abnormalities with POMK
 
 Schizophrenia with GPR17
 
+
+
+---
+
+## Genetic association analysis of 77,539 genomes reveals rare disease etiologies
+
+The Rareservoir
+
+BeviMed infers 241 known and 19 unknown genetic associations
+
+Variants in ERG are responsible for primary lymphoedema
+
+Variants in PMEPA1 result in Loeys–Dietz syndrome
+
+Variants in GPR156 lead to recessive congenital hearing loss
+
