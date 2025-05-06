@@ -1,5 +1,5 @@
 
-### Mutations in 329 probands with suspected renal electrolyte disorders
+## Mutations in 329 probands with suspected renal electrolyte disorders
 
 Mutations at non-GT/AG splice donor and acceptor sites in SLC12A3
 
@@ -21,7 +21,7 @@ Biallelic mutations in other salt wasting genes
 
 ---
 
-### Clinician-Driven Reanalysis of Exome Sequencing Data From Patients With Inherited Retinal Diseases
+## Clinician-Driven Reanalysis of Exome Sequencing Data From Patients With Inherited Retinal Diseases
 
 Patient Demographics
 
@@ -38,4 +38,23 @@ Mitochondrial Variants
 Filtered or Not Captured Variants in ES
 
 Noncanonical Splicing Variants in ES
+
+
+---
+
+## Rare disease gene association discovery in the 100,000 Genomes Project
+
+Gene burden analytical framework
+
+Application to 100KGP
+
+Monogenic diabetes with UNC13A
+
+Epilepsy with RBFOX3
+
+Charcot–Marie–Tooth disease with ARPC3
+
+Corneal abnormalities with POMK
+
+Schizophrenia with GPR17
 
