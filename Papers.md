@@ -114,3 +114,22 @@ ong-read genome sequencing
 Support from RNA-seq studies
 
 Final yield of likely diagnostic SVs
+
+---
+
+## Structural variant calling and clinical interpretation in 6224 unsolved rare disease exomes
+
+## Clinical Variant Reclassification in Hereditary Disease Genetic Testing
+
+Empirical Estimates of VC Accuracy
+
+VUS Reclassifications and the Causes of Reclassification
+
+Changes in VUS Reclassification Rates
+
+Reversals in Classification and Reclassifications to VUS
+
+Patterns of VUS Reclassifications in REA Groups
+
+
+
