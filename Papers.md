@@ -74,3 +74,13 @@ Variants in PMEPA1 result in Loeys–Dietz syndrome
 
 Variants in GPR156 lead to recessive congenital hearing loss
 
+---
+
+## Refinements and considerations for trio whole-genome sequence analysis when investigating Mendelian diseases presenting in early childhood
+
+Comprehensive gene-agnostic trio WGS analysis pipeline for pediatric genetic diseases
+
+Results from the application of the comprehensive analysis pipeline
+
+Clinical impact and professional user experience
+
