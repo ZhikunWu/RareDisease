@@ -84,3 +84,33 @@ Results from the application of the comprehensive analysis pipeline
 
 Clinical impact and professional user experience
 
+---
+
+
+### The impact of inversions across 33,924 families with rare disease from a national genome sequencing project
+
+Overall results summary
+
+Different categories of SVs detected due to MantaINV call
+
+Simple inversions
+
+Inversions with loss (>10%) at one end
+
+Deletions with small internal segment(s) retained
+
+Duplication-triplications
+
+Interlinked duplications
+
+Other types of complex SV
+
+Validation status
+
+Retrospective analysis of exomes
+
+ong-read genome sequencing
+
+Support from RNA-seq studies
+
+Final yield of likely diagnostic SVs
