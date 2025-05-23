@@ -142,6 +142,7 @@ Results from the application of the comprehensive analysis pipeline
 
 Clinical impact and professional user experience
 
+---
 
 ## Exome sequencing in undiagnosed congenital myopathy reveals new genes and refines genes–phenotypes correlations
 
@@ -160,7 +161,7 @@ New genes implicated in myopathies
 Widening the genetic and clinical heterogeneity
 
 
-
+---
 
 ## Quantitative thresholds for variant enrichment in 13,845 cases: improving pathogenicity classification in genetic hearing loss
 
@@ -173,4 +174,17 @@ PS4 assessment and refinement
 Utility of the proposed PS4 thresholds in genetic testing
 
 
+---
+
+### SV catalogues of three major ancestry groups in Singapore
+
+SG10K_Health SV Landscape
+
+Impact of SVs on regulatory elements and gene bodies
+
+SV patterns between international cohorts
+
+SVs between Asian ancestry groups
+
+SVs exhibit cis-linkage to disease GWAS loci
 
