@@ -131,5 +131,46 @@ Reversals in Classification and Reclassifications to VUS
 
 Patterns of VUS Reclassifications in REA Groups
 
+---
+
+
+## Refinements and considerations for trio whole-genome sequence analysis when investigating Mendelian diseases presenting in early childhood
+
+Comprehensive gene-agnostic trio WGS analysis pipeline for pediatric genetic diseases
+
+Results from the application of the comprehensive analysis pipeline
+
+Clinical impact and professional user experience
+
+
+## Exome sequencing in undiagnosed congenital myopathy reveals new genes and refines genes–phenotypes correlations
+
+Description of the cohort
+
+Overall genetic characterization of the cohort
+
+Main congenital myopathy genes and impact of exome sequencing
+
+Known myopathy genes linked to classical phenotypes
+
+Genes linked to atypical phenotypes
+
+New genes implicated in myopathies
+
+Widening the genetic and clinical heterogeneity
+
+
+
+
+## Quantitative thresholds for variant enrichment in 13,845 cases: improving pathogenicity classification in genetic hearing loss
+
+Samples and variants included in this study
+
+Posterior probability and positive likelihood ratio values for varying strengths of evidence
+
+PS4 assessment and refinement
+
+Utility of the proposed PS4 thresholds in genetic testing
+
 
 
