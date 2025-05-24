@@ -1,3 +1,22 @@
+### Use of whole genome sequencing to determine genetic basis of suspected mitochondrial disorders: cohort study
+
+Demographics
+
+Phenotype data
+
+Diagnostic yield
+
+Factors affecting diagnostic yield
+
+Types of diagnosis
+
+Potentially treatable disorders
+
+Mitochondrial diagnoses compared with nonmitochondrial diagnoses
+
+Muscle biopsy findings and mitochondrial complex activities
+
+---
 
 ## Mutations in 329 probands with suspected renal electrolyte disorders
 
