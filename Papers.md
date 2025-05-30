@@ -1,4 +1,4 @@
-### Use of whole genome sequencing to determine genetic basis of suspected mitochondrial disorders: cohort study
+## Use of whole genome sequencing to determine genetic basis of suspected mitochondrial disorders: cohort study
 
 Demographics
 
@@ -106,7 +106,7 @@ Clinical impact and professional user experience
 ---
 
 
-### The impact of inversions across 33,924 families with rare disease from a national genome sequencing project
+## The impact of inversions across 33,924 families with rare disease from a national genome sequencing project
 
 Overall results summary
 
@@ -195,7 +195,7 @@ Utility of the proposed PS4 thresholds in genetic testing
 
 ---
 
-### SV catalogues of three major ancestry groups in Singapore
+## SV catalogues of three major ancestry groups in Singapore
 
 SG10K_Health SV Landscape
 
@@ -211,7 +211,7 @@ SVs exhibit cis-linkage to disease GWAS loci
 
 
 
-### Genomic Sequencing as a First-Tier Screening Test and Outcomes of Newborn Screening
+## Genomic Sequencing as a First-Tier Screening Test and Outcomes of Newborn Screening
 
 Study Population
 
@@ -223,7 +223,7 @@ Newborns With Suspect Diseases
 
 ---
 
-### Genome Sequencing as a Diagnostic Test in Children With Unexplained Medical Complexity
+## Genome Sequencing as a Diagnostic Test in Children With Unexplained Medical Complexity
 
 Phenotype and Family History Characteristics
 
@@ -237,7 +237,7 @@ Clinical Implications of Diagnostic Information
 
 ---
 
-### Perspectives of Rare Disease Experts on Newborn Genome Sequencing
+## Perspectives of Rare Disease Experts on Newborn Genome Sequencing
 
 Respondent Characteristics
 
@@ -250,7 +250,7 @@ Expert Concordance for Gene-Disease Associations
 ---
 
 
-### Diagnostic Utility of Trio–Exome Sequencing for Children With Neurodevelopmental Disorders
+## Diagnostic Utility of Trio–Exome Sequencing for Children With Neurodevelopmental Disorders
 
 Cohort Information
 
@@ -272,7 +272,7 @@ ethical and legal restrictions related to the Shanghai Children's Hospital.
 ---
 
 
-### Exome copy number variant detection, analysis, and classification in a large cohort of families with undiagnosed rare genetic disease
+## Exome copy number variant detection, analysis, and classification in a large cohort of families with undiagnosed rare genetic disease
 
 CNV detection and analysis
 
@@ -297,7 +297,7 @@ A CNV is defined as high-confidence by GATK-gCNV (see Babadi et al.12 for detail
 (4)	The QS is equal or greater than the QS threshold as defined in Babadi et al.12 (QS >50 for duplications, >100 for deletions, and >400 for homozygous deletions).
 
 
-### Genomic reanalysis of a pan-European rare-disease resource yields new diagnoses
+## Genomic reanalysis of a pan-European rare-disease resource yields new diagnoses
 Pan-European rare-disease data collection
 
 New genetic diagnoses following systematic reanalysis
@@ -307,7 +307,7 @@ Cross-ERN analysis, recurrences and clinical actionability
 ---
 
 
-### Whole-Exome Sequencing Among School-Aged Children With High Myopia
+## Whole-Exome Sequencing Among School-Aged Children With High Myopia
 
 Cohort Information
 
