@@ -166,3 +166,45 @@
 > 临床实践中，二者互补方能全面评估冠脉病变风险。例如：一例5岁川崎病患儿左冠脉内径4.2mm（超过年龄阈值），但Z值=2.3（仅轻度扩张），可能无需激进治疗；而若Z值=5.8（中型瘤），即使内径未达8mm，仍需抗凝干预。
 
 
+
+## undo protein
+
+### Recovery undone pQTL
+```
+BRD10
+H2BC20P
+ADISSP
+IGA2_HUMAN
+IGK_HUMAN
+KGD4
+AFG2B
+NHERF1
+SNRPGP15
+IGG1_HUMAN
+IGM_HUMAN
+KPLCE
+SARG
+HSP90AB2P
+IGD_HUMAN
+PMS2P2
+```
+
+
+### Acute undone qQTL
+```
+H2BC20P
+IGD_HUMAN
+IGA2_HUMAN
+IGG1_HUMAN
+PMS2P2
+AFG2B
+BRD10
+HSP90AB4P
+IGM_HUMAN
+SARG
+SNRPGP15
+IGK_HUMAN
+KPLCE
+```
+  
+
