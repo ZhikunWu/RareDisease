@@ -12,6 +12,19 @@ Extensive admixture with wild species
 Phasing genomes with a haplotype graph
 
 
+## Grapevine pangenome facilitates trait genetics and genomic breeding
+
+The graph pangenome reference for grapevine (Grapepan v.1.0)
+
+Grapepan v.1.0-based population structure of grapevine
+
+GWAS of complex agronomic traits and the importance of SVs
+
+Divergent selection on agronomic traits in grapevine
+
+SVs enhance heritability estimates for grape traits
+
+
 ## Super pangenome of Vitis empowers identification of downy mildew resistance genes for grapevine improvement
 
 Haplotype-resolved complete T2T genome assembly of Chardonnay
@@ -44,6 +57,38 @@ Evolution of Asian cultivated rice
 Domestication of Asian cultivated rice
 
 Divergence between indica and japonica
+
+
+
+## The Marchantia polymorpha pangenome reveals ancient mechanisms of plant adaptation to the environment
+
+M. polymorpha intraspecific diversity resources
+
+M. polymorpha population structure
+
+Selection in the genome of M. polymorpha ruderalis
+
+GEA in M. polymorpha ssp. ruderalis
+
+Pangenomic variations in M. polymorpha
+
+Horizontal gene transfer aided plant terrestrial adaptation
+
+
+
+## Pangenome analysis reveals structural variation associated with seed size and weight traits in peanut
+
+Genetic diversity of 269 accessions with diverse seed sizes
+
+Generation of a high-quality pangenome with diverse pod sizes
+
+SVs potentially influencing gene expression
+
+Selective sweeps of trait-related genes in domestication
+
+SVs in the CKX6 gene reduces its expression and promotes seed expansion
+
+AhARF2-2 negatively regulates seed size
 
 
 
