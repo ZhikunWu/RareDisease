@@ -1,4 +1,18 @@
 
+## Pangenome analysis reveals genomic variations associated with domestication traits in broomcorn millet
+
+Genome sequence, genetic diversity and population structure
+
+Pangenome analysis of broomcorn millet
+
+Structural variations in broomcorn millet
+
+Artificial selection during broomcorn millet domestication
+
+Genomic variations associated with domestication
+
+
+
 ## The phased pan-genome of tetraploid European potato
 
 Phased pan-genome of European potato
@@ -107,4 +121,43 @@ Selective consequences of SV length
 Inversions and chromosome evolution
 
 Copy number variants of genes and gene expression
+
+
+
+## Telomere-to-telomere Citrullus super-pangenome provides direction for watermelon breeding
+
+T2T assemblies of 27 diverse accessions from seven species
+
+Detection of the centromere locations at chromosomes
+
+Watermelon super-pangenome construction and analysis
+
+SV characterization and graph-based genome
+
+Divergence among species and the origin of watermelon
+
+Gene gain and loss during watermelon domestication
+
+Contribution of SV genes during evolution and domestication
+
+
+## Pangenome analysis provides insight into the evolution of the orange subfamily and a key gene for citric acid accumulation in citrus fruits
+
+Variations in fruit flavor in the orange subfamily
+
+Phylogenetic tree of the orange subfamily
+
+Origin of Citrus
+
+Pangenome analysis of the orange subfamily
+
+Solo long terminal repeats contributed to variations in gene expression
+
+Structural variation in the orange subfamily
+
+Central role for PH4 in the accumulation of citric acid
+
+Decreased activation of PH5 by PH4 in Citrus-related genera
+
+
 
