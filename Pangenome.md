@@ -141,6 +141,64 @@ Gene gain and loss during watermelon domestication
 Contribution of SV genes during evolution and domestication
 
 
+
+
+## Oryza genome evolution through a tetraploid lens
+
+The wild Oryza genome data package
+
+TE dynamics in the ridleyi complex
+
+Macro-synteny and large-scale chromosomal rearrangements
+
+The syntenic pangenome
+
+Reconstruction of the evolutionary history of Oryza
+
+Homoeologous gene fractionation
+
+Subgenome dominance and equivalence in O. coarctata
+
+## The genomic landscape of gene-level structural variations in Japanese and global soybean Glycine max cultivars
+
+Genome references of multiple Japanese soybeans
+
+Gene-SV and differentially expressed genes
+
+Genomic region that distinguishes Japanese soybeans
+
+GWAS on the seed size and shape of Japanese soybeans
+
+
+## Pangenome analysis reveals genomic variations associated with domestication traits in broomcorn millet
+
+Genome sequence, genetic diversity and population structure
+
+Pangenome analysis of broomcorn millet
+
+Structural variations in broomcorn millet
+
+Artificial selection during broomcorn millet domestication
+
+Genomic variations associated with domestication
+
+
+## Pan-genomic analysis highlights genes associated with agronomic traits and enhances genomics-assisted breeding in alfalfa
+
+Improvement of the monoploid genome assembly of ZM4 alfalfa
+
+Variation detection and population structure analysis
+
+Assembly and annotation of 24 alfalfa accessions
+
+SV detection and pan-genome construction
+
+Graph-based genomic analysis of SV salt and quality traits
+
+Graph pan-genome empowers alfalfa breeding
+
+
+
 ## Pangenome analysis provides insight into the evolution of the orange subfamily and a key gene for citric acid accumulation in citrus fruits
 
 Variations in fruit flavor in the orange subfamily
