@@ -207,4 +207,120 @@ IGK_HUMAN
 KPLCE
 ```
   
+---
+
+进行 **pQTL（protein quantitative trait loci）分析**，也就是将 **基因型数据（如SNP）** 与 **蛋白质表达水平** 进行关联分析，常用的工具和算法主要来自 **eQTL分析框架的扩展**。以下是目前常用且被认为效果较好的工具、算法以及它们的特点：
+
+
+
+### ✅ **主流pQTL分析工具与算法**
+
+#### 1. **Matrix eQTL**
+
+* **语言/平台**：R
+* **特点**：
+
+  * 高效、快速，适合大规模数据
+  * 支持线性模型和ANOVA模型
+* **是否适用于pQTL**：✅ 是，尽管最初为eQTL设计，但完全适用于蛋白质表达（只要是定量表型）
+* **链接**：[https://github.com/andreyshabalin/MatrixEQTL](https://github.com/andreyshabalin/MatrixEQTL)
+
+
+
+#### 2. **FastQTL**
+
+* **语言/平台**：C++
+* **特点**：
+
+  * 速度快，适合 cis-pQTL 分析
+  * 支持permutation-based FDR控制
+* **适用情况**：适合只分析 cis-QTL（即SNP和蛋白质在同一染色体附近）
+* **链接**：[https://fastqtl.sourceforge.net/](https://fastqtl.sourceforge.net/)
+
+
+
+#### 3. **TensorQTL**
+
+* **语言/平台**：Python + TensorFlow
+* **特点**：
+
+  * 利用GPU加速
+  * 支持 cis 和 trans QTL 分析
+  * 可用于大规模数据集
+* **适用情况**：推荐用于包含数千样本的 pQTL 分析
+* **链接**：[https://github.com/broadinstitute/tensorqtl](https://github.com/broadinstitute/tensorqtl)
+
+
+#### 4. **QTLtools**
+
+* **语言/平台**：C++
+* **特点**：
+
+  * 功能全面，包括QTL mapping、conditional analysis、fine-mapping等
+  * 支持 cis 和 trans 分析
+* **适用情况**：基因型数据和蛋白质数据都较齐全
+* **链接**：[https://qtltools.github.io/qtltools/](https://qtltools.github.io/qtltools/)
+
+
+
+#### 5. **PLINK + 线性模型**
+
+* **语言/平台**：C/C++
+* **特点**：
+
+  * 可用于基本的基因型-表型关联
+  * 不专门为QTL设计，但可以做初步分析
+* **适用情况**：小规模数据或快速初步探索
+
+
+
+#### 6. **GEMMA / LIMIX / BOLT-LMM**
+
+* **类型**：线性混合模型（LMM）工具
+* **用途**：考虑群体结构、亲缘关系等混杂因素
+* **适合分析**：
+
+  * GEMMA：适合小-中等规模
+  * LIMIX：灵活，支持多个表型
+  * BOLT-LMM：适合大规模样本（如UK Biobank）
+* **链接**：
+
+  * GEMMA: [http://www.xzlab.org/software.html](http://www.xzlab.org/software.html)
+  * LIMIX: [https://limix.readthedocs.io](https://limix.readthedocs.io)
+
+
+
+### 🧪 分析流程建议
+
+1. **预处理阶段**
+
+   * 蛋白质数据归一化（如z-score或inverse normal transformation）
+   * SNP数据过滤（MAF、HWE、缺失率）
+   * 协变量整理（年龄、性别、批次效应、PCs）
+
+2. **QTL映射**
+
+   * 选择工具：如 TensorQTL / Matrix eQTL
+   * 选择模型：线性模型或混合模型
+   * cis 和 trans 分开分析
+
+3. **统计检验和多重比较**
+
+   * FDR控制（如Benjamini-Hochberg）
+   * permutation测试提高稳健性
+
+4. **结果注释和可视化**
+
+   * Manhattan plot、QQ plot、cis-window plot
+   * SNP功能注释（如使用ANNOVAR、SnpEff）
+
+
+### 📚 推荐数据集与研究示例
+
+* **SCALLOP Consortium**：人类血浆pQTL研究，使用SOMAscan数据
+* **INTERVAL study**：蛋白质水平pQTL图谱
+* **GTEx v9将计划扩展到pQTL**（目前主要是eQTL）
+
+
+如你提供你的数据量规模（样本数、SNP数、蛋白数量）、分析目标（只做cis还是cis+trans）等，我可以帮你具体推荐一个分析方案。是否希望用R或Python进行处理也很重要。是否需要支持GPU也是选择TensorQTL的关键。欢迎补充更多信息。
 
