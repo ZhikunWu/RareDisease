@@ -82,6 +82,24 @@ Diagnostic classifier for MIS-C using machine learning
 Validation of the 4-protein diagnostic signature
 
 
+## Longitudinal serum proteome mapping reveals biomarkers for healthy ageing and related cardiometabolic diseases
+
+Serum proteome profiling of longitudinal cohorts
+
+Longitudinal trajectories of serum proteome during follow-up
+
+Identifying ageing-related proteins using longitudinal data
+
+Biological implications of ageing-related proteins
+
+Associations of ageing-related proteins with diseases
+
+Ageing-related proteins as cardiometabolic health indicators
+
+Determinants of PHAS and 22 ageing-related proteins
+
+
+
 
 ## Rare variant associations with plasma protein levels in the UK Biobank
 ```
@@ -155,6 +173,8 @@ GEIs implicate known biological pathways and are influenced by age and sex
 Gene-environment interactions capture why some vQTLs lack genetic main effects on protein levels
 Alternative explanations for variance QTLs underlying the plasma proteome
 ```
+
+
 
 
 
