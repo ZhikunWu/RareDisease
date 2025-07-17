@@ -125,62 +125,91 @@ pQTL-augmented PheWAS
 
 
 ### Large-scale plasma proteomics comparisons through genetics and disease associations
-```
+
 Comparison of precision
+
 Inter-platform correlation of levels
+
 Dilution and subcellular location
+
 Protein–phenotype associations
+
 Detection of pQTLs
+
 pQTL analysis by ancestry group
+
 pQTL comparison between platforms
+
 Relationship of pQTLs between platforms
+
 Pleiotropic pQTLs
+
 pQTLs and disease-associated variants
 
-```
+
 
 
 ### Plasma proteomic associations with genetics and health in the UK Biobank
 https://metabolomips.org/ukbbpgwas/
 
-```
+
 Data processing and quality control
+
 Proteomic links with health and disease
+
 Discovery of pQTLs
+
 Replication of pQTLs
+
 Non-European pQTL mapping
+
 Comparisons with previous pQTL studies
+
 Identification and fine-mapping of independent signals
+
 SNP-based heritability of proteins
+
 Protein interactions and pathways at trans loci
+
 Insights into cytokine interactions
+
 Complement cascade trans pQTL networks
+
 Scaling of pQTL associations
+
 Co-localization with expression QTLs
+
 Drug targets and disease biology applications
 
-```
+
 
 
 ### Blood protein assessment of leading incident diseases and mortality in the UK Biobank
-```
+
 Protein associations with incident outcomes
+
 ProteinScore development
+
 Exploration of the type 2 diabetes ProteinScore
+
 Metabolomic score comparison
 
-```
+
 
 
 ### Systematic discovery of gene-environment interactions underlying the human plasma proteome in UK Biobank
-```
+
 Discovery of variance QTLs underlying the plasma proteome
+
 Variance QTLs largely overlap with main effect QTLs for the blood proteome
+
 Variance QTLs unveil gene-environment interactions dispersed across the plasma proteome
+
 GEIs implicate known biological pathways and are influenced by age and sex
+
 Gene-environment interactions capture why some vQTLs lack genetic main effects on protein levels
+
 Alternative explanations for variance QTLs underlying the plasma proteome
-```
 
 
 
