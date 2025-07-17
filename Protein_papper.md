@@ -102,19 +102,27 @@ Determinants of PHAS and 22 ageing-related proteins
 
 
 ## Rare variant associations with plasma protein levels in the UK Biobank
-```
+
 UKB Pharma Plasma Proteome cohort characteristics
+
 Variant-level associations
+
 Assessing epitope effects
+
 Gene-level protein abundance associations
+
 Pan-ancestry collapsing analysis
+
 Protein–protein interactions
+
 Insights into allelic series
+
 Biomarker discovery
+
 Clonal haematopoiesis pQTLs
+
 pQTL-augmented PheWAS
 
-```
 
 ### Large-scale plasma proteomics comparisons through genetics and disease associations
 ```
