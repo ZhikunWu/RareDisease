@@ -1,34 +1,34 @@
 
 # pangenome
-Complex genetic variation in nearly complete human genomes
+## Complex genetic variation in nearly complete human genomes
 
-Building pangenome graphs
+## Building pangenome graphs
 
-A graph-based genome and pan-genome variation of the model plant Setaria
+## A graph-based genome and pan-genome variation of the model plant Setaria
 
-Pangenome graph construction from genome alignments with Minigraph-Cactus
+## Pangenome graph construction from genome alignments with Minigraph-Cactus
 
-Pangenome analysis provides insight into the evolution of the orange subfamily and a key gene for citric acid accumulation in citrus fruits
+## Pangenome analysis provides insight into the evolution of the orange subfamily and a key gene for citric acid accumulation in citrus fruits
 
-Pan-genome bridges wheat structural variations with habitat and breeding
+## Pan-genome bridges wheat structural variations with habitat and breeding
 
-Population-level structural variant characterization from pangenome graph
+## Population-level structural variant characterization from pangenome graph
 
-European ash pangenome reveals widespread structural variation and a diverse genetic basis for low ash dieback susceptibility
+## European ash pangenome reveals widespread structural variation and a diverse genetic basis for low ash dieback susceptibility
 
-Large-scale gene expression alterations introduced by structural variation drive morphotype diversification in Brassica oleracea
+## Large-scale gene expression alterations introduced by structural variation drive morphotype diversification in Brassica oleracea
 
-Structural variation in the pangenome of wild and domesticated barley
+## Structural variation in the pangenome of wild and domesticated barley
 
-Complete sequencing of ape genomes
+## Complete sequencing of ape genomes
 
-Pan-genome bridges wheat structural variations with habitat and breeding
+## Pan-genome bridges wheat structural variations with habitat and breeding
 
-Super-pangenome analyses highlight genomic diversity and structural variation across wild and cultivated tomato species
+## Super-pangenome analyses highlight genomic diversity and structural variation across wild and cultivated tomato species
 
-The pan-genome and local adaptation of Arabidopsis thaliana
+## The pan-genome and local adaptation of Arabidopsis thaliana
 
-Pangenome analysis reveals genomic variations associated with domestication traits in broomcorn millet
+## Pangenome analysis reveals genomic variations associated with domestication traits in broomcorn millet
 
 
 ---
