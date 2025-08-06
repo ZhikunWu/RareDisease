@@ -214,8 +214,50 @@ Alternative explanations for variance QTLs underlying the plasma proteome
 
 
 
+### Plasma proteomics for biomarker discovery in childhood tuberculosis
+
+Clinical characteristics of the cohort
+
+DIA-PASEF enabled high-throughput plasma proteomics
+
+Identification of TB disease candidate biomarkers
+
+Machine learning based identification of a TB biosignature
+
+Detection of unconfirmed TB
+
+### Associations of 2923 plasma proteins with incident inflammatory bowel disease in a prospective cohort study and genetic analysis
+
+Participant characteristics
+
+Observational associations of proteins with IBD
+
+Mendelian randomization and colocalization analyses
+
+Transcriptome analysis of protein-coding genes across different tissues
+
+Single-cell type expression analysis of candidate protein-coding genes
+
+PPI network, enrichment analysis, and druggability assessment
+
+
+
+#### Statistical analysis
+Baseline proteomics data were available for 53,022 participants, focusing on 49,443 participants of European ancestry. After excluding individuals with a history of IBD at baseline (N = 643), the final analysis comprised 48,800 individuals. We normalized individual protein levels for subsequent analyses. Baseline characteristics of the included participants were described using means (standard deviations) for continuous variables and counts (proportions) for categorical variables.
+
+Cox proportional hazards regression models were used to estimate the associations between protein levels and incident IBD and its subtypes to calculate HR and 95% CI. Model 1 was unadjusted for covariates. Model 2 was initially adjusted for age, sex, assessment center, years of education, employment status, household income, and TDI. Model 3 was fully adjusted for smoking status, alcohol consumption, PA, healthy diet, sleep duration, and BMI. Furthermore, we performed sensitivity analyses. First, Cox analysis was performed after excluding samples with values below the limit of detection. Second, additional adjustments were made for the first 10 genetic principal components in the Cox analysis. Third, we excluded participants with a baseline history of other immune-mediated diseases (code details in Supplementary Table 7). Fourth, additional adjustments were made for baseline histories of major chronic conditions, including hypertension, diabetes, hyperlipidemia, cardiovascular diseases, cancer, and other immune-mediated diseases (code details in Supplementary Table 7), in the Cox analysis. Finally, the association between protein levels and the risk of developing IBD was analyzed based on the time of diagnosis (diagnosed within < 2, 2–6, and > 6 years of follow-up).
+
+To develop protein-based prediction models for IBD and its subtypes, the dataset was first randomly split into an 80% training subset and a 20% testing subset. The significant proteins identified by Cox proportional hazards regression in 80% training subset were input into the training subset’s eXtreme Gradient Boosting (XGBoost) classifier69. The importance of these proteins was visualized using Shapley Additive Explanations (SHAP) values, and a simplified protein prediction model was constructed using the top 10 most important proteins to facilitate clinical application70. The testing dataset was then used to assess and compare the AUC values of the traditional risk factor model, simplified protein prediction model, and combined model.
+
+Multiple testing corrections were applied using the FDR method with the “fdrtool” package, considering the number of proteins analyzed71. A threshold of FDR < 0.05 was used to determine statistical significance. This approach controls for the risk of false positives and ensures a more reliable, stringent interpretation of results.
+
+
+
+
 
 ## New biomarkers of Kawasaki disease identified by gingival crevicular fluid proteomics
 
 Finally, MRM-MS confirmed the expression patterns of 12 DEPs (IFIT3, UB2L6, HP, A1AT, HSP90AA1, HNRPC, HSP90AB1, SAA1, MX1, B2M FKBP4, and TRAP1), thereby demonstrating high consistency with the DIA results and further validating the DEPs’ potential as biomarkers for KD.
+
+
 
