@@ -253,6 +253,25 @@ Multiple testing corrections were applied using the FDR method with the “fdrto
 
 
 
+## Integrated plasma and vegetation proteomic characterization of infective endocarditis for early diagnosis and treatment
+
+The plasma and vegetation proteomic landscape of IE
+
+Plasma proteome-based machine learning classifier accurately distinguishes IE from non-IE cases
+
+Identification of prognostic protein co-expression networks of the plasma and vegetation proteomes
+
+The association between liver dysfunction and severe heart failure in IE progression suggests stratified therapy
+
+Plasma proteome-based models supplement CBMs in predicting disease severity of IE
+
+Infection severity-associated proteomic characterization distinguishes IE patients with insufficient microbiological evidence from non-IE cases, identifying LRG1 as a potential biomarker
+
+Neutrophil extracellular traps are potential therapeutic targets for IE patients infected with Streptococcus and S. aureus
+
+Alterations in postoperative plasma proteome reveal NDUFB4 as a potential biomarker for IE
+
+
 
 
 ## New biomarkers of Kawasaki disease identified by gingival crevicular fluid proteomics
