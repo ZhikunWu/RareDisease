@@ -1,121 +1,112 @@
 
-## 基于BUSCO构建进化树
-
-利用BUSCO（Benchmarking Universal Single-Copy Orthologs）结果构建物种进化树的核心思路是：**通过筛选单拷贝直系同源基因作为系统发育标记，确保基因树与物种树的一致性**。以下是具体方法、工具选择及注意事项，结合最新研究进展和实践经验总结：
+# BUSCO结果构建进化树
 
 
+## 🧩 思路概览
 
-### 🔬 **一、基本原理与数据准备**
-1. **为什么选择单拷贝基因？**  
-   - 单拷贝直系同源基因（Single-Copy Orthologs）在物种分化后无旁系同源基因干扰，能减少因基因复制/丢失导致的基因树-物种树冲突（ILS）。  
-   - BUSCO评估基因组完整性时，其数据库（如`eudicots_odb10`）已预选保守的单拷贝基因集，可直接用于系统发育分析。
+BUSCO 的核心是利用一组单拷贝直系同源基因 (single-copy orthologs, SCOs)，这些基因是跨物种保守的，非常适合用来构建系统发育树。
+主要步骤如下：
 
-2. **数据预处理流程**：  
-   ```mermaid
-   graph LR
-   A[输入基因组/转录组FASTA] --> B{BUSCO分析}
-   B --> C[获取单拷贝基因序列]
-   C --> D[多序列比对（如MAFFT）]
-   D --> E[比对修剪（如TrimAl）]
-   E --> F[构建进化树]
-   ```
+1. **提取单拷贝基因序列**
 
+   * BUSCO 在 `run_xxx/busco_sequences/single_copy_busco_sequences/` 目录下会输出每个物种的单拷贝 BUSCO 蛋白/核苷酸序列（FASTA 格式）。
+   * 你需要把所有物种对应的同一个 BUSCO ID 的序列整理在一起。
 
+2. **对每个 BUSCO 基因进行多序列比对 (MSA)**
 
-### ⚙️ **二、建树工具与方法**
-#### **1. 自动化工具（适合非专业用户）**
-- **BuscoPhylo（网页版）**   
-  - **输入**：多个物种的基因组/蛋白组FASTA文件（无需预先运行BUSCO）。  
-  - **流程**：自动执行BUSCO→提取单拷贝基因→比对→建树（IQ-TREE）。  
-  - **优势**：  
-    - 图形化界面，支持外群（Outgroup）指定生成有根树。  
-    - 结果包含树文件（Newick格式）和比对序列，保存期30天。  
-  - **限制**：大样本量（>50基因组）可能超时，建议本地化运行。
+   * 工具：`MAFFT` / `MUSCLE` / `Clustal Omega`
+   * 例如：
 
-- **Phyling（命令行工具）**   
-  - **创新点**：  
-    - 结合HMM模型筛选高信息量标记基因，降低随机误差。  
-    - 支持**共识法（Consensus）** 和**串联法（Concatenation）** 两种建树策略（见下图）。  
-    - **检查点机制**：可增量添加样本，避免重复计算。  
-  - **性能**：  
-    - 比OrthoFinder快130倍（细菌数据集仅需5分钟）。  
-    - 多线程优化（16线程效率最佳），内存占用<5GB。
+     ```bash
+     mafft --auto input.fasta > aligned.fasta
+     ```
 
-#### **2. 编程实现（灵活定制）**
-- **Python + Biopython/pyphylogenomics**  
-  ```python
-  # 示例：提取单拷贝基因并比对
-  from Bio.Phylo.Applications import MafftCommandline
-  import os
+3. **比对结果修剪 (可选，但推荐)**
 
-  # 从BUSCO结果目录收集单拷贝序列
-  single_copy_dir = "busco_output/run_*/single_copy_busco_sequences"
-  os.system(f"cat {single_copy_dir}/*.faa > concatenated.fasta")
+   * 去除低质量比对区域，比如用 `trimAl` 或 `BMGE`。
+   * 例：
 
-  # 多序列比对（MAFFT）
-  mafft_cline = MafftCommandline(input="concatenated.fasta", localpair=True)
-  stdout, stderr = mafft_cline()
-  with open("aligned.fasta", "w") as f:
-      f.write(stdout)
-  ```
-- **下游建树**：  
-  - 使用IQ-TREE或RAxML生成最大似然树（ML）：  
-    ```bash
-    iqtree -s aligned.fasta -m MFP -bb 1000 -nt AUTO
-    ```
+     ```bash
+     trimal -in aligned.fasta -out aligned_trimmed.fasta -automated1
+     ```
 
-#### **3. 进阶策略：减少系统误差**
-- **基因树筛选**：  
-  - BUSCO基因树错误率可能高于UCE（超保守元件），尤其在高信息位点比例时。  
-  - **解决方案**：  
-    - 用Phyling的HMM模块过滤低质量基因（如进化速率异常或位点缺失>30%）。  
-    - 结合Z染色体标记（低ILS率）验证拓扑结构一致性。  
-- **模型选择**：  
-  - 使用**位点异质性模型**（如LG+C60）处理替换率变异，提高远缘物种树准确性。
+4. **拼接所有 BUSCO 基因的比对结果 (Concatenation approach)**
+
+   * 将所有单拷贝基因的比对结果按物种顺序拼接成一个超级矩阵 (supermatrix)。
+   * 工具：`AMAS`, `FASconCAT-G`。
+   * 例如用 AMAS：
+
+     ```bash
+     python AMAS.py concat -i *.fasta -f fasta -d aa -p partitions.txt -t supermatrix.phy
+     ```
+
+5. **构建系统发育树**
+
+   * 常用方法：
+
+     * **最大似然法 (ML)** → `IQ-TREE`, `RAxML`, `FastTree`
+     * **贝叶斯推断 (BI)** → `MrBayes`
+   * 例：用 IQ-TREE：
+
+     ```bash
+     iqtree2 -s supermatrix.phy -m MFP -bb 1000 -alrt 1000
+     ```
+
+     这里 `-m MFP` 自动选择最佳替代模型，`-bb` 自助法 bootstrap。
+
+6. **可视化进化树**
+
+   * 工具：`iTOL` (网页版), `FigTree`, `ETE3` (Python)。
 
 
 
-### ⚠️ **三、关键注意事项**
-1. **数据质量要求**：  
-   - BUSCO完整性需>80%，否则单拷贝基因数量不足影响分辨率。  
-   - 避免包含部分杂合基因组，单倍型分型（如Phased Genome）可减少等位基因干扰。
+## 🧪 举个简单流程示例
 
-2. **进化树冲突来源**：  
-   | **因素**                | **影响**                                                                 | **缓解措施**                          |
-   |-------------------------|--------------------------------------------------------------------------|---------------------------------------|
-   | 不完全谱系分选（ILS）   | 近缘物种快速分化时基因树与物种树不一致                              | 增加标记基因数量或使用溯祖模型（ASTRAL） |
-   | 基因渗入（Introgression）| 杂交事件导致拓扑结构错误                                            | 检测D统计量（如Dsuite）筛选基因座      |
-   | 模型错误                | 替换模型不适配（如忽略位点异质性）                                      | 使用ModelFinder（IQ-TREE）选最佳模型   |
+假设你有三个物种：A, B, C，各自跑完 BUSCO：
 
-3. **结果验证**：  
-   - **一致性检验**：比较不同建树方法（串联法 vs. 共识法）的拓扑结构。  
-   - **支持率评估**：  
-     - 自举法（Bootstrap）>80%或UFBoot >95%视为高支持。  
-     - 低支持节点需谨慎解读，可能反映真实进化模糊性。
+```
+A/run_busco/busco_sequences/single_copy_busco_sequences/
+B/run_busco/busco_sequences/single_copy_busco_sequences/
+C/run_busco/busco_sequences/single_copy_busco_sequences/
+```
 
+操作流程：
 
-### 🌰 **四、实际应用案例**
-1. **蔷薇科系统发育** ：  
-   - 基于12种植物的1,375个BUSCO基因，串联法构建ML树，解析中国木瓜（*Pseudocydonia sinensis*）与苹果、梨的亲缘关系。  
-   - **关键发现**：中国木瓜位于苹果亚科基部，其黄酮合成通路扩张与果实药用特性相关。
+```bash
+# 1. 整理同源序列
+mkdir all_busco
+for id in $(ls A/run_busco/.../*.faa | sed 's/.*\///'); do
+   cat A/.../$id B/.../$id C/.../$id > all_busco/$id.faa
+done
 
-2. **单子叶植物目级关系** ：  
-   - 整合602个单拷贝核基因 + 1,375 BUSCO基因，解决泽泻目（Alismatales）基部节点争议（支持Tofieldiaceae而非天南星科为最早分支）。
+# 2. 对每个基因比对
+for f in all_busco/*.faa; do
+   mafft --auto $f > ${f%.faa}.aln
+done
 
+# 3. 修剪
+for aln in all_busco/*.aln; do
+   trimal -in $aln -out ${aln%.aln}.trim -automated1
+done
 
+# 4. 拼接成超级矩阵
+AMAS.py concat -i all_busco/*.trim -f fasta -d aa -t supermatrix.phy -p partitions.txt
 
-### 💎 **五、工具对比与推荐**
-| **场景**                  | **推荐工具**       | **优势**                                  | **局限**                     |
-|---------------------------|--------------------|------------------------------------------|------------------------------|
-| 快速入门/小数据集         | BuscoPhylo网页版   | 零代码、可视化操作                        | 大样本易超时                 |
-| 大规模数据（>100样本）    | Phyling            | 并行优化、检查点机制、支持共识树          | 需命令行基础                 |
-| 定制化分析（如整合表型）  | Python + IQ-TREE   | 灵活整合其他数据（如表达量、SNP）        | 开发成本高                   |
-| 高冲突节点解析            | ASTRAL-III         | 专攻ILS处理，生成物种树置信区间           | 仅适用于基因树输入           |
-
-> 💡 **实践建议**：首次分析推荐Phyling（兼顾速度与准确性）；若需网页操作选BuscoPhylo；复杂问题组合多种方法验证（如串联法+共识法+溯祖法）。
-
-通过上述方法，BUSCO不仅能评估基因组质量，还可转化为高置信度的系统发育假说，推动从基因到进化的整合生物学研究。
+# 5. 构建进化树
+iqtree2 -s supermatrix.phy -m MFP -bb 1000 -alrt 1000
+```
 
 
 
+## ⚖️ 另一种方法：基于单基因树的 **共识树 (coalescent-based species tree)**
 
+如果你不想用超级矩阵方法，也可以：
+
+* 对每个 BUSCO 基因分别构建 ML 树（比如用 IQ-TREE）。
+* 然后用 `ASTRAL` 或 `MP-EST` 等工具推断物种树。
+  这种方法更符合多基因树整合的统计框架。
+
+
+
+👉 我可以帮你写一个自动化 **Python 脚本 / Snakemake 流程** 来从 BUSCO 输出直接跑完 MSA → 拼接 → 树推断。
+你是希望走 **超级矩阵拼接法 (concatenation)** 还是 **基因树整合法 (coalescent)**？
