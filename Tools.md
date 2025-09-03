@@ -72,6 +72,131 @@ SpliceAI 预测变异可能导致的剪接位点变化，分为四类：
 
 ---
 
+下面给你一套“看懂 SpliceAI → 挑出最可能有功能位点”的实操指南，够快也够稳。
+
+# 1) SpliceAI 结果怎么看
+
+SpliceAI 典型输出在 VCF 的 `INFO/SPLICEAI` 字段，或在表格中包含 8 个关键列（0–1 的概率分数，越大越可能影响剪接）：
+
+* **DS\_AG**：Acceptor Gain（产生新的受体位点）
+* **DS\_AL**：Acceptor Loss（破坏原有受体位点）
+* **DS\_DG**：Donor Gain（产生新的供体位点）
+* **DS\_DL**：Donor Loss（破坏原有供体位点）
+* **DP\_AG/AL/DG/DL**：对应事件最可能发生的位置（相对变异坐标的偏移）
+
+常用派生量：
+
+* **DS\_max = max(DS\_AG, DS\_AL, DS\_DG, DS\_DL)**（最保守的综合判定）
+* **Event\_max = 对应 DS\_max 的事件类型**（你要报告它）
+
+# 2) 阈值如何用（经验法）
+
+不同队伍会略不同，但实战常用分级（兼顾召回与特异）：
+
+* **高可信**：DS\_max ≥ **0.8**
+* **中等可信**：0.5 ≤ DS\_max < 0.8
+* **可关注**：0.2 ≤ DS\_max < 0.5（建议结合其它证据再决定）
+
+> 注：±1/±2 位的“规范剪接位点”变异，本身就很危险；若 SpliceAI 也高分，基本默认功能性强。
+
+# 3) 如何挑“更可能有功能”的位点（优先级策略）
+
+按下列条件综合打分/筛选，越多命中越优先验证：
+
+**A. 位点位置与事件类型**
+
+1. **±1/±2**（canonical splice site）：哪怕中等分数，也应高优先。
+2. **扩展剪接区**（典型：受体 -3..+6，供体 -3..+8）：中高分优先。
+3. **深度内含子（>50bp）**：需要高分（≥0.5，最好≥0.8）或有其它证据（RNA-seq、保守性）才考虑。
+4. **外显子内变异**：若本是同义/错义但 DS 高（≥0.5），也要优先，因为可能影响 ESE/ESS 或造成外显子跳读。
+
+**B. 生物学后果**
+
+* 预测会 **造成外显子跳读、移码、提前终止并引发 NMD** → 优先级上调。
+* 预测产生 **强隐蔽（cryptic）位点** 且 **DP** 指向靠近强剪接信号 → 优先。
+
+**C. 交叉证据（推荐联合）**
+
+* **MaxEntScan/MMSplice/SQUIRLS/Pangolin** 等再打一次分 → 多模型一致上调优先。
+* **保守性**（phyloP/phastCons 高）、**基因约束**（pLI/LOEUF 高）、**组织表达匹配**（目标表型相关组织高表达） → 上调优先。
+* **群体频率**：gnomAD **极低频/未见** 更可疑，同位点同变异若常见则下调优先。
+* **已知证据**：ClinVar/文献/内部数据库有剪接功能证据 → 上调。
+* **RNA-seq/RT-PCR/小型 minigene 实验**：一票否决或一票通过的“硬证据”。
+
+**D. 实验与推进**
+
+* **高优先组合**：`DS_max ≥ 0.8` 或 `DS_max ≥ 0.5 且在扩展剪接区/±1±2` → 先做 RT-PCR（患者 RNA 可得时）或 **minigene** 验证。
+* **中优先**：`0.2–0.5` 且有 ≥2 项交叉证据 → 备选实验或等 RNA 证据。
+* **低优先**：`<0.2` 且无其它支持 → 暂不推进。
+
+# 4) 常见坑
+
+* **深内含子高分假阳性**：没有组织匹配的表达或保守性支持时要谨慎。
+* **基因模型/转录本选择**：确保与临床相关的主转录本；不同转录本 DP 会差异很大。
+* **窗口设置**：SpliceAI 的预测窗口（例如 5k）不同会影响深内含子预测；复现实验室流程时要固定参数。
+* **仅看 DS\_max**：记得结合 **事件类型** 与 **DP 位置** 去理解具体机制。
+
+# 5) 一个可落地的优先级打标流程（例）
+
+1. 先给每个变异计算：`DS_max` 与 `Event_max`、`DP_event`。
+2. 打标：
+
+   * `Tier 1`：`DS_max ≥ 0.8`，或 `DS_max ≥ 0.5` 且位于 ±1/±2 或扩展剪接区。
+   * `Tier 2`：`0.2–0.5` 且满足 ≥2 个交叉证据（保守性↑、MaxEntScan↓、低频、相关组织表达↑）。
+   * `Tier 3`：其余。
+3. `Tier 1` → 优先做实验验证；`Tier 2` → 视资源与表型拟合度安排；`Tier 3` → 记录待查。
+
+# 6) 快速过滤示例
+
+**从 VCF 里筛 DS\_max ≥ 0.5 的位点（bcftools+awk）**
+
+```bash
+# 假设 SPLICEAI=ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t%INFO/SPLICEAI\n' input.vcf.gz \
+| awk -F'\t' '
+{
+  split($5,a,"|");
+  ds_ag=a[3]+0; ds_al=a[4]+0; ds_dg=a[5]+0; ds_dl=a[6]+0;
+  ds_max=ds_ag; ev="AG";
+  if (ds_al>ds_max){ds_max=ds_al; ev="AL"}
+  if (ds_dg>ds_max){ds_max=ds_dg; ev="DG"}
+  if (ds_dl>ds_max){ds_max=ds_dl; ev="DL"}
+  if (ds_max>=0.5)
+    print $1,$2,$3,$4,ds_max,ev,$5
+}' OFS='\t' > spliceai_high.tsv
+```
+
+**用 Python 做更全面的分层并输出报告**
+
+```python
+import csv
+
+def tier(ds_max, pos_class, extra_hits):
+    # pos_class: 'canonical','extended','deep','exonic'
+    # extra_hits: 交叉证据命中数（0/1/2…）
+    if ds_max >= 0.8: return "Tier1"
+    if ds_max >= 0.5 and pos_class in {"canonical","extended"}: return "Tier1"
+    if 0.2 <= ds_max < 0.5 and extra_hits >= 2: return "Tier2"
+    return "Tier3"
+
+# 你可以把 gnomAD 频率、MaxEntScan 结果等汇总进 extra_hits
+```
+
+# 7) 报告时建议写清楚
+
+* 变异：基因/转录本/坐标/注释（HGVS）
+* SpliceAI：`DS_max=0.xx`，`Event=DG/AL/...`，`DP=±N bp`（相对位置与预测新/失去位点）
+* 其它证据：MaxEntScan、保守性、频率、表型匹配
+* 预期后果：外显子跳读/移码/NMD 可能性
+* 下一步：RT-PCR 或 minigene 设计思路（引物、覆盖区间）
+
+
+
+如果你把一小段实际 SpliceAI 结果（几行 VCF 或表格）贴出来，我可以直接按上面的规则帮你 **逐条分级并给验证优先级清单**，顺便把筛选脚本配到你们现有流程里。
+
+
+---
+
 ### Hemizygous Mutation 综合解析
 
 #### **定义与遗传机制**  
