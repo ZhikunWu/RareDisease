@@ -1,8 +1,8 @@
 ## Important papers
 
-Pharmacogenomics of coronary artery response to intravenous gamma globulin in kawasaki disease
+[Pharmacogenomics of coronary artery response to intravenous gamma globulin in kawasaki disease](https://www.nature.com/articles/s41525-024-00419-7)
 
-
+[Identification of novel locus associated with coronary artery aneurysms and validation of loci for susceptibility to Kawasaki disease](https://www.nature.com/articles/s41431-021-00838-5)
 
 
 ### deal with sample
