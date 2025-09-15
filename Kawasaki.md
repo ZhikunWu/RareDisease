@@ -1,3 +1,10 @@
+## Important papers
+
+Pharmacogenomics of coronary artery response to intravenous gamma globulin in kawasaki disease
+
+
+
+
 ### deal with sample
 
 第一次去除样本
