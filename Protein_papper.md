@@ -242,6 +242,46 @@ PPI network, enrichment analysis, and druggability assessment
 
 
 
+### A plasma proteomics-based candidate biomarker panel predictive of amyotrophic lateral sclerosis
+
+Proteome-wide association analysis reveals plasma proteins linked to ALS
+
+Comparative analysis of plasma biomarkers in patients with C9orf72 ALS
+
+Comparison of differentially abundant proteins in plasma to CSF
+
+Pathway analysis identifies skeletal muscle and neuronal processes
+
+Genetic alterations do not influence protein abundance levels
+
+Machine learning uncovers a distinct plasma protein signature linked to ALS
+
+The machine learning model is not powered by NEFL alone
+
+
+
+### Integrated plasma and vegetation proteomic characterization of infective endocarditis for early diagnosis and treatment
+
+The plasma and vegetation proteomic landscape of IE
+
+Plasma proteome-based machine learning classifier accurately distinguishes IE from non-IE cases
+
+Identification of prognostic protein co-expression networks of the plasma and vegetation proteomes
+
+The association between liver dysfunction and severe heart failure in IE progression suggests stratified therapy
+
+Plasma proteome-based models supplement CBMs in predicting disease severity of IE
+
+Infection severity-associated proteomic characterization distinguishes IE patients with insufficient microbiological evidence from non-IE cases, identifying LRG1 as a potential biomarker
+
+Neutrophil extracellular traps are potential therapeutic targets for IE patients infected with Streptococcus and S. aureus
+
+Alterations in postoperative plasma proteome reveal NDUFB4 as a potential biomarker for IE
+
+
+
+
+
 #### Statistical analysis
 Baseline proteomics data were available for 53,022 participants, focusing on 49,443 participants of European ancestry. After excluding individuals with a history of IBD at baseline (N = 643), the final analysis comprised 48,800 individuals. We normalized individual protein levels for subsequent analyses. Baseline characteristics of the included participants were described using means (standard deviations) for continuous variables and counts (proportions) for categorical variables.
 
