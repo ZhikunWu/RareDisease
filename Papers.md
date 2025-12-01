@@ -321,3 +321,54 @@ Variant Interpretation
 Variants were prefiltered so that only those passing the GATK VQSR (variant quality score recalibration) metric and those located outside of low-complexity regions remained. Low-certainty variant positions with a genotype depth (DP) less than 10 and genotype quality (GQ) less than 20 and heterozygous genotype calls with an allele balance of more than 0.8 or less than 0.2 were ignored. The annotation of variants was performed with Ensembl’s Variant Effect Predictor (VEP) version 99 for human genome assembly GRCh37.69We used the VEP70 CADD, LOFTEE,71 and SpliceAI plugins to generate additional bioinformatic estimations of variant deleteriousness. Potentially pathogenic protein-truncating variants (PTVs) were classified as frameshift variant, splice acceptor variant, splice donor variant, stop gained, or start lost variants. Variant filtering included the following steps: (1) the present analysis focuses on rare variants with presumed large effect sizes. Therefore, we excluded variants that had minor allele frequencies (MAF) higher than 0.005 from 3 external exome sequence databases (1000 Genomes; National Heart, Lung, and Blood Institute Exome Sequencing Project; and gnomAD) and our MAGIC cohort. (2) We excluded variants not consistent with hereditary patterns, which were only 1-hit heterozygous variants in autosomal recessive (AR) genes and homozygous variants in autosomal dominant (AD) genes. Annotation of pathogenic (P), likely pathogenic (LP), variants of uncertain significance (VUS), benign (B), and likely benign (LB) for potentially pathogenic PTVs were performed by using ANNOtate VARiation software version 2020June,72 and pathogenicity was assigned according to 2015 American College of Medical Genetics (ACMG) criteria using InterVar,73 which is a computational implementation of expert panel recommendations for clinical interpretation of genetic variants (ACMG 2015 criteria).74 A total of 75 genes were included in this study (eTable 2 in Supplement 2), including 16 nonsyndromic HM genes, 27 genes of eye syndromes associated with HM, and 32 genes of systemic syndromes associated withHM(hereafter, we refer to this gene list as HMgenes). All HMgenes were extracted from OMIM,75 IMI-Myopia Genetics Report,76 and PubMed for articles published up to December 2022 using genetic relevant keywords (for example, gene, genetic, mutation, or variant) and “high myopia.” Variants from 75 genes were selected from the WES data set of the school-aged population with HM.
 
 
+---
+
+### Clinical Camel An Open Expert-Level Medical Language Model with Dialogue-Based Knowledge Encoding
+
+### Clinical Variant Reclassification in Hereditary Disease Genetic Testing
+
+### The expanding diagnostic toolbox for rare genetic diseases
+
+### Predicting expression-altering promoter mutations with deep learning
+
+### Leveraging diverse genomic data to guide equitable carrier screening Insights from gnomAD v.4.1.0
+
+### Pangenome analysis provides insights into the evolution of mango (Mangifera spp.)
+
+### Genome assembly and annotation of mango accessions reveal high-quality genomic features and evolutionary insights
+
+### Pan-genome characterization and functional insights across six mango accessions
+
+### Comparative genomic analysis and evolutionary relationships of Mangifera accessions reveal structural variation, divergence, and adaptation
+
+### FGL1: a novel biomarker and target for non-small cell lung cancer, promoting tumor progression and metastasis through KDM4A/STAT3 transcription mechanism
+
+### Plasma Proteomics Reveals Dysregulated Pathways Across the Spectrum LMNA Cardiomyopathy
+
+### Regulation of the unfolded protein response transducer IRE1α by SERPINH1 aggravates periodontitis with diabetes mellitus via prolonged ER stress
+
+### High-quality genome of a modern soybean cultivar and resequencing of 547 accessions provide insights into the role of structural variation
+
+### Resolving the three-dimensional interactome of human accelerated regions during human and chimpanzee neurodevelopment
+
+### A genomic mutational constraint map using variation in 76,156 human genomes
+
+### Adaptive sequence divergence forged new neurodevelopmental enhancers in humans
+
+### Differential selection of yield and quality traits has shaped genomic signatures of cowpea domestication and improvement
+
+### A near-complete assembly of asparagus bean provides insights into anthocyanin accumulation in pods
+
+### Comprehensive genomic analyses of Vigna unguiculata provide insights into population differentiation and the genetic basis of key agricultural traits
+
+### Assessing the genetic diversity of cowpea [Vigna unguiculata (L.) Walp.] germplasm collections using phenotypic traits and SNP markers
+
+### Transcriptome analyses reveal key genes related to pod dehiscence of adzuki bean (Vigna angularis L.)
+
+### Spatial profiling of chromatin accessibility in formalin-fixed paraffin-embedded tissues
+
+### Comprehensive echocardiogram evaluation with view primed vision language AI
+
+### BRAIN-MAGNET A functional genomics atlas for interpretation of non-coding variants
+
+
