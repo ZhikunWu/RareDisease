@@ -73,3 +73,31 @@ Chromosomal variability in centromere genotypes
 Chromosome-specific HOR landscapes
 
 Different levels of locally nested HOR contributed to the landscape of centromere evolution
+
+---
+
+## Insights into natural neocentromere evolution from a cattle T2T X chromosome
+
+Genome assembly
+
+Repeat annotation and rDNA copies
+
+Telomeres at the p and q-arms of chromosomes
+
+Genomic architecture of centromeric satellite repeats
+
+Inverted and sex-specific repeats in the BTAX centromere
+
+The BTAX centromere exhibits a unique CpG profile
+
+Cattle X-Y PAR and non-PAR synteny
+
+Conserved PAR genes and expression in testes
+
+Discovery of new cattle genes
+
+Wagyu-specific genome improved mapping rate and variant calling from short-reads
+
+Generating and characterising a catalogue of Wagyu SVs
+
+
