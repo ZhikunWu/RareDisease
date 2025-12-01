@@ -320,3 +320,72 @@ Finally, MRM-MS confirmed the expression patterns of 12 DEPs (IFIT3, UB2L6, HP, 
 
 
 
+## A map of blood regulatory variation in South Africans enables GWAS interpretation
+
+Whole-genome and blood transcriptome sequencing
+
+Cell-type deconvolution
+
+Modeling deconvoluted cell types in disease
+
+GWAS of deconvoluted cell types
+
+Cis-QTL mapping
+
+Independent cis-eQTL mapping
+
+Cis-interaction eQTLs (ieQTL) mapping
+
+A South African map of blood regulatory variation
+
+Pan-UKBB GWAS colocalization
+
+
+## Plasma proteome profiling in giant cell arteritis
+
+Participant characteristics
+
+Plasma proteome profiles differ between GCA groups and controls
+
+Plasma protein differences in active and inactive GCA compared with controls
+
+Functional enrichment analysis of differentially abundant proteins
+
+Correlation of plasma proteins with PGA and CRP in patients with active GCA
+
+Plasma proteome profiles with machine learning distinguish patients with GCA from controls
+
+
+
+
+## Plasma proteomics discovery of mental health risk biomarkers in adolescents
+
+Protein identification
+
+Enriched pathways and biological processes
+
+Predictive models generation
+
+
+## Integrated landscape ofplasma metabolism and proteome ofpatients with posttraumatic deep vein thrombosis
+
+Clinical characteristics of the studied cohort
+
+Global plasma metabolic profiles
+
+Metabolite groups altered in pt-DVT
+
+Dysregulation ofmultiple metabolic pathways related topt-DVT
+
+CP Clusters altered in pt-DVT
+
+Association between metabolic alteration and pt-DVT-related blood characteristics
+
+Machine learning identified hematal-metabolic block to discriminate pt-DVT
+
+Metabolomics and proteomics analyses reveal potential therapeutic strategies for pt-DVT
+
+
+
+
+
