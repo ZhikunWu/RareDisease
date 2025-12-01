@@ -1,4 +1,51 @@
 
+### Faba genome
+
+```
+Improved pea reference genome and pan-genome highlight genomic features and evolutionary characteristics
+
+Reference genome sequence and population genomic analysis of peas provide insights into the genetic basis of Mendelian and other agronomic traits
+
+
+Satellite DNA in Vicia faba is characterized by remarkable diversity in its sequence composition, association with centromeres, and replication timing
+
+Raw Illumina reads from ChIP-seq experiment will be available from European Nucleotide Archive under the study PRJEB5241
+
+The giant diploid faba genome unlocks variation in a global protein crop
+
+satellite repeats (FabTR-83 in green, FabTR-64 in red, FabTR-53 in magenta and FokI in yellow)
+
+Genetics of nodulation in Aeschynomene evenia uncovers mechanisms of the rhizobium–legume symbiosis
+
+
+Assembly of the 81.6 Mb centromere of pea chromosome 6 elucidates the structure and evolution of metapolycentric chromosomes
+
+These arrays included FabTR-10 repeats, which were located at multiple positions in CEN6, and FabTR-48 and FabTR-49, each of which occupied only a single locus. By contrast, other large satellites in CEN6, such as FabTR-85, -106, and -107, with arrays up to 2 Mb in size, were free of CENH3.
+
+Domain Organization at the Centromere and Neocentromere
+
+A telomere-to-telomere genome assembly of the cultivated peanut
+https://doi.org/10.6084/m9.figshare.26551309.v1
+
+Haplotype-resolved genome assembly of Phanera championii reveals molecular mechanisms of flavonoid synthesis and adaptive evolution
+
+The genomes of seven economic Caesalpinioideae trees provide insights into polyploidization history and secondary metabolite biosynthesis
+
+https://doi.org/10.6084/m9.figshare.25037543, https://doi.org/10.6084/m9.figshare.25037618, https://doi.org/10.6084/m9.figshare.25037561, https://doi.org/10.6084/m9.figshare.25000856, https://doi.org/10.6084/m9.figshare.25000859, https://doi.org/10.6084/m9.figshare.25037573, https://doi.org/10.6084/m9.figshare.25037582
+
+
+Gleditsia sinensis
+https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/037/074/535/GCA_037074535.1_ASM3707453v1/GCA_037074535.1_ASM3707453v1_genomic.fna.gz
+
+
+The genome of Vicia sativa ssp. amphicarpa provides insights into the role of terpenoids in antimicrobial resistance within subterranean fruits
+
+Chromosome-level assembly of the common vetch (Vicia sativa) reference genome
+
+```
+
+
+
 ## Faba species
 
 我为你整理了这些物种的拉丁学名及其对应的中文名称，方便你查阅。由于植物分类和中文命名可能存在不同观点或变动，个别名称的翻译主要依据学术文献和权威资料，但请注意可能存在其他中文别名。
