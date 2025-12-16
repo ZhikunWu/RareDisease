@@ -275,3 +275,16 @@ Selection signatures related to body stature
 Selection and functional exploration of the GALNT13 gene
 
 
+## Multispecies pangenomes reveal a pervasive influence of population size on structural variation
+
+Study design and demographic background
+
+Rapid evolution of genome size and satellite landscapes
+
+Pangenome graph construction and composition
+
+SV diversity within and between species
+
+Gene copy number variants and gene expression
+
+
