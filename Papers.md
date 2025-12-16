@@ -290,6 +290,48 @@ CNV classification
 
 
 
+
+
+## Specificity, length and luck drive gene rankings in association studies
+
+Burden test and GWAS gene ranks differ
+
+How should genes be prioritized?
+
+Burden tests favour trait-specific genes
+
+GWAS prioritize trait-specific variants
+
+LoF burden tests prioritize long genes
+
+Random genetic drift affects GWAS
+
+Estimating trait importance
+
+
+## Causal modelling of gene effects from regulators to programs to traits
+
+Selection of model traits
+
+Pathway enrichment for trait associations
+
+Gene regulation shapes genetic signals
+
+Trait-associated program regulations
+
+Complex interplay of programs
+
+Validation with GWAS and trans-eQTL
+
+Unified graphs from genes to programs to traits
+
+Extension of the model to other traits
+
+
+
+
+
+
 A CNV is defined as high-confidence by GATK-gCNV (see Babadi et al.12 for details) if the following criteria are met:
 (1)	The CNV is present in a high-quality sample (with ≤200 autosomal raw CNV calls of which at least 35 have QS >20).
 (2)	The sample frequency of the call is ≤0.01 within the Broad callset.
