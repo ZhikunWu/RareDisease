@@ -253,3 +253,25 @@ Decreased activation of PH5 by PH4 in Citrus-related genera
 
 
 
+
+## Telomere-to-telomere genome assembly of a male pig provides insight into population structure and selection for body stature
+
+T2T assembly of all 20 chromosomes
+
+Genome annotation
+
+Complete genomic structure of porcine centromeres
+
+ChrY structure
+
+Cross-species comparative genomic analysis
+
+SV calling based on long reads
+
+Population structure and divergence
+
+Selection signatures related to body stature
+
+Selection and functional exploration of the GALNT13 gene
+
+
