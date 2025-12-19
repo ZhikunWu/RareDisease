@@ -225,3 +225,244 @@ ML:B
 你可以直接告诉我：
 👉 **物种？覆盖度？想分析全基因组还是特定区域（如 rDNA / X 染色体）？**
 
+
+
+
+
+# 原来的甲基化bam文件未比对至染色体，如何比对到染色体，同时获取甲基化位点信息
+
+这是一个**非常关键、而且很多人会踩坑的问题**。我直接给你**可操作的标准流程**，并明确指出**哪些步骤会导致甲基化信息丢失、哪些不会**。
+
+
+
+# 一、先给结论（避免走弯路）
+
+> **Nanopore 甲基化 BAM（Dorado 产生）可以重新比对到染色体坐标，并且甲基化信息不会丢失，前提是：
+> 你必须使用支持 MM/ML 标签的比对流程。**
+
+**正确流程是：**
+
+```
+原始 FASTQ（含修饰标签）
+   ↓ minimap2（保留 MM/ML）
+重新比对到染色体参考
+   ↓
+排序 / index
+   ↓
+modkit pileup
+```
+
+⚠️ **错误做法**（会丢甲基化信息）：
+
+* ❌ 从 BAM 转 FASTQ 时不保留 modified base tags
+* ❌ 用旧版 minimap2 / samtools
+* ❌ 先 pileup 再比对
+
+
+
+# 二、你的“原始甲基化 BAM”现在处于什么状态？
+
+你现在的情况是：
+
+> **BAM 中已有 5mC / 5hmC，但没有比对到染色体级参考**
+
+常见来源包括：
+
+* 比对到：
+
+  * contig
+  * scaffold
+  * 临时参考
+* 或：
+
+  * basecalling 阶段输出的未比对 BAM
+
+👉 **解决方案：重新比对**
+
+
+
+# 三、标准做法一（⭐⭐⭐⭐⭐ 强烈推荐）：从 FASTQ 重新比对
+
+## Step 1️⃣ 从 Dorado BAM 导出 FASTQ（保留修饰）
+
+### ⚠️ 关键点
+
+* 必须保留 **modified base tags**
+* 使用 **samtools ≥1.17**
+
+```bash
+samtools fastq \
+  -T MM,ML \
+  dorado_methylation.bam \
+  > reads_with_mods.fastq
+```
+
+> `-T MM,ML` = 明确告诉 samtools 不要丢掉甲基化标签
+
+
+
+## Step 2️⃣ 比对到染色体级参考基因组
+
+```bash
+minimap2 -ax map-ont \
+  reference.chrom.fa \
+  reads_with_mods.fastq \
+  | samtools sort -o aligned.chrom.bam
+```
+
+📌 minimap2 **天然支持 MM/ML 标签透传**
+
+
+
+## Step 3️⃣ 建立索引
+
+```bash
+samtools index aligned.chrom.bam
+```
+
+
+
+## Step 4️⃣ 验证甲基化信息是否仍在
+
+```bash
+samtools view aligned.chrom.bam | grep "MM:Z" | head
+```
+
+如果能看到 `MM:Z:` 和 `ML:B`
+👉 **说明成功**
+
+
+
+## Step 5️⃣ 提取染色体坐标上的甲基化位点
+
+```bash
+modkit pileup \
+  aligned.chrom.bam \
+  methylation.per_site.tsv \
+  --ref reference.chrom.fa \
+  --mods 5mC 5hmC
+```
+
+
+
+# 四、标准做法二（⭐⭐⭐）：直接重新比对 BAM（不推荐）
+
+> **理论可行，但容易踩坑**
+
+```bash
+samtools view -h dorado.bam \
+| minimap2 -ax map-ont reference.fa - \
+| samtools sort -o aligned.bam
+```
+
+❌ 风险：
+
+* 中间 pipe 若不支持 MM/ML
+* samtools 旧版本会 silently drop tags
+
+👉 **不推荐用于正式分析**
+
+
+
+# 五、常见问题 & 你一定要检查的 5 件事
+
+## 1️⃣ FASTQ 是否真的含修饰信息？
+
+```bash
+grep "MM:Z" reads_with_mods.fastq | head
+```
+
+如果没有 → **你已经丢信息了**
+
+
+
+## 2️⃣ minimap2 版本
+
+```bash
+minimap2 --version
+```
+
+✅ 推荐 ≥ 2.24
+
+
+
+## 3️⃣ samtools 版本
+
+```bash
+samtools --version
+```
+
+✅ 推荐 ≥ 1.17
+
+
+
+## 4️⃣ Dorado 输出模式
+
+如果你还有原始数据，**最稳的方式是：**
+
+```bash
+dorado basecaller \
+  sup \
+  pod5s/ \
+  --modified-bases 5mCG 5hmCG \
+  > reads.fastq
+```
+
+再从 FASTQ 走完整流程
+
+
+
+## 5️⃣ 染色体命名是否一致
+
+* BAM：`chr1`
+* FASTA：`1`
+
+❌ 不一致 → pileup 会失败
+
+
+
+# 六、IGV 可视化（验证用）
+
+* 加载：
+
+  * `aligned.chrom.bam`
+  * `reference.chrom.fa`
+* 勾选：
+
+  * **Show modified bases**
+
+你应该能看到 CpG 位点的颜色深浅
+
+
+
+# 七、审稿人最容易问的 3 个问题（提前准备）
+
+1. **How were modified bases preserved during alignment?**
+   → samtools fastq -T MM,ML + minimap2
+
+2. **Which reference genome was used for methylation calling?**
+   → chromosome-level assembly
+
+3. **How were per-site methylation levels derived?**
+   → modkit pileup
+
+
+
+# 八、一句话“Methods 级总结”（可直接用）
+
+> *Nanopore reads containing base modification tags were re-aligned to the chromosome-level reference genome using minimap2 while preserving MM and ML tags, and per-site DNA methylation levels were quantified using modkit.*
+
+
+
+## 如果你愿意，我可以继续帮你：
+
+* 🔹 **写一整套 shell pipeline（可直接跑）**
+* 🔹 **检查你当前 BAM 是否已经丢失修饰信息**
+* 🔹 **按基因 / rDNA / 着丝粒统计甲基化**
+* 🔹 **把甲基化与 Hi-C / SV / ASE 联合分析**
+
+你只需要告诉我一句：
+👉 **你现在手里的文件是 FASTQ、POD5，还是已经只有 BAM？**
+
+
+
