@@ -288,3 +288,37 @@ SV diversity within and between species
 Gene copy number variants and gene expression
 
 
+
+## Phylogenomic and super-pangenome analyses unveil the genetic landscape of tomato evolution and domestication
+
+High-quality tomato gene-based super-pangenome
+
+New phylogeny of distant tomato wild relatives and cultivated tomatoes
+
+Divergence of pan-gene sets in the super-pangenome
+
+Origin and evolution of duplicated tomato genes
+
+Evolution, domestication and improvement in tomato clade
+
+Presence/absence variation genes related to fruit trait and stress tolerance
+
+The LRR-RLKome of leucine-rich repeat receptor-like kinases
+
+Rapidly evolving and positively selected tomato genes
+
+Comprehensive platform for tomato gene-based superpangenome
+
+
+## Population-level super-pangenome reveals genome evolution and empowers precision breeding in watermelon
+
+Genome assembly and annotation of 135 watermelon accessions
+
+Chromosomal evolution of the Citrullus genus
+
+Comprehensive gene-based super-pangenome
+
+
+HiFi reads for each accession were processed using HiFiAdapterFilt52 to remove adapter sequences. The cleaned HiFi reads, together with ONT and Hi-C data when available, were assembled into contigs using hifiasm. Haplotypic duplications were removed using the purge_dups package. Potential contaminant sequences from microorganisms and organelle genomes were identified and removed by comparing the contig sequences against the NCBI nt/nr database.  For accessions with Hi-C data, pseudochromosomes were constructed using the 3D-DNA software56. For the remaining accessions, chromosome-level assemblies were generated using RagTag57, guided by previously published reference genomes. BUSCO completeness of the assembled genomes was estimated using the embryophyta_odb10 database15. Base accuracy was assessed using Merqury16. The presence of telomeres was determined by quarTeT58 and alignments to telomere-related repeat unit.
+
+
