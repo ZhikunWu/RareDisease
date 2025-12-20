@@ -280,6 +280,28 @@ Alterations in postoperative plasma proteome reveal NDUFB4 as a potential biomar
 
 
 
+## The proteogenomic landscape of the human kidney and implications for cardio-kidney-metabolic health
+
+Human kidney tissue pQTL analysis
+
+Integration with eQTL and external datasets
+
+Genetic impact of drug metabolism and complement in kidney
+
+Prioritizing proteins for kidney function via co-localization
+
+Mendelian randomization links genotype to kidney function
+
+Nominating eGFR effector cell types
+
+Gene prioritization for hypertension and kidney function
+
+GWAS and QTL integration highlights kidney proteins in CKM
+
+Druggability in kidney and CKM disease treatment
+
+
+
 
 
 #### Statistical analysis
