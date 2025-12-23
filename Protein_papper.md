@@ -428,6 +428,11 @@ Machine learning identified hematal-metabolic block to discriminate pt-DVT
 
 Metabolomics and proteomics analyses reveal potential therapeutic strategies for pt-DVT
 
+### Plasma proteomic associations with genetics and health in the UK Biobank
+Genetic association analyses 
+GWAS analyses were performed using REGENIE v.2.2.1 through a two-step procedure to account for population structure detailed previously. In brief, the first step fits a whole-genome regression model for individual trait predictions based on genetic data using the leave one chromosome out (LOCO) scheme. We used a set of high-quality genotyped variants: MAF > 1%, MAC > 100, genotyping rate > 99%, Hardy–Weinberg equilibrium test P > 10−15(LD) pruning (1,000 variant windows, 100 sliding windows and r2, <10% missingness and linkage-disequilibrium < 0.8). The LOCO phenotypic predictions were used as offsets in step 2, which performs variant association analyses using standard linear regression.
+
+
 
 
 
