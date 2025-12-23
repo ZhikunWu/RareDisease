@@ -56,3 +56,30 @@ Clinical and Neuroimaging Features of F3-F7 Patients
 ---
 
 
+## Statistically and functionally fine-mapped blood eQTLs and pQTLs from 1,405 humans reveal distinct regulation patterns and disease relevance
+
+An expanded catalog of fine-mapped whole-blood eQTLs
+
+A fine-mapped pQTL resource from 1,384 EAS samples
+
+Functional characterization of fine-mapped pQTLs
+
+Contrasting eQTLs and pQTLs highlights distinct functional features
+
+Buffering of blood mRNA expression variation in constrained genes
+
+Limited colocalization between eQTLs and pQTLs
+
+Examples of limited colocalization between eQTLs and pQTLs
+
+pQTLs may be more relevant to complex traits than eQTLs
+
+Characterizing the trans-pQTL effects
+
+Buffering of context-specific (severe COVID-19) eQTL effects
+
+Interpreting a negative correlation between mRNA and protein expression
+
+
+Fine-mapping of eQTLs and other QTLs was performed based on our previous pipeline (that is, using FINEMAP v.1.3.1 and susieR v.0.11.43 with default parameters, where the inputs were the summary statistics and in-sample covariate-adjusted LD matrix), with two minor changes.
+
