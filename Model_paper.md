@@ -48,6 +48,23 @@ Riboformer identifies sequence determinants of ribosome collisions
 Riboformer allows interpretation of exacerbated ribosome stalling in aging
 
 
+## Predicting functional constraints across evolutionary timescales with phylogeny-informed genomic language models
+```
+Alignment- and phylogeny-informed genomic language models
+GPN-Star shows strong predictive capability for pathogenic coding variants
+GPN-Star is the state-of-the-art predictor of pathogenic non-coding variants
+GPN-Star is able to identify fine-mapped putatively causal variants in GWAS
+Relevant evolutionary timescales for different variant effect prediction tasks
+GPN-Star improves rare variant association testing
+GPN-Star predictions are highly informative for complex trait heritability
+Evolutionary timescales and the genetic architecture of complex traits
+Tissue-specific predictions further improve heritability enrichment
+GPN-Star learns functional elements in the genome and their dependencies
+GPN-Star learns genome-wide evolutionary constraints
+Controlling for mutation rate variation improves variant effect prediction
+GPN-Star is a general and flexible framework for learning evolutionary constraints across diverse species and alignments
+```
+
 ## mRNABERT: advancing mRNA sequence design with a universal language model and comprehensive dataset
 
 ## A foundation language model to decipher diverse regulation of RNAs
