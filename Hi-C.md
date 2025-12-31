@@ -449,4 +449,51 @@ TAD是染色质折叠的基本结构单位，内部交互频繁，与外部区�
 
 **您是否已经熟悉 Linux 命令行操作？** 如果需要，我可以为您提供 **Chromap** 处理 Arima v2 数据的一行命令示例。
 
+---
+
+# 提供 Chromap 处理 Arima v2 数据的一行命令示例
+
+使用 **Chromap** 处理 Arima v2 数据的核心优势在于它不需要预先构建复杂的酶切位点索引。对于 Arima v2 的多酶体系，Chromap 能够通过比对策略自动识别有效的连接片段。
+
+以下是处理数据的一行命令示例及详细参数解析：
+
+### 核心命令示例
+
+```bash
+chromap -t 20 -x genome_index -r genome.fa -1 read_1.fastq.gz -2 read_2.fastq.gz --preset hic -o output.pairs
+
+```
+
+
+
+### 参数详细说明
+
+* **`-t 20`**: 指定使用的线程数（根据您的服务器配置调整）。
+* **`-x genome_index`**: 指定基因组索引文件的路径（需提前使用 `chromap -i` 生成）。
+* **`-r genome.fa`**: 参考基因组的 Fasta 文件，用于辅助比对。
+* **`-1 / -2`**: 分别输入双端测序的 Fastq 文件。
+* **`--preset hic`**: **关键参数**。这是 Chromap 的预设模式，专门为 Hi-C 数据优化。它会自动开启双端比对、去重（Deduplication）、以及针对嵌合 Reads（Chimeric reads）的拆分处理，从而绕过了对酶切位点文件的强制需求。
+* **`-o output.pairs`**: 输出格式为 `.pairs`。这是目前 3D 基因组学通用的标准中间格式，可直接被 `Cooler` 或 `Juicer Tools` 转换为矩阵文件。
+
+
+
+### 后续建议步骤：转换为可视化矩阵
+
+Chromap 生成 `.pairs` 文件后，通常需要将其转换为 `.cool` 格式以便后续分析和可视化（使用 Juicebox 或 HiGlass）：
+
+```bash
+# 使用 cooler 将 pairs 转换为 cool 矩阵（以 10kb 分辨率为例）
+cooler cload pairs -c1 2 -p1 3 -c2 4 -p2 5 genome.chrom.sizes:10000 output.pairs output_10kb.cool
+
+```
+
+
+
+### 💡 进阶小贴士
+
+1. **索引构建**：在跑上面的命令前，请确保已经通过 `chromap -i -r genome.fa -x genome_index` 建好了索引。
+2. **内存占用**：Chromap 为了追求极致的速度，会消耗较多内存。处理人类基因组数据建议准备 **64GB** 以上的内存。
+3. **多库处理**：如果您有多个 Lane 的数据，可以先分别运行，最后使用 `pairtools merge` 合并 pairs 文件。
+
+**您是否需要我为您整理一份从 Fastq 到生成热图矩阵的完整 Shell 脚本模板？**
 
