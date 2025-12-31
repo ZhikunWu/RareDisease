@@ -497,3 +497,56 @@ cooler cload pairs -c1 2 -p1 3 -c2 4 -p2 5 genome.chrom.sizes:10000 output.pairs
 
 **您是否需要我为您整理一份从 Fastq 到生成热图矩阵的完整 Shell 脚本模板？**
 
+
+---
+
+# 用哪些工具可以基于Hi-C数据检测loop
+
+基于Hi-C数据检测染色质环（chromatin loops）可以使用多种工具。以下是一些常用的工具：
+
+### 1. **HiC-Pro**
+
+* **功能**: 用于Hi-C数据的处理、质量控制、分辨率调整以及染色质环的识别。它是一个多步骤的工作流程，能够从原始Hi-C数据中提取并分析染色质相互作用。
+* **环检测**: 在处理数据后，可以通过HiC-Pro生成的交互矩阵进行进一步分析，结合其他工具进行染色质环的识别。
+* **官网**: [HiC-Pro GitHub](https://github.com/nservant/HiC-Pro)
+
+### 2. **Fit-Hi-C**
+
+* **功能**: Fit-Hi-C是一个用于从Hi-C数据中高效识别染色质环的工具。它采用统计建模方法，通过拟合不同分辨率下的Hi-C数据，识别显著的染色质环。
+* **环检测**: Fit-Hi-C专门用于高效且灵敏地识别染色质环及其相互作用。
+* **官网**: [Fit-Hi-C](https://github.com/zhengxwen/fit-hi-c)
+
+### 3. **Juicer**
+
+* **功能**: Juicer是一个完整的Hi-C数据分析工具，具有数据处理、交互矩阵构建和可视化等功能。它也提供了染色质环的检测。
+* **环检测**: Juicer结合其可视化工具，可以识别和验证染色质环结构，特别适用于大规模Hi-C数据集。
+* **官网**: [Juicer GitHub](https://github.com/aidenlab/juicer)
+
+### 4. **3D-DNA**
+
+* **功能**: 3D-DNA是一个高效的Hi-C数据分析工具，旨在进行基因组组装以及结构化分析，包括染色质环和染色体折叠结构的识别。
+* **环检测**: 在基因组装过程中，3D-DNA能够通过Hi-C数据检测染色质环的三维结构。
+* **官网**: [3D-DNA GitHub](https://github.com/theaidenlab/3d-dna)
+
+### 5. **HiCExplorer**
+
+* **功能**: HiCExplorer是一个全面的Hi-C数据分析工具集，用于处理、可视化和分析Hi-C数据。
+* **环检测**: 其中的`hicFindLoops`功能用于识别染色质环，通过对Hi-C数据的分析，可以发现显著的环状结构。
+* **官网**: [HiCExplorer GitHub](https://github.com/Teichlab/HiCExplorer)
+
+### 6. **CHiCAGO**
+
+* **功能**: CHiCAGO（Chromatin Interaction Analysis by ChIA-PET and Other Gel-based Optimization）是一个用于Hi-C和其他染色质相互作用数据分析的工具。
+* **环检测**: 它能够根据统计模型分析Hi-C数据，并有效地识别染色质环。
+* **官网**: [CHiCAGO GitHub](https://github.com/andrews5/CHiCAGO)
+
+### 7. **HiCCUP**
+
+* **功能**: HiCCUP是一个用于Hi-C数据分析的工具，专门用于识别和解读染色质环。
+* **环检测**: 它通过分析Hi-C数据中的交互频率和构建的染色质折叠模型来识别环状结构。
+* **官网**: [HiCCUP GitHub](https://github.com/Teichlab/HiCCUP)
+
+这些工具各有其优缺点和特定的使用场景，可以根据数据类型和分析需求来选择合适的工具进行染色质环的检测。你在分析过程中是否有特定的需求或工具偏好？
+
+
+
