@@ -617,7 +617,10 @@ rDNA 并不总是活跃的，只有未被甲基化的拷贝才会被转录。
 
 ## Identification of de novo variants from parent-proband duos via long-read sequencing
 ## Modest increase in the de novo single-nucleotide mutation rate in house mice born by assisted reproduction
+## The superpowers of imprinting control regions
 
+de novo SNV/Indel, SV, Methylation,
+imprinting region
 
 ---
 
