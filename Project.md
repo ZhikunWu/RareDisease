@@ -611,3 +611,17 @@ rDNA 并不总是活跃的，只有未被甲基化的拷贝才会被转录。
 
 **您想让我为您准备这个用于提取 rDNA 数据的基础生信脚本吗？**
 
+---
+
+# Duo模型检测后代de novo变异
+
+## Identification of de novo variants from parent-proband duos via long-read sequencing
+## Modest increase in the de novo single-nucleotide mutation rate in house mice born by assisted reproduction
+
+
+---
+
+
+
+
+
