@@ -536,5 +536,128 @@ dorado basecaller \
 你只需要告诉我一句：
 👉 **你现在手里的文件是 FASTQ、POD5，还是已经只有 BAM？**
 
+---
+
+# 如何得到phased 甲基化位点，具体代码是什么
+
+要得到 Phased（定相/分型）的甲基化位点，核心逻辑是将 BAM 文件中的每一条 Read 标记上它属于父本（H1）还是母本（H2），然后利用这些标记将甲基化统计分开。
+
+通常的流程是：**Variant Calling (找变异) -> Phasing (定相) -> Haplotagging (给Reads打标签) -> Modkit Pileup (分型统计)**。
+
+鉴于你的数据是 Nanopore R10.4.1 数据，以下是目前最主流、准确的流程代码，使用 **Clair3** (变异检测), **Whatshap** (定相), 和 **Modkit** (甲基化提取)。
+
+### 准备工作
+
+你需要：
+
+1. **BAM 文件**: `input.bam` (你的文件)
+2. **参考基因组**: `ref.fa` (必须与生成 BAM 时用的参考基因组一致，如 hg38)
+3. **工具**: 安装 `clair3`, `whatshap`, `modkit`, `samtools`, `tabix`
+
+
+### 第一步：变异检测 (Variant Calling)
+
+如果还没有该样本的 VCF 文件，需要先从 BAM 中通过 Clair3 找到 SNP，这是区分两条染色体的基础。
+
+```bash
+# 运行 Clair3 (根据你的机器配置调整 threads)
+# 注意：模型路径 (--model_path) 需要指向你安装的 r1041_e82_400bps_sup_v420 (或其他对应模型)
+run_clair3.sh \
+  --bam_fn=11_7_23_R1041_HPRC_HG02583_1_dorado0.6.0_sup4.3.0_5mCG_5hmCG.bam \
+  --ref_fn=ref.fa \
+  --threads=32 \
+  --platform="ont" \
+  --model_path="/path/to/clair3_models/r1041_e82_400bps_sup_v420" \
+  --output=clair3_output
+
+```
+
+*产出*: `clair3_output/merge_output.vcf.gz`
+
+### 第二步：变异定相 (Phasing) & Reads 标记 (Haplotagging)
+
+使用 Whatshap 利用长读长跨越 SNP 的能力，将 VCF 中的变异分型，并将分型信息（HP tag）写回 BAM 文件。
+
+```bash
+# 1. 对 VCF 进行定相 (Phasing)
+whatshap phase \
+  --output phased.vcf.gz \
+  --reference ref.fa \
+  --ignore-read-groups \
+  clair3_output/merge_output.vcf.gz \
+  11_7_23_R1041_HPRC_HG02583_1_dorado0.6.0_sup4.3.0_5mCG_5hmCG.bam
+
+# 建立索引
+tabix -p vcf phased.vcf.gz
+
+# 2. 对 BAM 进行单倍型标记 (Haplotagging)
+# 这一步会在 BAM 的 reads 中添加 HP:i:1 或 HP:i:2 标签
+whatshap haplotag \
+  --output haplotagged.bam \
+  --reference ref.fa \
+  --ignore-read-groups \
+  phased.vcf.gz \
+  11_7_23_R1041_HPRC_HG02583_1_dorado0.6.0_sup4.3.0_5mCG_5hmCG.bam
+
+# 建立 BAM 索引
+samtools index haplotagged.bam
+
+```
+
+*产出*: `haplotagged.bam` (这是带有单倍型信息的 BAM)
+
+### 第三步：提取 Phased 甲基化信号 (Modkit)
+
+现在 BAM 文件里的 Reads 都有了 `HP` 标签，使用 `modkit pileup` 的 `--partition-tag` 参数即可直接输出分型的甲基化结果。
+
+```bash
+# 提取 5mC 并按单倍型分开
+modkit pileup \
+  haplotagged.bam \
+  phased_methylation.bed \
+  --ref ref.fa \
+  --cpg \
+  --partition-tag HP \
+  --combine-strands
+
+```
+
+* **`--partition-tag HP`**: 这是一个关键参数。它告诉 modkit 根据 BAM 文件中的 `HP` 标签将 reads 分成不同的组（ungrouped, haplotype 1, haplotype 2）。
+* **`--cpg`**: 仅输出 CpG 位点（通常做 phased methylation 主要关注 CpG）。
+
+
+
+### 结果解读
+
+生成的 `phased_methylation.bed` 是一个增强版的 bedMethyl 文件。它通常包含如下列（具体取决于 modkit 版本，但逻辑一致）：
+
+Modkit 会输出带有 partition 信息的列。你需要关注其中的 **Tag** 或 **Partition** 列。
+
+* **Haplotype 1 (HP1)**: 对应父本或母本的一条染色体。
+* **Haplotype 2 (HP2)**: 对应另一条。
+* **None/Ungrouped**: 无法确定来源的 reads（通常是因为该区域缺乏 SNP 或 reads 质量不够）。
+
+你可以通过 `awk` 或 `pandas` 进一步筛选，例如：
+
+```bash
+# 筛选 Haplotype 1 的高置信度位点
+awk '$4 == "1" {print $0}' phased_methylation.bed > haplotype1.bed
+
+# 筛选 Haplotype 2 的高置信度位点
+awk '$4 == "2" {print $0}' phased_methylation.bed > haplotype2.bed
+
+```
+
+*(注：具体第几列代表 partition id 请查看 modkit 输出文件的 header，通常是前几列之一)*
+
+### 总结
+
+1. **Clair3**: 找变异。
+2. **Whatshap**: 定相并给 BAM 打上 `HP` 标签。
+3. **Modkit**: 识别 `HP` 标签并分别计算 H1 和 H2 的甲基化频率。
+
+这个流程得到的 `phased_methylation.bed` 可以让你直接比较同一个位点在父本和母本染色体上的甲基化差异（ASM, Allele-Specific Methylation）。
+
+
 
 
