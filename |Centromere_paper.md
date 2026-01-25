@@ -1,4 +1,18 @@
+## Cyclical evolution of centromere architecture across 193 eukaryote species
 
+Recurrent evolution of centromere architecture across the eukaryotic radiation
+
+Satellite diversity and higher order repetition across eukaryotes
+
+Convergent centrophilic transposition across eukaryotes
+
+Formation of tandem repeat structures from centrophilic transposons
+
+Centromeres dominated by retrotransposons
+
+Independent evolution of holocentric architecture with and without satellite repeats
+
+A cyclical model for evolution of centromere architecture during the eukaryotic radiation
 
 
 ## Satellite DNA in Vicia faba is characterized by remarkable diversity in its sequence composition, association with centromeres, and replication timing
