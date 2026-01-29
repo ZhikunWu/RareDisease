@@ -34,3 +34,50 @@ Y117	NA19240	NA19239	NA19238	YRI	AFR
 评估4：HiFi序列可以同时对SNV和SV进行分phase，但是需要验证两个变异是否完全按照phase的顺序排布；
 
 
+---
+
+
+## TAD conservation in vertebrate genomes is driven by stabilising selection
+
+Identification of syntenic blocks across 12 species
+
+Identification of TADs in the vertebrate fibroblast genomes
+
+TAD number is conserved across vertebrate evolution
+
+Divergence time correlates with TAD border position conservation in vertebrates
+
+Gene position is conserved within TADs
+
+Most syntenic blocks show stabilising selection while a few evolve under genetic drift
+
+
+## TAD evolutionary and functional characterization reveals diversity in mammalian TAD boundary properties and function
+
+Cross-species comparison of TAD boundaries reveals variation in evolutionary conservation
+
+Genetic and epigenetic properties of boundaries vary depending on their evolutionary conservation
+
+Transposable elements contribute to the evolution of conserved and species-specific TAD boundaries
+
+Species-specific boundaries are over-represented at evolutionary breaks of synteny
+
+Deletion of an ultraconserved TAD boundary results in tissuespecific functional phenotypes
+
+Deletion of a human-specific boundary alters gene expression in human neurons
+
+
+## Evolutionary analysis of gene ages across TADs associates chromatin topology with whole-genome duplications
+
+Gene ages are not randomly distributed in human and mouse TADs
+
+Gene age co-localization is stronger in TADs than in fixed-size partitions of the human genome
+
+Gene age co-localization patterns are related to TAD insulation
+
+Essential young genes are associated with TADs enriched in old genes
+
+Essential young genes show more 3D interactions with old genes and other essential genes
+
+
+
