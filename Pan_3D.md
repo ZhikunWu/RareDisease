@@ -81,3 +81,36 @@ Essential young genes show more 3D interactions with old genes and other essenti
 
 
 
+## Common DNA sequence variation influences 3-dimensional conformation of the human genome
+Mapping 3D chromatin conformation across individuals
+
+3D chromatin conformation variations between individuals
+
+Coordinated variation of the 3D genome, epigenome, and transcriptome
+
+Genetic loci influencing 3D chromatin conformation
+
+Contribution of 3D chromatin QTLs to molecular phenotypes and disease risk
+
+## Comparative 3D genome architecture in vertebrates
+
+Initial characteristics of chromosomal conformation across species
+
+Inter‑chromosomal interactome across species
+
+The local spatial context is largely conserved in ten mammals
+
+The TADs are evolutionarily conserved gene expression regulatory units
+
+Some TEs appear highly correlated with chromatin interactions
+
+
+
+
+After iterative correction and eigenvector decomposition [28] and quantile normalization [29], we generated 31 Hi-C contact maps at 20-kb resolution (~ 83.12% of bins had at least 1000 intra-chromosomal contacts, which were highly reproducible between biological replicates (median stratumadjusted correlation coefficient, SCC > 0.905; Fig. 1B)
+
+
+### binning
+In this step, an .mcool file will be produced under the coolers-hg38 sub-folder for each .pairs.gz file using cooler. The mcool format is the official Hi-C data format for the 4DN consortium and can be visualized using HiGlass:
+
+
