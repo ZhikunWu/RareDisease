@@ -1,3 +1,103 @@
+# 如何合并不同批次hi-C数据处理得到的pair文件
+
+合并 Hi-C 数据的 `pairs` 文件通常发生在“去重之后”和“生成交互矩阵（.hic/.cool）之前”。具体操作取决于你使用的分析流程（Juicer/HiC-Pro 还是 Pairtools/4DN）。
+
+以下是针对三种最常见格式的合并方案：
+
+### 场景一：使用 Juicer 格式 (`merged_nodups.txt`)
+
+如果你使用的是 Juicer Pipeline，你的中间文件通常是 `merged_nodups.txt`。合并这类文件的核心原则是：**先合并文本，再重新排序**。
+
+因为 `.hic` 文件的生成工具（Pre）严格要求输入文件必须按染色体和位置排序。
+
+```bash
+# 1. 合并文件 (假设你有两个批次 batch1 和 batch2)
+cat batch1/merged_nodups.txt batch2/merged_nodups.txt > combined_unsorted.txt
+
+# 2. 重新排序 (Juicer 的标准排序顺序)
+# -k2,2d: 按第2列(chr1)字典序排序
+# -k3,3n: 按第3列(pos1)数值排序
+# -k6,6d: 按第6列(chr2)字典序排序
+# -k7,7n: 按第7列(pos2)数值排序
+# --parallel=8: 使用8个线程加速
+# -S 10G: 使用10G内存作为缓冲区
+sort --parallel=8 -S 10G -k2,2d -k3,3n -k6,6d -k7,7n combined_unsorted.txt > combined_merged_nodups.txt
+
+# 3. (可选) 利用合并后的文件生成 .hic
+java -jar juicer_tools.jar pre combined_merged_nodups.txt combined.hic hg38.chrom.sizes
+
+```
+
+> **注意**：如果你的染色体命名包含 `chr` 前缀（如 `chr1`, `chr2`），使用 `-k2,2d` 可能会导致排序问题（如 chr1, chr10, chr2...）。如果是这种情况，或者你想更严谨，可以使用 `sort -k2,2V` (版本排序) 或者确保你的 `.chrom.sizes` 文件顺序与 sort 结果一致。
+
+
+
+### 场景二：使用 Pairtools / 4DN 格式 (`.pairs.gz`)
+
+如果你使用的是 `pairtools` 或 4DN 流程，文件通常带有头部信息（Header, 以 `#` 开头）。直接 `cat` 会导致中间出现头部信息，报错。
+
+推荐使用 `pairtools` 自带的 `merge` 功能，它会自动处理 Header 并保证排序（前提是输入文件已经排好序）。
+
+```bash
+# 安装 pairtools (如果你还没有)
+# pip install pairtools
+
+# 合并多个 .pairs.gz 文件
+pairtools merge -o combined.pairs.gz \
+    --nproc 8 \
+    batch1.pairs.gz batch2.pairs.gz batch3.pairs.gz
+
+# 如果你需要再次去重 (仅当这些批次属于同一个文库的多次测序时需要，生物学重复不需要)
+# pairtools dedup input.pairs.gz --output output.dedup.pairs.gz
+
+```
+
+**优点**：`pairtools merge` 非常智能，它进行的是“归并排序”（merge sort），比解压后重新 `sort` 大文件要快得多且节省内存。
+
+
+
+### 场景三：使用 HiC-Pro 格式 (`.validPairs`)
+
+HiC-Pro 的 `.validPairs` 本质上也是制表符分隔的文本文件，通常没有复杂的 Header（或者 Header 很容易去除）。
+
+```bash
+# 1. 直接合并
+cat batch1.allValidPairs batch2.allValidPairs > combined.allValidPairs
+
+# 2. 重新排序 (HiC-Pro 要求按 Reads Name 或者 坐标排序，取决于后续步骤)
+# 如果是为了生成矩阵，建议按坐标排序：
+# 假设列顺序为: read_name, chr1, pos1, strand1, chr2, pos2, strand2 ...
+sort -k2,2V -k3,3n -k5,5V -k6,6n combined.allValidPairs > combined.sorted.validPairs
+
+# 3. 使用 HiC-Pro 的 build_matrix 脚本
+# 你可以直接将合并后的文件输入给 HiC-Pro 的构建矩阵工具
+HiC-Pro_3.1.0/bin/utils/sparseToDense.py ...
+
+```
+
+
+### 关键生物学问题：要不要“二次去重”？
+
+在合并之前，请确认你的实验设计：
+
+1. **同一个文库（Library）被分成了多个 Lane 测序**：
+* **必须合并后再次去重**。因为同一个 PCR 分子可能出现在 Lane 1 也出现在 Lane 2。如果只是简单合并，PCR 重复会被误认为是真实的信号。
+* *操作*：`cat` -> `sort` -> `dedup` (使用 pairtools dedup 或 juicer dedup)。
+
+
+2. **生物学重复（Bio-Rep）或不同的文库**：
+* **不需要再次去重**。Batch 1 和 Batch 2 是独立的实验，即便它们正好在同一个位置有 reads，那也是真实的生物学信号增强，而不是 PCR 扩增偏好。
+* *操作*：直接 `merge` (如上文所述)。
+
+
+
+### 总结建议
+
+* 如果是 **.pairs** 格式，无脑用 `pairtools merge`。
+* 如果是 **Juicer** 格式，用 `sort -k2,2d -k3,3n -k6,6d -k7,7n`。
+* 永远不要试图通过合并最终的 `.hic` 或 `.cool` 文件来提高分辨率（虽然可以做，但效果不如合并 pairs 文件后重新建图好）。
+
+---
 
 ## Hi-C - Arima
 
