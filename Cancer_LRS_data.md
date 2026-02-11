@@ -1,0 +1,7 @@
+## Long-read sequencing of an advanced cancer cohort resolves rearrangements, unravels haplotypes, and reveals methylation landscapes
+
+[EGA data](https://ega-archive.org/studies/EGAS00001001159?page=0%2C2)
+
+Genomic and transcriptomic sequence datasets for long-read and short-read platforms have been deposited at the European Genome-Phenome Archive (EGA; https://ega-archive.org/) as part of study EGA: EGAS00001001159, as listed in the key resources table, with accession numbers as listed in Table S1. Processed methylation frequency data are available from GEO under accession no. GEO: GSE270257. Other processed data from Long-Read POG, figure source data, and accompanying short-read variants can be downloaded from https://www.bcgsc.ca/downloads/nanopore_pog/. Data on mutations, copy changes, and expression from tumor samples in the POG program are also accessible from https://www.personalizedoncogenomics.org/cbioportal/. WGBS data, ENCODE accessions, and samples from GEO: GSE186458 that were used as normal tissues are listed in the key resources table and included in Table S8.
+Code used to generate figures in this article is available in containerized, reproducible form at https://github.com/bcgsc/long_read_pog (https://doi.org/10.5281/zenodo.13180584).
+Any additional information required to reanalyze the data reported in this paper is available from the lead contact upon request.
