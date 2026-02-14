@@ -10,6 +10,7 @@
 
 [HiC_tools](https://github.com/mdozmorov/HiC_tools): Hi-C data analysis tools and papers
 
+[Raichu](https://github.com/XiaoTaoWang/Raichu/)
 
 ## Papers
 
