@@ -1,3 +1,17 @@
+# Pan TE
+1. PanTE -> 1kg -> imputation
+2. TE -> 1kg evolution
+3. TE -> isoform  + chimeric transcript
+4. TE -> methylation
+5. Alu loop out exon (Inverted Alu repeats in loop-out exon skipping across hominoid evolution)
+
+
+##  Detection TE
+
+L1Hs copies >5.9 kbp, young Alu copies >280 bp (AluYa5 and AluYb8), humanspecific SVA copies >1 kbp (SVAE, and SVAF), and HERV-K flanking long terminal repeats >900 bp (LTR5_Hs).
+
+
+
 ## 转座元件
 
 判断一个检测到的 **转座元件（TE, transposable element）是否完整**，通常需要结合 **序列长度、结构特征、边界完整性和功能元件** 等信息。下面我给你详细说明判断方法和实践策略：
