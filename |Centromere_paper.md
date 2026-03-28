@@ -115,3 +115,15 @@ Wagyu-specific genome improved mapping rate and variant calling from short-reads
 Generating and characterising a catalogue of Wagyu SVs
 
 
+# Evolutionary innovations and genetic diversity in angiosperm centromeres
+
+Evolutionary Diversification of Centromere Composition and Architecture in Angiosperms
+
+Distinct Evolutionary Trajectories of Centromere Satellite Arrays in Angiosperms
+
+Transposon Dynamics Drives Centromere Structural Variation Between Angiosperm Species
+
+Tracing Centromere Diversity Across Angiosperm Species at the Population Level
+
+Progressive Centromere Differentiation Associated with Speciation in Angiosperms
+
