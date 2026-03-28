@@ -1,3 +1,4 @@
+# 着丝粒区间contact特点
 在 Hi-C 交互热图（Contact Map）中，着丝粒（Centromere）区域呈现出非常独特且易于辨识的特征。由于着丝粒主要由高度重复的卫星 DNA（Satellite DNA）组成，且在空间构象上具有特殊的聚集属性，其交互模式主要体现在以下几个方面：
 
 ### 1. 顺式交互（Intra-chromosomal）中的“十字形”空缺
