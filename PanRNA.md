@@ -1,4 +1,7 @@
 # Haplotype-aware pantranscriptome analyses using spliced pangenome graphs
+
+# PanGraphRNA An efficient and flexible bioinformatics platform for graph pangenome‐based RNA‐seq data analysis
+
 # pangenome graph如何转为可以用于RNA比对的spliced pangenome graph
 将普通的 **Pangenome Graph**（通常基于 DNA 序列构建，包含 SNP 和 SV）转换为 **Spliced Pangenome Graph**，核心在于**将已知的转录组结构（外显子和内含子剪接位点）整合进图形结构中**。
 
