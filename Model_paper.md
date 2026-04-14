@@ -1,3 +1,25 @@
+# Model benchmark
+
+### Evaluating the representational power of pre-trained DNA language models for regulatory genomics
+
+### DART-Eval: A Comprehensive DNA Language Model Evaluation Benchmark on Regulatory DNA
+
+### Benchmarking DNA foundation models for genomic and genetic tasks
+
+### Benchmarking DNA Sequence Models for Causal Regulatory Variant Prediction in Human Genetics
+
+### DNALONGBENCH: a benchmark suite for long-range DNA prediction tasks
+
+### THE HUMAN GENOMICS LONG-RANGE BENCHMARK: ADVANCING DNA LANGUAGE MODELS
+
+### Genomic benchmarks: a collection of datasets for genomic sequence classification
+
+### Unsupervised evaluation of pre-trained DNA language model embeddings
+
+### Benchmarking pre-trained genomic language models for RNA sequence-related predictive applications
+
+
+---
 
 ## Deep learning modeling of ribosome profiling reveals regulatory underpinnings of translatome and interprets disease variants
 
