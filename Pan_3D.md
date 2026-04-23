@@ -107,6 +107,34 @@ Some TEs appear highly correlated with chromatin interactions
 
 
 
+## Haplotype-Resolved 3D Genomic Landscapes and Their Impacts on Agronomic Traits in Grapevine
+
+Haplotype-Resolved A/B Compartments Landscapes in TS and PN
+
+Haplotype-Resolved TADs in TS and PN
+
+Distinct TAD State Transitions Between Haplotypes
+
+Transcriptional Consequences of Haplotype-Specific TAD State Transitions
+
+Structural Variants Shape Haplotype-Specific 3D Genome Architecture
+
+Phased 3D Genome Variations are Linked to Key Agronomic Traits
+
+
+## haplotype-specific TAD
+
+2. 使用“合并-回射”法（Pooled-to-Haploid Strategy）
+这是目前单倍型研究中最稳健的方法，因为它避免了直接在极低深度数据上“盲找”。
+
+Pooled Calling： 将所有读段（不分单倍型）合并，计算出一套高质量的 “参考 TAD 边界”。
+
+Haploid Extraction： 在单倍型特异性矩阵（Hap1, Hap2）中，分别计算这些参考边界位置的绝缘指数（Insulation Score）。
+
+Differential Testing： 通过统计学检验比较 Hap1 和 Hap2 在同一位置的绝缘强度差异。如果强度差异显著，则判定为单倍型特异性 TAD。
+
+
+
 
 After iterative correction and eigenvector decomposition [28] and quantile normalization [29], we generated 31 Hi-C contact maps at 20-kb resolution (~ 83.12% of bins had at least 1000 intra-chromosomal contacts, which were highly reproducible between biological replicates (median stratumadjusted correlation coefficient, SCC > 0.905; Fig. 1B)
 
