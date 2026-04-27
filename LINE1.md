@@ -1,3 +1,17 @@
+
+# Recurrent LINE 1 exonization drives transcriptome remodelling in NSCLC
+
+Transcriptomic dysregulation and association with LINE-1 expression in NSCLC
+
+LINE-1 associated exonization and its relationship with oncogenic gene expression in NSCLC
+
+Genomic distribution, strand bias, and splice site architecture of LINE-1 exonization events
+
+Genome browser visualization of LINE-1 associated exonization events in NSCLC
+
+
+
+
 # LINE-1上的甲基化特点是怎样的？
 
 LINE-1（L1）的DNA甲基化是维持基因组稳定性的核心表观遗传机制。由于L1序列占据了人类基因组的约17%，其甲基化状态不仅决定了转座子的沉默与否，通常也被视作**全基因组甲基化水平的“晴雨表”**（Surrogate marker）。
