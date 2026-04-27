@@ -1,5 +1,5 @@
 
-# Recurrent LINE 1 exonization drives transcriptome remodelling in NSCLC
+## Recurrent LINE 1 exonization drives transcriptome remodelling in NSCLC
 
 Transcriptomic dysregulation and association with LINE-1 expression in NSCLC
 
@@ -8,6 +8,23 @@ LINE-1 associated exonization and its relationship with oncogenic gene expressio
 Genomic distribution, strand bias, and splice site architecture of LINE-1 exonization events
 
 Genome browser visualization of LINE-1 associated exonization events in NSCLC
+
+
+## Chromosomal Inversions Mediated by Tandem Insertions of Transposable Elements
+
+panTEannot: a TEannot adaptation
+
+panREPET pipeline
+
+Retracing shared TE insertions
+
+Benchmarking panREPET
+
+Core TE insertions
+
+TE insertion dates
+
+Factors affecting the transposition dynamics of TE families
 
 
 
