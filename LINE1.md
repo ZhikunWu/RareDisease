@@ -27,6 +27,18 @@ TE insertion dates
 Factors affecting the transposition dynamics of TE families
 
 
+## A comprehensive transposable element	insertions catalog of the human genome
+
+catalog human	transposable	element	insertions
+
+TE impact on methylation
+
+TE impact on expression
+
+catalog for pangenome 
+
+full length TE copies
+
 
 
 # LINE-1上的甲基化特点是怎样的？
