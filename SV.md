@@ -2,9 +2,7 @@
 ## somatic SVs from long read
 
 [SomaSV](https://github.com/eioyuou/SomaSV)
-
 [Severus]()
-
 [Savana]
 
 [nanomonsv]
