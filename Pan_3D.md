@@ -38,6 +38,45 @@ Y117	NA19240	NA19239	NA19238	YRI	AFR
 ---
 
 
+## Reconstructing the 3D genome organization of Neanderthals reveals that chromatin folding shaped phenotypic and sequence divergence
+
+Reconstructing the 3D genome organization of archaic hominins
+
+Archaic hominin and modern human genomes exhibit a range of 3D divergence
+
+3D genome organization diverges between AH and MH at 167 genomic loci
+
+Regions with 3D divergence highlight AH-MH phenotypic differences
+
+Relationship between sequence divergence and 3D divergence
+
+Maintenance of 3D genome organization constrained sequence diver- gence in recent hominin evolution
+
+
+
+
+
+
+## Hi-C for genome-wide detection of enhancerhijacking rearrangements in routine lymphoid cancer biopsies
+
+FFPE Hi-C identifies topological features across a range of read depths
+(range 3.5M–89.5M unique valid pairs)
+
+FFPE Hi-C captures state-selective topological features
+
+FFPE Hi-C detects oncogenic SVs
+
+FFPE Hi-C supports heterologous IGH enhanceroncogene interactions
+
+FFPE Hi-C identifies enhancer-hijacking rearrangements at diverse loci
+
+FFPE Hi-C detects large oncogenic copy-number alterations
+
+Hi-C distinguishes BCL6 gene-activating from BCL6-LCR-donating events
+
+FFPE Hi-C identifies enhancer-donating partners for MYC rearrangements
+
+MYC topology, enhancers, and breakpoints are correlated in DLBCL and MM
 
 
 ## Pan-3D Genome Analysis Reveals the Roles of Structural Variation in Chicken Chromatin Architectures, Domestication and Production Traits
