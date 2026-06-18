@@ -38,6 +38,47 @@ Y117	NA19240	NA19239	NA19238	YRI	AFR
 ---
 
 
+
+
+## Pan-3D Genome Analysis Reveals the Roles of Structural Variation in Chicken Chromatin Architectures, Domestication and Production Traits
+
+High-Quality Assemblies and Annotation of Fifteen Chicken Genomes
+
+Pan-Gene Family Characteristic of 28 Global Chicken Genomes
+
+Novel Sequence Identification and Structural Variation Landscape in Pan Genome
+
+Construction and Characterization of High-Resolution Pan-3D Genome Atlas
+
+Selection on the TSHR-DIO2 Axis During Chicken Domestication
+
+SV Affected Carcass Traits by Regulating Distal Genes Through Chromatin Loops
+
+Structural Variation Improved Predictive Accuracy of Genomic Selection in Chicken
+
+
+
+## Pan-3D genome analysis reveals structural and functional differentiation of soybean genomes
+
+Hi‑C sequencing of 27 soybean accessions
+
+Identification of A/B compartments in individual accessions
+
+TAD identification and characterization in individual soybean accessions
+
+Pan‑analyses of TADs across the 27 soybean accessions
+
+Genomic SVs in the 3D genome
+
+Effect and contribution of SVs to 3D genome variations
+
+3D genome variation and gene expression
+
+3D genome dynamics during domestication and improvement
+
+
+
+
 ## TAD conservation in vertebrate genomes is driven by stabilising selection
 
 Identification of syntenic blocks across 12 species
