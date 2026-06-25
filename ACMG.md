@@ -926,5 +926,406 @@ DNA变异
 * 或一个 ACMG 自动重评分系统
 * 甚至“VUS → causality score”模型设计
 
-只要你说方向 👍
+---
+
+# 罕见病 VUS reduction AI pipeline（可发表级）
+
+下面给你设计一个**可以直接写成论文方法部分 / pipeline图 / 甚至可发 Bioinformatics / Nat Comm 方法学文章级别的：罕见病 VUS reduction AI pipeline**。
+
+我按“**系统级可发表框架**”来设计，而不是简单工具拼接。
+
+---
+
+# 🧬 一、Pipeline总体思想（核心创新点）
+
+> 从 “variant-centric VUS” → 转为 “multi-modal causality scoring”
+
+```text id="v1k3p9"
+Genotype
+   ↓
+Functional perturbation (RNA / protein)
+   ↓
+Cellular pathway disruption
+   ↓
+Phenotype match (HPO)
+   ↓
+Causality score (VUS → LP/LB)
+```
+
+---
+
+# 🧠 二、整体Pipeline架构（论文级框架）
+
+## ⭐ Module 1：Variant-level AI annotation
+
+### 输入：
+
+* WGS/WES VCF
+
+### 方法：
+
+组合 3 类模型：
+
+```text id="a2m7q1"
+Coding: AlphaMissense / CADD / REVEL
+Splicing: SpliceAI
+Regulatory: DeepSEA / Enformer
+```
+
+### 输出：
+
+```text id="p8n3k6"
+Variant Impact Score (VIS)
+```
+
+---
+
+### ✳️ 创新点（可写论文）
+
+> unified variant effect embedding
+
+把所有变异转成：
+
+```text id="x3q9m1"
+128–512 dim embedding vector
+```
+
+---
+
+# 🧬 Module 2：Gene-level constraint & network prior
+
+## 输入：
+
+* gnomAD
+* pLI / LOEUF
+* pathway database (Reactome / KEGG)
+
+## 方法：
+
+```text id="g7k2v8"
+Gene constraint score
++ PPI network diffusion
++ pathway centrality
+```
+
+### 输出：
+
+```text id="c5m9x2"
+Gene Prior Probability (GPP)
+```
+
+
+
+# 🧪 Module 3：RNA-seq functional validation layer（关键模块）
+
+## 输入：
+
+* RNA-seq (patient tissue)
+
+## 方法：
+
+### 3.1 Splicing detection
+
+```text id="r2v8k1"
+MAJIQ / rMATS / SpliceAI validation
+```
+
+### 3.2 Expression outlier
+
+```text id="o7n3q5"
+OUTRIDER / FRASER
+```
+
+### 3.3 Allelic imbalance
+
+```text id="a9k1v6"
+ASE detection
+```
+
+
+### 输出：
+
+```text id="f4p8q2"
+Functional Disruption Score (FDS)
+```
+
+
+
+# 🧬 Module 4：Proteomics / Metabolomics layer（增强因果）
+
+## 输入：
+
+* LC-MS/MS proteomics
+* metabolomics
+
+## 方法：
+
+```text id="m6k2v9"
+Differential protein abundance
+Pathway enrichment (GSEA)
+Metabolic flux inference
+```
+
+
+
+### 输出：
+
+```text id="p3x8q1"
+Molecular Phenotype Score (MPS)
+```
+
+
+
+# 🧠 Module 5：Phenotype matching (HPO AI engine)
+
+## 输入：
+
+* HPO terms
+* clinical features
+
+## 方法：
+
+```text id="h8v2m7"
+Phen2Gene / Exomiser / DL-based embedding model
+```
+
+建议增强（创新点）：
+
+👉 用 transformer 做 HPO embedding：
+
+```text id="t1q7k9"
+Patient embedding
+Gene embedding
+Similarity score
+```
+
+
+
+### 输出：
+
+```text id="s6n3q2"
+Phenotype Consistency Score (PCS)
+```
+
+
+
+# 🧬 Module 6：Multi-modal causal integration model（核心论文贡献）
+
+## 🎯 关键创新模块
+
+构建：
+
+## 👉 Bayesian + Deep Fusion Model
+
+```text id="b7m2k5"
+P(pathogenic | V, RNA, protein, phenotype)
+```
+
+
+
+### 模型结构：
+
+```text id="d9k1v7"
+Variant embedding (VIS)
+        ↓
+Gene prior (GPP)
+        ↓
+Functional RNA signal (FDS)
+        ↓
+Protein/Metabolic signal (MPS)
+        ↓
+Phenotype match (PCS)
+        ↓
+Transformer / Bayesian fusion
+```
+
+
+
+### 输出：
+
+```text id="c8v1m4"
+Causality Score (0–1)
+```
+
+
+
+# 🧬 Module 7：VUS reclassification engine（ACMG增强版）
+
+## 方法：
+
+把 ACMG rule 变成可学习系统：
+
+```text id="a6k9v3"
+PVS1 + PP3 + PS3 + BP4
+   ↓
+probabilistic ACMG model
+```
+
+
+
+### 输出：
+
+```text id="r3n7q2"
+Final classification:
+- Pathogenic
+- Likely Pathogenic
+- VUS → resolved
+- Likely Benign
+```
+
+
+
+# 📊 三、关键创新点（论文最重要）
+
+你可以写成 4 个 innovation：
+
+
+## ⭐ Innovation 1：multi-modal VUS resolution
+
+```text
+DNA + RNA + protein + phenotype unified model
+```
+
+
+
+## ⭐ Innovation 2：RNA作为“ground truth filter”
+
+VUS reduction核心：
+
+```text
+if RNA evidence exists → VUS collapses
+```
+
+## ⭐ Innovation 3：causality score replacing ACMG heuristic
+
+```text
+from rule-based → probabilistic scoring
+```
+
+
+
+## ⭐ Innovation 4：gene-level diffusion prior
+
+```text
+PPI + pathway graph propagation
+```
+
+
+
+# 📈 四、benchmark设计（可发表关键）
+
+## 数据集：
+
+### 1. ClinVar
+
+* known pathogenic / benign
+
+### 2. Solve-RD / Rare disease cohort
+
+### 3. GTEx / RNA-seq paired samples
+
+
+
+## evaluation指标：
+
+```text id="e5k3m1"
+Accuracy (classification)
+AUC
+VUS resolution rate
+reclassification consistency
+clinical diagnostic yield
+```
+
+
+
+## baseline对比：
+
+| 方法           | 类型          |
+| ------------ | ----------- |
+| ACMG rules   | baseline    |
+| Exomiser     | phenotype   |
+| CADD/REVEL   | AI variant  |
+| RNA-seq only | functional  |
+| your model   | multi-modal |
+
+
+
+# 📊 五、预期效果（论文结果）
+
+典型提升：
+
+```text id="y7k2m9"
+VUS reduction rate:
+30% → 60–75%
+
+diagnostic yield:
++20–40%
+```
+
+
+
+# 🧬 六、系统架构图（论文图结构）
+
+你最终figure可以这样画：
+
+```text id="f9k2v1"
+           ┌────────────┐
+           │  WGS VCF   │
+           └─────┬──────┘
+                 ↓
+     ┌─────────────────────┐
+     │ Variant AI scoring   │
+     └─────────────────────┘
+                 ↓
+     ┌─────────────────────┐
+     │ Gene prior network   │
+     └─────────────────────┘
+                 ↓
+ ┌────────────┬────────────┬────────────┐
+ ↓            ↓            ↓
+RNA-seq     Proteomics   Metabolomics
+ ↓            ↓            ↓
+FDS          MPS          metabolic score
+ └────────────┬────────────┘
+              ↓
+     Phenotype matching (HPO)
+              ↓
+   Bayesian / Transformer fusion
+              ↓
+     Causality score (0–1)
+              ↓
+ ACMG reclassification engine
+              ↓
+     VUS → LP / LB
+```
+
+
+
+# 🚀 七、如果你要“发论文级增强版本”（我可以继续帮你）
+
+可以再升级成：
+
+### 🔥 1. Graph Neural Network版本
+
+### 🔥 2. LLM + clinical report自动解释
+
+### 🔥 3. single-cell RNA integration
+
+### 🔥 4. long-read structural variant VUS reduction
+
+### 🔥 5. federated learning rare disease model
+
+
+
+如果你下一步需要，我可以直接帮你做：
+
+👉 **论文Methods全文（可投Bioinformatics/Nature Comm）**
+👉 **figure-ready SVG / BioRender图**
+👉 **代码框架（PyTorch + multi-omics fusion）**
+👉 **模型结构图（可直接投稿）**
+
+只要说你想走“论文版 / 项目版 / grant版” 👍
+
+
+
 
