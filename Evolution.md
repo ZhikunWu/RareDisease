@@ -1,4 +1,18 @@
 
+# A global map for introgressed structural variation and selection in humans
+
+High-quality, haplotype-phased Papuan assemblies
+
+Genomic variation in the Papuan assemblies
+
+A global map of genomic introgression from archaic hominins
+
+Adaptive introgression in PNG genomes
+
+Potential centromere introgression from archaic hominins in the PNG genomes
+
+
+
 # Processed pseudogenes as dynamic substrates of vertebrate genome evolution
 
 Retrocopies dominate vertebrate pseudogene landscapes and track non-LTR retrotransposon content
