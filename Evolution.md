@@ -1,4 +1,43 @@
 
+# Processed pseudogenes as dynamic substrates of vertebrate genome evolution
+
+Retrocopies dominate vertebrate pseudogene landscapes and track non-LTR retrotransposon content
+
+Conserved formation bias and lineage-specific sculpting shape retrocopy repertoires
+
+ORF retention and selective constraint identify functionally recruited retrocopies
+
+Sex chromosome-autosome retrocopy trafficking reveals MSCI-driven asymmetry in mammals
+
+Cancer gene retrocopies reveal tumor suppressor bias in large-bodied and long-lived lineages
+
+A comprehensive retrocopy resource for the vertebrate genomics community
+
+
+
+# The Vertebrate Genomes Project Phase I: A global reference genome resource
+
+A high-quality phylogenomic resource
+
+Genomic content across vertebrates
+
+Regulatory elements across vertebrates
+
+Genome evolution across vertebrates
+
+Gene family evolution
+
+Comparative genomics of traits and diseases
+
+Species conservation
+
+Genome assemblies were annotated using the NCBI RefSeq Eukaryotic Genome Annotation Pipeline (EGAP)4 or its publicly available implementation, EGAPx. 
+
+RepeatModeler version 2.0.4/December 2022 was used to generate RepeatMasker family libraries. The assemblies were repeat-masked with RepeatMasker versions 4.1.4 family libraries for earlier obtained assemblies and version 4.1.7-p1 for later obtained assemblies.
+
+
+---
+
 ## Chromosome fusions repatterned recombination rate and facilitated reproductive isolation during Pristionchus nematode speciation
 
 ### Phylogenetic tree reconstruction
