@@ -37,6 +37,21 @@ Y117	NA19240	NA19239	NA19238	YRI	AFR
 
 ---
 
+# Evolutionary patterns and functional effects of 3D chromatin structures in butterflies with extensive genome rearrangements
+
+Genome assembly, annotation, and phylogenetic analysis
+
+Drastic genome rearrangements in Graphium butterflies
+
+Identification of 3D chromatin structures of butterflies revealed by Hi-C
+
+Impact of inter-chromosome fusions on 3D chromatin structures
+
+Alteration of 3D chromatin structures with intra-chromosome rearrangements
+
+3D chromatin structure evolution in the Hox gene cluster of insects
+
+
 
 ## Reconstructing the 3D genome organization of Neanderthals reveals that chromatin folding shaped phenotypic and sequence divergence
 
