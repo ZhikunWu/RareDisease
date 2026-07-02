@@ -1,3 +1,126 @@
+# GENESPACE画出多个物种共线性图的各个步骤是怎样的
+
+GENESPACE（通常在 R 环境下运行）是目前利用长读长和高质量二倍体/多倍体基因组进行**多物种大规模共线性分析与可视化**的明星级工具。它底层主要依赖 OrthoFinder 寻找同源基因，并通过 MCScanX 算法精细化构筑共线性区块，最终绘制出极具美感的全基因组点图或环状/线性共线性图。
+
+利用 GENESPACE 从头到尾绘制多个物种共线性图，核心包含以下 5 个标准步骤：
+
+---
+
+### 步骤 1：准备输入数据（严格的数据集结构）
+
+GENESPACE 对输入文件的路径和命名有非常严格的要求。你需要在本地创建一个主工作目录（如 `genespace_wd/`），并在其下建立一个名为 `rawGenomes/` 的子文件夹。
+
+每个物种需要准备两个核心文件，并存放在以该**物种名命名的子文件夹**中：
+
+1. **单拷贝最长转录本的肽序列文件（`.fa` 或 `.fasta`）**：通常为全基因组所有基因的最长转录本蛋白序列。
+2. **简化版的基因注释文件（`.gff` 或 `.gff3`）**：只需包含基因的染色体、起始位置、终止位置和基因 ID。
+
+**标准目录树结构示例：**
+
+```text
+genespace_wd/
+└── rawGenomes/
+    ├── speciesA/
+    │   ├── speciesA.fa
+    │   └── speciesA.gff
+    └── speciesB/
+        ├── speciesB.fa
+        └── speciesB.gff
+
+```
+
+---
+
+### 步骤 2：格式化预处理（Format Raw Genomes）
+
+打开 R 环境，加载 GENESPACE 包。第一步是利用内置函数对原始的 FASTA 和 GFF 文件进行清洗和标准化，提取出 GENESPACE 能够直接读取的坐标与序列格式。
+
+```R
+library(GENESPACE)
+
+# 设置工作目录
+wd <- "/path/to/genespace_wd"
+
+# 运行格式化管线（自动解析并规范化各物种的 GFF 和 FASTA）
+parse_annotations(
+  wd = wd,
+  genomeIDs = c("speciesA", "speciesB", "speciesC"),
+  gffString = "gff",
+  faString = "fa"
+)
+
+```
+
+*执行后，GENESPACE 会在工作目录下自动生成 `genomes/` 等规范化后的中间文件夹。*
+
+---
+
+### 步骤 3：初始化 GENESPACE 对象
+
+在运行正式的计算前，需要构建一个配置对象，定义好参考基因组（Ref Genome）以及各个物种染色体的排序或过滤规则。
+
+```R
+gpar <- init_genespace(
+  wd = wd, 
+  genomeIDs = c("speciesA", "speciesB", "speciesC"),
+  refGenome = "speciesA" # 以 speciesA 作为基准参考物种
+)
+
+```
+
+---
+
+### 步骤 4：运行共线性核心计算管线（Run Pipeline）
+
+这是整个流程中耗时最长的一步。GENESPACE 将自动在后台依次执行以下核心算法：
+
+1. 调用 **OrthoFinder** 进行全互换（All-by-all）比对并聚类同源基因组（Orthogroups）。
+2. 调用 **MCScanX** 算法计算物种间的共线性区块（Syntenic blocks）。
+3. 进行位置内插（Interpolation），将未聚类上但物理位置处于共线性块内部的基因补齐。
+
+```R
+# 一键运行全部核心计算
+gpar <- run_genespace(gpar)
+
+```
+
+*计算完成后，所有的共线性坐标、同源对等核心数据均会保存在 `gpar` 对象以及工作目录的 `results/` 文件夹中。*
+
+---
+
+### 步骤 5：可视化绘图（Plot Synteny）
+
+GENESPACE 提供了极其强大的多物种线性共线性图（Riparian plot）绘制函数。你可以通过参数自定义染色体的颜色、高亮特定染色体、隐藏隐性重复（以防多倍体过多导致线条太杂）。
+
+#### ① 绘制经典的经典多物种多线共线性图（Riparian Plot）
+
+```R
+# 默认绘制所有输入物种的并行共线性缎带图
+plot_riparian(gpar)
+
+```
+
+#### ② 自定义高亮与美化调参
+
+```R
+plot_riparian(
+  gpar,
+  highlightGenomes = "speciesA",        # 高亮某一特定物种的贡献
+  backgroundCol = "grey90",             # 背景未高亮线条的颜色
+  chromosomes = c("chr1", "chr2"),      # 仅展示特定的几条染色体
+  reorderChrs = TRUE                    # 自动根据共线性对齐重新对染色体排序，减少交叉线
+)
+
+```
+
+### 💡 实战避坑提示：
+
+1. **基因 ID 必须完全一致**：`.fa` 文件中的 Sequence Header（`>GeneID`）必须与 `.gff` 文件中的第九列（ID=GeneID）完全精确匹配，否则在步骤 2 格式化时会报错或匹配出空文件。
+2. **多线程加速**：OrthoFinder 比对非常消耗算力，在执行 `run_genespace` 前，可以通过设置 R 的环境变量或给函数传递 `nCores = 16` 参数来启用多核心并行加速。
+
+
+
+---
 
 # A global map for introgressed structural variation and selection in humans
 
