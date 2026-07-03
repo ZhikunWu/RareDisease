@@ -1,3 +1,24 @@
+
+# NCBI genome assembly filter:
+
+1.Assembly Sequencing Tech至少包含nanopore（ont）或者pabio；
+2. Assembly Stats Number of Scaffolds小于2000；
+3. Assembly Stats Total Number of Chromosomes小于100；
+4. Assembly Stats Total Sequence Length大于50 Mb；
+5. Assembly Paired Assembly Accession不为空的话选择Assembly Accession中GCF开头的，去除另一个记录；
+6.相同Organism Name的时候，Organism Infraspecific Names Strain或者Organism Infraspecific Names Cultivar中完全一样的时候，只选一个记录，优先hap1, pri,或者mar
+
+
+Organism Name一样的记录中保留一个，按照以下条件进行筛选：
+1.优先保留Assembly Sequencing Tech中有hi-C，Arima，或其他有类似hi-C数据的；
+2.优先保留记录中存在T2T，或者Assembly Level中有complete的；
+3.进一步筛选Annotation Release Date最近日期的；
+4.进一步筛选Assembly Stats Total Sequence Length中较长的；
+5.如果筛选到某一步只剩一条记录则不再进行筛选；
+
+
+---
+
 # GENESPACE画出多个物种共线性图的各个步骤是怎样的
 
 GENESPACE（通常在 R 环境下运行）是目前利用长读长和高质量二倍体/多倍体基因组进行**多物种大规模共线性分析与可视化**的明星级工具。它底层主要依赖 OrthoFinder 寻找同源基因，并通过 MCScanX 算法精细化构筑共线性区块，最终绘制出极具美感的全基因组点图或环状/线性共线性图。
