@@ -1,3 +1,4 @@
+
 # Model benchmark
 
 ### Evaluating the representational power of pre-trained DNA language models for regulatory genomics
@@ -19,7 +20,28 @@
 ### Benchmarking pre-trained genomic language models for RNA sequence-related predictive applications
 
 
+
+
 ---
+
+
+# Pre-training genomic language model with variants for better modeling functional genomics
+
+Method overview
+
+Pre-trained UKBioBERT learns better gene representations
+
+Embeddings from UKBioBERT can enhance model performance for gene expression prediction at the cell-type level
+
+Embeddings from UKBioBERT can recover the predictability of gene expression levels across different conditions
+
+Fine-tuned UKBioFormer predicts more accurate gene expression levels across individuals compared with baselines
+
+UKBioFormer can identify the direction of eQTL effects with the help of neural network explainability
+
+
+
+
 
 ## Deep learning modeling of ribosome profiling reveals regulatory underpinnings of translatome and interprets disease variants
 
