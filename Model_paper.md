@@ -25,6 +25,18 @@
 ---
 
 
+# Omnireg-gpt: a high-efficiency foundation model for comprehensive genomic sequence understanding
+
+Benchmark of genomics foundational models
+
+OmniReg-GPT improves context-dependent gene expression prediction
+
+OmniReg-GPT accurately predicts single-cell chromatin accessibility and transcription factor activity
+
+OmniReg-GPT predicts 3D chromatin organization
+
+
+
 # Pre-training genomic language model with variants for better modeling functional genomics
 
 Method overview
