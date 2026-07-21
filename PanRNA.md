@@ -1,3 +1,24 @@
+# data
+
+[2025_LR-RNA-seq_GeneAnnotationBias_NatComm](https://github.com/Mele-Lab/2025_LR-RNA-seq_GeneAnnotationBias_NatComm/tree/master)
+
+[TRAILS](https://github.com/juninamo/TRAILS): Long-read sequencing for 29 immune cell subsets reveals disease-linked isoforms
+PRJDB17558
+
+A systematic benchmark of Nanopore long-read RNA sequencing for transcript-level analysis in human cell lines
+https://www.ebi.ac.uk/ena/browser/view/PRJEB44348
+
+High-throughput RNA isoform sequencing using programmed cDNA concatenation
+https://github.com/broadinstitute/mas-seq-paper-data
+
+Sources of gene expression variation in a globally diverse human cohort
+https://www.ncbi.nlm.nih.gov/bioproject/PRJNA851328
+
+Mapping medically relevant RNA isoform diversity in the aged human frontal cortex with deep long-read RNA-seq
+https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1008058
+
+
+
 # Haplotype-aware pantranscriptome analyses using spliced pangenome graphs
 
 # PanGraphRNA An efficient and flexible bioinformatics platform for graph pangenome‐based RNA‐seq data analysis
