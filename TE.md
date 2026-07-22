@@ -1,3 +1,16 @@
+
+# PanTE
+1.HPRC HiFi data, HGSVC HiFi data, 1k genome ONT, in-house ONT data, Arab Pangenome, Japanese Pangenome
+2. Detect SVs by at least two of three tools, HiFi: pbsv, sniffles, cuteSV  ONT: sniffles, cuteSV, svim
+3. Merge SVs from all sample by Jasmine
+4. Detect TEs based on sequences of SVs by RepeatModeler and RepeatMasker
+5. Detect complete TEs
+6. TEs effect to gene expression or isoform
+7. TEs effect to TAD from Hi-C data 
+8. evolution of TEs of primates
+9. PanTE and the application
+
+
 # Pan TE
 1. PanTE -> 1kg -> imputation
 2. TE -> 1kg evolution
