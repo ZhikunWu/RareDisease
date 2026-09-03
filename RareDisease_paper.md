@@ -1,9 +1,10 @@
 
-可以。你这个问题如果从**“罕见病大型队列 + 基因组学/表型 + 新基因发现/罕见变异 burden/诊断/多组学”**这个方向来找，近四年（约 **2022.9–2026.9**）其实有一批非常值得系统阅读的文章。
+# 罕见病重要文章
+
 
 我先给你做一个**尽可能全面的第一轮清单**，重点放在 **Nature / Nature Genetics / Nature Medicine / Nature Communications / AJHG / Genetics in Medicine** 等高水平期刊，而且优先选择真正使用了**数千到数万甚至十万级罕见病或相关基因组数据**的研究。
 
----
+
 
 # 一、最值得优先看的 TOP 15
 
@@ -1345,4 +1346,1149 @@ new diagnosis
 [22]: https://www.nature.com/articles/s41588-023-01637-y?utm_source=chatgpt.com "Public platform with 39,472 exome control samples enables association studies without genotype sharing | Nature Genetics"
 [23]: https://www.nature.com/articles/s41576-023-00683-w?utm_source=chatgpt.com "The expanding diagnostic toolbox for rare genetic diseases | Nature Reviews Genetics"
 [24]: https://www.nature.com/articles/s41588-025-02160-y?utm_source=chatgpt.com "Toward clinical long-read genome sequencing for rare diseases | Nature Genetics"
+
+
+# 基因型和表型关系构建工具
+
+
+在罕见病队列里，**“基因型 + 表型联合”真正有价值的地方，不是简单把 HPO 当作注释列，而是把表型作为一个概率或相似度证据，与变异的致病性、频率、遗传模式、家系共分离等信息一起进入候选基因/候选变异排序模型**。
+
+目前做得比较成熟、在大型罕见病项目里也比较常用的方法，基本可以分成 5 类：**表型相似度打分、表型驱动基因排序、表型+变异联合排序、贝叶斯/似然模型、AI/NLP 自动表型提取与联合推断**。
+
+我比较推荐你优先关注下面这些工具。
+
+| 工具             | 输入                                  |   是否直接联合 VCF | 核心思想                                                       | 适合场景                   | 推荐度   |
+| -------------- | ----------------------------------- | -----------: | ---------------------------------------------------------- | ---------------------- | ----- |
+| **Exomiser**   | VCF + PED + HPO                     |            是 | variant pathogenicity + phenotype similarity + inheritance | WES/WGS、trio/singleton | ★★★★★ |
+| **Genomiser**  | WGS VCF + HPO                       |            是 | Exomiser + noncoding regulatory variants                   | WGS、非编码变异              | ★★★★★ |
+| **LIRICAL**    | HPO + disease/genotype信息            |           部分 | likelihood ratio / Bayesian-style phenotype matching       | 鉴别诊断、疾病排序              | ★★★★★ |
+| **Phen2Gene**  | HPO                                 |            否 | phenotype → gene probability/ranking                       | 大队列预筛选                 | ★★★★  |
+| **PhenIX**     | VCF + HPO                           |            是 | phenotype similarity + variant filtering                   | Mendelian disease      | ★★★★  |
+| **hiPHIVE**    | HPO + gene/model-organism phenotype | 内置于 Exomiser | 人+鼠+鱼+PPI phenotype propagation                            | 新基因发现                  | ★★★★★ |
+| **Phenomizer** | HPO                                 |            否 | semantic similarity                                        | differential diagnosis | ★★★★  |
+| **AMELIE**     | HPO + candidate genes               |           间接 | NLP 文献挖掘 + phenotype-gene evidence                         | 新基因/VUS解释              | ★★★★  |
+| **DeepPVP**    | VCF + HPO                           |            是 | deep learning + phenotype similarity                       | 研究型 prioritization     | ★★★   |
+| **Phevor**     | phenotype ontology + gene           |           间接 | ontology propagation                                       | 新基因候选                  | ★★★   |
+| **Phenolyzer** | phenotype terms                     |            否 | disease/gene/network integration                           | gene prioritization    | ★★★   |
+| **AI-MARRVEL** | variant/gene + phenotype            |         是/部分 | AI + phenotype/genomic evidence                            | 临床候选筛选                 | ★★★★  |
+
+其中如果你是要做**大型罕见病队列的标准分析流程**，我会优先推荐：
+
+> **HPO标准化 → Exomiser → LIRICAL/Phen2Gene辅助 → ACMG/ClinGen → 未解决病例 Genomiser → 定期 reanalysis**
+
+这是目前比较稳妥的一条路线。
+
+---
+
+## 1. Exomiser：目前最值得优先使用
+
+如果你的输入是：
+
+```text
+WES/WGS VCF
++
+HPO
++
+PED
+```
+
+那么我认为 **Exomiser 是首选之一**。
+
+它不是单纯看 HPO，也不是单纯看 pathogenicity，而是大致构建：
+
+```text
+Variant evidence
+│
+├─ AF
+├─ consequence
+├─ REVEL
+├─ MVP
+├─ AlphaMissense
+├─ SpliceAI
+└─ ClinVar
+
+        +
+
+Inheritance
+│
+├─ AD
+├─ AR
+├─ X-linked
+├─ de novo
+└─ compound het
+
+        +
+
+Phenotype
+│
+├─ Patient HPO
+├─ Disease HPO
+├─ Human gene phenotype
+├─ Mouse phenotype
+└─ Zebrafish phenotype
+
+        ↓
+
+Final gene / variant score
+        ↓
+Candidate ranking
+```
+
+官方定位就是从 **VCF + HPO** 中寻找最可能的致病变异。([GitHub][1])
+
+而且大型队列已经证明这种策略很有效。在 100,000 Genomes Project 的已诊断病例中，Exomiser 可以把相当大比例的真实诊断排到前几个候选中；一项对 4,877 个诊断病例的分析中，真实诊断位于 Top 1、Top 3、Top 5、Top 10 的比例分别约为 **82.6%、91.3%、92.4%、93.6%**。([PubMed Central (PMC)][2])
+
+这个结果非常说明问题：
+
+> **表型并不是锦上添花，而是能显著缩小候选范围。**
+
+---
+
+# 2. Exomiser 里面最重要的是 hiPHIVE
+
+Exomiser 的 phenotype component 有几个模式：
+
+```text
+PhenIX
+PHIVE
+hiPHIVE
+```
+
+其中 **hiPHIVE** 最值得关注。
+
+它不只是：
+
+```text
+patient HPO
+vs
+known disease HPO
+```
+
+还会扩展到：
+
+```text
+Human phenotype
++
+Mouse phenotype
++
+Zebrafish phenotype
++
+PPI neighbors
+```
+
+所以对于：
+
+> **尚未建立明确 human gene–disease association 的新基因**
+
+也有一定识别能力。
+
+这对于你做**罕见病新基因发现**特别重要。
+
+不过很有意思的是，2025 年一项基于 UDN 已解决病例的系统优化研究发现：在已知临床诊断场景中，**human-only hiPHIVE** 的平均表现反而比默认的人+模型动物模式更好；但模型动物/PPI 模式对于少数新近发现基因仍可能把遗漏候选重新捞回来。([PubMed Central (PMC)][3])
+
+所以我比较推荐：
+
+```text
+Primary:
+human-only hiPHIVE
+
+Secondary / discovery:
+full hiPHIVE
+human + mouse + zebrafish + PPI
+```
+
+而不是只跑一次。
+
+---
+
+# 3. 2025 年 Exomiser 优化研究非常值得参考
+
+这篇我很建议你看：
+
+**An optimized variant prioritization process for rare disease diagnostics: recommendations for Exomiser and Genomiser**
+
+Genome Medicine，2025。
+
+他们使用了：
+
+> 386 个 UDN 已诊断 probands
+
+系统测试了：
+
+* HPO质量
+* HPO数量
+* VCF质量
+* family information
+* inheritance
+* pathogenicity predictors
+* phenotype model
+
+优化之后：
+
+### WGS
+
+真实 coding diagnostic variant 进入：
+
+> **Top 10：49.7% → 85.5%**
+
+### WES
+
+> **Top 10：67.3% → 88.2%**
+
+提升非常明显。([PubMed Central (PMC)][3])
+
+他们推荐的组合特别值得直接借鉴：
+
+```text
+Family VCF
++
+PED
++
+human-only hiPHIVE
++
+REVEL
++
+MVP
++
+AlphaMissense
++
+SpliceAI
++
+ClinVar whitelist
+```
+
+然后人工 review：
+
+> **Top 30 candidates**
+
+([PubMed Central (PMC)][3])
+
+---
+
+# 4. LIRICAL：我认为第二个应该重点使用
+
+LIRICAL 和 Exomiser 思路不完全一样。
+
+它更像：
+
+> **给定患者表型，这个疾病出现这些表型的概率有多大？**
+
+它不是单纯 semantic similarity，而更接近：
+
+```text
+Likelihood Ratio
+
+LR =
+P(phenotype | disease)
+────────────────────
+P(phenotype | not disease)
+```
+
+然后多个 phenotype：
+
+```text
+HPO1
+HPO2
+HPO3
+HPO4
+...
+ ↓
+Likelihood ratios
+ ↓
+Combined likelihood
+ ↓
+Disease ranking
+```
+
+这有一个非常大的优点：
+
+> **能够利用“有”和“没有”的表型。**
+
+比如：
+
+```text
+Patient:
+Developmental delay +
+Seizure +
+Microcephaly +
+Hearing loss -
+
+Disease A:
+DD +
+Seizure +
+Microcephaly +
+Hearing loss +
+
+Disease B:
+DD +
+Seizure +
+Microcephaly +
+Hearing loss -
+```
+
+传统 phenotype overlap 可能两者都很像。
+
+LIRICAL 会认为：
+
+> absence of hearing loss
+
+本身也具有诊断信息。
+
+所以如果你的临床数据里有：
+
+```text
+present HPO
+absent HPO
+```
+
+LIRICAL 非常值得加入。
+
+---
+
+# 5. Phen2Gene：非常适合大规模 cohort
+
+Phen2Gene 更简单，但非常实用。
+
+输入：
+
+```text
+HP:0001250
+HP:0001263
+HP:0000252
+...
+```
+
+输出：
+
+```text
+Gene     phenotype_score
+GENE1    0.92
+GENE2    0.88
+GENE3    0.76
+...
+```
+
+它构建了一个：
+
+> **HPO → Gene knowledgebase**
+
+然后根据不同 HPO 的信息量进行加权。([PubMed Central (PMC)][4])
+
+最大的优势是：
+
+> **非常快。**
+
+原始 benchmark 的中位运行时间不到 1 秒量级，因此非常适合：
+
+```text
+10,000 patients
+×
+HPO
+```
+
+先做 phenotype gene prioritization。
+
+之后再和你的 VCF 结果 intersect：
+
+```text
+Phen2Gene Top 1000 genes
+        ∩
+rare damaging variants
+        ↓
+candidate genes
+```
+
+这对于 **singleton WES** 特别实用。
+
+---
+
+# 6. Phenomizer：适合 disease-level differential diagnosis
+
+Phenomizer 是 HPO 官方体系中非常经典的一类方法。
+
+基本逻辑：
+
+```text
+Patient HPO profile
+        ↓
+Semantic similarity
+        ↓
+OMIM / disease phenotype
+        ↓
+Disease ranking
+```
+
+所以它更适合回答：
+
+> “这个患者最像什么疾病？”
+
+而不是：
+
+> “VCF 中哪个 variant 最可能致病？”
+
+HPO 官方目前也把：
+
+* Exomiser
+* Genomiser
+* Phenomizer
+* Profile Search
+
+作为 phenotype-driven analysis 工具体系的一部分。([人类表型本体][5])
+
+---
+
+# 7. AMELIE：解决“数据库落后于文献”的问题
+
+这类工具非常有意义。
+
+Exomiser 很依赖：
+
+```text
+OMIM
+Orphanet
+HPO annotations
+ClinVar
+```
+
+但是罕见病领域经常出现：
+
+```text
+2026 January:
+new gene-disease paper published
+
+↓
+OMIM / HPO 尚未完全更新
+```
+
+这时候传统方法可能没有 gene–phenotype association。
+
+AMELIE 的优势是：
+
+> **直接从 biomedical literature 中挖掘 gene–disease–phenotype evidence。**
+
+逻辑类似：
+
+```text
+Patient HPO
++
+Candidate gene
+        ↓
+Search millions of papers
+        ↓
+Gene-disease evidence
++
+Phenotype match
+        ↓
+Candidate ranking
+```
+
+所以非常适合：
+
+* novel disease genes
+* recent literature
+* VUS
+* 新表型扩展
+
+我会把它放在：
+
+> **Exomiser Top 30–100 candidate 的二次解释阶段**
+
+而不是作为第一层筛选。
+
+---
+
+# 8. DeepPVP
+
+DeepPVP 是：
+
+> phenotype-based variant prioritization + deep learning
+
+把：
+
+```text
+variant pathogenicity
++
+phenotype similarity
++
+gene knowledge
+```
+
+联合起来，通过神经网络预测 causal variant。其论文报告相对于若干早期 phenotype-based 方法有性能提升。([PubMed Central (PMC)][6])
+
+不过如果是大规模真实临床 cohort，我目前还是更推荐：
+
+> Exomiser / Genomiser
+
+而 DeepPVP 更适合作为研究性辅助工具。
+
+---
+
+# 9. Genomiser：WGS 的重要补充
+
+如果你只有 WES：
+
+```text
+Exomiser
+```
+
+基本已经覆盖主要 coding variant。
+
+但如果你有 WGS，我强烈建议增加：
+
+```text
+Genomiser
+```
+
+因为它可以分析：
+
+```text
+promoter
+enhancer
+UTR
+intronic
+regulatory
+other noncoding variants
+```
+
+Genomiser 在 Exomiser 框架基础上加入了：
+
+> ReMM 等 noncoding pathogenicity evidence。
+
+([PubMed Central (PMC)][3])
+
+特别值得注意的是：
+
+### compound heterozygous
+
+比如：
+
+```text
+Gene X
+
+maternal:
+coding LoF
+
+paternal:
+deep intronic splice variant
+```
+
+Exomiser 可能只看到：
+
+```text
+一个 coding variant
+```
+
+无法构成 AR。
+
+Genomiser 可以识别：
+
+```text
+coding
++
+noncoding
+=
+compound heterozygous
+```
+
+2025 UDN benchmark 就明确观察到了这种情况。([PubMed Central (PMC)][3])
+
+---
+
+# 10. Hong Kong Genome Project 的实际经验也非常有参考价值
+
+2025 年 Hong Kong Genome Project 做了一个非常现实的大规模 benchmark：
+
+> **985 个 rare disease WGS patients**
+
+其中：
+
+* 207 positive
+* 778 negative
+
+对 Genomiser 做参数优化。
+
+优化后，在原本 negative cohort 中又发现了一批 noncoding candidates，并带来额外诊断贡献。([PubMed Central (PMC)][7])
+
+这说明：
+
+> **coding-first + noncoding-second**
+
+目前比一开始把全基因组所有变异同时塞进模型更实际。
+
+---
+
+# 11. HPO 本身的质量非常重要
+
+这里其实比选工具还重要。
+
+一个患者不要简单写：
+
+```text
+Developmental delay
+Abnormality of nervous system
+Seizure
+Abnormality of brain
+```
+
+这几个高度冗余。
+
+最好是：
+
+```text
+Global developmental delay
+Generalized tonic-clonic seizure
+Microcephaly
+Hypotonia
+Delayed speech and language development
+Abnormal EEG
+```
+
+也就是说：
+
+> **specific HPO > very broad HPO**
+
+HPO 本身已经包含超过 18,000 个 phenotype terms，并且与大量遗传病注释相连，是目前 rare disease phenotype 标准化的核心体系。([人类表型本体][5])
+
+---
+
+# 12. 不要只记录 positive phenotype
+
+这是很多队列容易忽视的问题。
+
+推荐记录：
+
+```text
+HPO_ID
+status
+onset
+severity
+age_at_exam
+```
+
+例如：
+
+```text
+HP:0001250    present    infancy
+HP:0000252    present    congenital
+HP:0000407    absent     age=10
+```
+
+特别是：
+
+> **明确 absent 的 phenotype**
+
+对于 differential diagnosis 非常有价值。
+
+例如：
+
+```text
+Disease A:
+ID + seizure + deafness
+
+Disease B:
+ID + seizure - deafness
+```
+
+如果患者明确：
+
+```text
+age 15
+normal hearing
+```
+
+这是一个非常强的 negative evidence。
+
+---
+
+# 13. 表型还应该考虑年龄依赖
+
+不能简单认为：
+
+```text
+没有 phenotype
+=
+negative phenotype
+```
+
+比如一个疾病：
+
+```text
+Cataract onset: 30–50 years
+```
+
+患者：
+
+```text
+3 years old
+No cataract
+```
+
+这个 absent 基本没有信息量。
+
+因此最好记录：
+
+```text
+age of onset
+age at last examination
+```
+
+这也是 phenotype likelihood 方法比简单 Jaccard similarity 更有优势的原因之一。
+
+---
+
+# 14. 推荐一个实际可落地的“Genotype + Phenotype”评分模型
+
+如果你自己做 cohort，而不完全依赖 Exomiser，我会建议构建：
+
+$$
+Score_{variant}
+=
+w_1G+
+w_2P+
+w_3I+
+w_4S+
+w_5C
+$$
+
+其中：
+
+### G：Genotype pathogenicity
+
+```text
+AF
+LoF
+REVEL
+AlphaMissense
+SpliceAI
+CADD
+ClinVar
+```
+
+### P：Phenotype similarity
+
+例如：
+
+```text
+Resnik similarity
+Lin similarity
+Information Content
+```
+
+### I：Inheritance
+
+```text
+de novo
+AR
+AD
+XL
+compound het
+```
+
+### S：Segregation
+
+```text
+affected carrier
+unaffected noncarrier
+parental origin
+```
+
+### C：Clinical evidence
+
+```text
+OMIM
+ClinGen
+Orphanet
+GeneReviews
+literature
+```
+
+最终：
+
+```text
+Variant score
+      ×
+Phenotype score
+      ×
+Inheritance probability
+      ↓
+Final posterior-like score
+```
+
+比：
+
+```text
+CADD > 20
+AND
+HPO gene overlap
+```
+
+要合理得多。
+
+---
+
+# 15. 如果是你这种大型 singleton-WES 队列，我建议这样设计
+
+如果很多病例没有父母，我不会强行照 trio pipeline 做。
+
+可以：
+
+```text
+                 Singleton WES
+                      │
+              ┌───────┴────────┐
+              ↓                ↓
+          Genotype          Phenotype
+              │                │
+       Rare variants          HPO
+              │                │
+     ┌────────┼──────┐         ↓
+     ↓        ↓      ↓      Phen2Gene
+    LoF    Missense Splice      │
+     │        │      │          │
+   pLI     REVEL  SpliceAI     ↓
+   LOEUF    AM     dbscSNV  gene score
+     │        │      │          │
+     └────────┴──────┴────┬─────┘
+                          ↓
+                       Exomiser
+                          ↓
+                 phenotype × variant
+                          ↓
+                  Top candidate genes
+                          ↓
+              ACMG / ClinGen evaluation
+                          ↓
+                  Candidate diagnosis
+```
+
+这一套非常适合批量跑。
+
+---
+
+# 16. Trio 的时候再加入遗传模型
+
+如果有 trio：
+
+```text
+Proband
+Father
+Mother
+```
+
+就可以额外加入：
+
+```text
+De novo
+Compound heterozygous
+Homozygous recessive
+X-linked
+Dominant inherited
+Mosaic
+```
+
+这样 phenotype + genotype 的威力会进一步增强。
+
+因为：
+
+```text
+variant pathogenicity = 0.8
+phenotype match = 0.9
+de novo compatible = yes
+gene known AD = yes
+```
+
+这种证据组合远远强于单纯 pathogenicity prediction。
+
+---
+
+# 17. 对新基因发现，不要把 HPO 筛得太死
+
+这是非常重要的一点。
+
+如果你做的是**诊断**：
+
+```text
+known disease-gene
++
+phenotype match
+```
+
+可以给高权重。
+
+但如果你做：
+
+> novel gene discovery
+
+绝对不要：
+
+```text
+if gene not in HPO/OMIM:
+    remove
+```
+
+因为这样一定找不到新基因。
+
+更好的策略：
+
+```text
+Tier 1
+known disease gene + strong HPO match
+
+Tier 2
+known disease gene + partial phenotype
+
+Tier 3
+novel gene
++ pathway/PPI/model organism phenotype support
+
+Tier 4
+novel biological candidate
+```
+
+这就是 hiPHIVE、Phen2Gene gene network、model organism data 有价值的地方。
+
+---
+
+# 18. 表型相似度建议采用 information-content based 方法
+
+不要简单：
+
+$$
+Similarity =
+\frac{shared\ HPO}{total\ HPO}
+$$
+
+因为：
+
+```text
+Seizure
+```
+
+和：
+
+```text
+Abnormality of nervous system
+```
+
+信息量完全不一样。
+
+比较合理的是：
+
+$$
+IC(t)=-\log P(t)
+$$
+
+越罕见、越特异的 phenotype：
+
+> IC 越高。
+
+例如：
+
+```text
+Developmental delay
+```
+
+信息量较低。
+
+而：
+
+```text
+Postaxial polydactyly type A
+```
+
+信息量较高。
+
+所以更加推荐：
+
+* Resnik
+* Lin
+* semantic similarity
+* likelihood-ratio
+
+而不是 HPO exact-match count。
+
+---
+
+# 19. 还可以增加 phenotype clustering
+
+如果你有几千到几万 rare disease patients，可以做：
+
+```text
+HPO matrix
+      ↓
+semantic similarity
+      ↓
+patient-patient similarity
+      ↓
+clustering
+      ↓
+phenotypic subgroups
+```
+
+然后：
+
+```text
+Cluster 1
+        ↓
+rare variant burden
+
+Cluster 2
+        ↓
+rare variant burden
+```
+
+这个对于**发现新的 disease-gene association**非常有价值。
+
+例如：
+
+```text
+5000 undiagnosed patients
+↓
+HPO clustering
+↓
+12 patients phenotype highly similar
+↓
+7 patients rare variants in same gene
+```
+
+这种证据比：
+
+```text
+全队列直接 burden
+```
+
+要强很多。
+
+---
+
+# 20. 更进一步：patient matching
+
+可以建立：
+
+```text
+Patient A
+HPO + gene X variant
+
+Patient B
+HPO + gene X variant
+
+Patient C
+HPO + gene X variant
+```
+
+然后计算：
+
+$$
+S =
+PhenotypeSimilarity(A,B)
++
+GenotypeSimilarity(A,B)
+$$
+
+形成：
+
+> **genotype–phenotype matchmaking**
+
+这也是 Matchmaker Exchange 类体系的核心思想。
+
+对于 ultra-rare disease：
+
+```text
+一个中心只有1例
+```
+
+非常重要。
+
+---
+
+# 21. 我建议你的大型罕见病 cohort 最终采用“三层模型”
+
+如果让我给你设计，我会用：
+
+```text
+Layer 1
+Genotype-first
+─────────────────────
+AF
+LoF
+missense
+splice
+CNV
+SV
+STR
+inheritance
+ClinVar
+ACMG
+
+
+Layer 2
+Phenotype-first
+─────────────────────
+HPO
+specificity
+information content
+present / absent
+onset
+Phen2Gene
+LIRICAL
+
+
+Layer 3
+Joint inference
+─────────────────────
+Exomiser
+Genomiser
+gene-disease evidence
+segregation
+literature
+model organisms
+network
+```
+
+最后：
+
+```text
+                FINAL PRIORITY
+                     │
+       ┌─────────────┼─────────────┐
+       ↓             ↓             ↓
+    Tier 1        Tier 2        Tier 3
+   Diagnosis      VUS           Novel gene
+```
+
+这会比传统：
+
+```text
+MAF < 0.01
+CADD > 20
+ClinVar pathogenic
+```
+
+强很多。
+
+---
+
+## 如果只让我选 5 个
+
+针对你说的“**罕见病队列里基因型如何联合表型提高诊断率**”，我会按下面优先级：
+
+1. **Exomiser**：真正做 VCF + HPO + PED 联合排序，最值得作为主分析工具。([PubMed Central (PMC)][3])
+2. **LIRICAL**：基于 likelihood ratio 的 phenotype–disease 诊断排序，尤其适合利用 negative HPO。
+3. **Phen2Gene**：HPO→gene，速度非常快，非常适合上万病例预计算 phenotype gene score。([PubMed Central (PMC)][4])
+4. **Genomiser**：WGS 未解决病例继续搜索 noncoding / regulatory / compound-het。([PubMed Central (PMC)][3])
+5. **AMELIE**：利用最新文献补充 gene–phenotype evidence，特别适合 VUS 和新基因。
+
+对于你如果下一步准备做一个**大型 singleton-WES 罕见病队列**，我尤其建议不要只做“每个病例单独 Exomiser”。更有研究价值的是把它升级成：
+
+> **个体层 phenotype-driven diagnosis + 队列层 phenotype clustering + gene-based rare variant burden + patient matching**
+
+这样既可以提高已有疾病的**诊断率**，又可以进一步做**新 disease gene discovery**。
+
+[1]: https://github.com/exomiser/Exomiser?utm_source=chatgpt.com "GitHub - exomiser/Exomiser: A Tool to Annotate and Prioritize Exome Variants · GitHub"
+[2]: https://pmc.ncbi.nlm.nih.gov/articles/PMC9288531/?utm_source=chatgpt.com "Phenotype‐driven approaches to enhance variant prioritization and diagnosis of rare disease - PMC"
+[3]: https://pmc.ncbi.nlm.nih.gov/articles/PMC12539062/?utm_source=chatgpt.com "An optimized variant prioritization process for rare disease diagnostics: recommendations for Exomiser and Genomiser - PMC"
+[4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC7252576/?utm_source=chatgpt.com "Phen2Gene: rapid phenotype-driven gene prioritization for rare diseases - PMC"
+[5]: https://hpo.jax.org/?utm_source=chatgpt.com "Human Phenotype Ontology"
+[6]: https://pmc.ncbi.nlm.nih.gov/articles/PMC6364462/?utm_source=chatgpt.com "DeepPVP: phenotype-based prioritization of causative variants using deep learning - PMC"
+[7]: https://pmc.ncbi.nlm.nih.gov/articles/PMC12452281/?utm_source=chatgpt.com "Clinical and data-driven optimization of Genomiser for rare disease patients: experience from the Hong Kong Genome Project - PMC"
 
