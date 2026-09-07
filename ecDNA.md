@@ -770,3 +770,609 @@ PacBio HiFi
 [11]: https://pmc.ncbi.nlm.nih.gov/articles/PMC9671848/?utm_source=chatgpt.com "Extrachromosomal DNA amplifications in cancer - PMC"
 
 
+---
+
+# 最近三年有做ecDNA检测方面benchmark的文章吗？具体有哪些高水平的文章
+
+有，而且如果你把范围严格限定为**近3年（2024–2026）“ecDNA/eccDNA检测或结构重建方法的系统benchmark”**，其实数量并没有30篇那么多；真正称得上**高水平、直接比较多个方法**的文章主要集中在 **Nature Communications、Genome Research，以及 CoRAL 的高水平方法论文**。
+
+我建议把它们分成两类理解：
+
+* **A类：真正的“benchmark/方法比较”论文**——直接比较多个ecDNA/eccDNA caller。
+* **B类：方法论文中包含系统benchmark**——虽然标题不是benchmark，但对多个方法、模拟数据和真实癌细胞进行了比较。
+
+下面按这个标准整理。
+
+---
+
+# 1. 最重要的一篇：Nature Communications 2024
+
+### ① Comparative analysis of methodologies for detecting extrachromosomal circular DNA
+
+**Nature Communications, 2024, 15:9208**
+
+这是目前近三年我认为**最标准、最完整的一篇ecDNA/eccDNA detection benchmark**。
+
+[Nature Communications 原文](https://www.nature.com/articles/s41467-024-53496-8?utm_source=chatgpt.com)
+
+它做了两层benchmark：
+
+### 第一层：计算工具benchmark
+
+比较了 **7个pipeline、11种运行模式**：
+
+**Short-read：**
+
+* Circle-Map
+* Circle_finder
+* ECCsplorer
+* ecc_finder
+
+**Long-read：**
+
+* CReSIL
+* eccDNA_RCA_nanopore
+* NanoCircle
+* ecc_finder
+
+同时使用：
+
+* 7组模拟数据
+* 不同测序深度
+* 不同比例chimeric reads
+* F1-score
+* sequence identity
+* base-pair difference
+* duplication rate
+* CPU
+* memory
+
+进行评价。([Nature][1])
+
+### 最重要的结果
+
+在 **50× long-read**模拟数据：
+
+| Long-read工具         |        F1 |
+| ------------------- | --------: |
+| **CReSIL**          | **0.918** |
+| NanoCircle          |     0.905 |
+| eccDNA_RCA_nanopore |     0.859 |
+| ecc_finder asm-ont  |     0.179 |
+
+因此作者的结论是：
+
+> **CReSIL是long-read eccDNA detection中表现最好的方法之一，尤其在>10×覆盖度时。**
+
+([Nature][1])
+
+---
+
+# 2. 这篇论文还有一个非常重要的实验benchmark
+
+它不只是benchmark软件。
+
+还比较了：
+
+* WGS-SR
+* WGS-LR
+* Circle-Seq-SR
+* Circle-Seq-LR
+* 3SEP-SR
+* 3SEP-LR
+* ATAC-seq
+
+共 **7种实验策略**，用了 **21个真实测序数据集**。([Nature][1])
+
+尤其重要的是：
+
+> **Circle-Seq + long-read 对 >10 kb、copy-number amplified eccDNA的检测效率明显较高。**
+
+所以这篇论文实际上回答了两个问题：
+
+```text
+实验方法：
+WGS / Circle-Seq / 3SEP / ATAC
+             ↓
+        哪种最好？
+
+计算方法：
+CReSIL / NanoCircle / ecc_finder / ...
+             ↓
+        哪种最好？
+```
+
+因此如果你要设计一个**ecDNA detection benchmark**，这篇是最应该参考的框架。
+
+---
+
+# 3. 第二篇：CoRAL，Genome Research
+
+### ② CoRAL accurately resolves extrachromosomal DNA genome structures with long-read sequencing
+
+**Genome Research, 2024**
+
+这篇严格来说不是“所有ecDNA检测工具的大benchmark”，但它是**目前long-read癌症ecDNA结构重建benchmark中非常重要的一篇**。
+
+[Genome Research / CoRAL 原文](https://genome.cshlp.org/content/34/9/1344?utm_source=chatgpt.com)
+
+CoRAL：
+
+> **Complete Reconstruction of Amplifications with Long reads**
+
+同时支持：
+
+* Oxford Nanopore
+* PacBio
+
+这是你目前**PacBio HiFi数据**特别值得关注的一篇。([PubMed Central (PMC)][2])
+
+它进行了：
+
+### 模拟数据benchmark
+
+比较：
+
+* CoRAL
+* Decoil
+* AmpliconArchitect
+* de novo assembly相关方法
+
+评价：
+
+* breakpoint detection
+* segment ordering
+* cycle reconstruction
+* copy-number explanation
+
+结果显示：
+
+> **CoRAL在复杂ecDNA结构的breakpoint检测和segment order inference方面优于Decoil和short-read AA。**
+
+([PubMed Central (PMC)][2])
+
+而且作者进一步在**10个ecDNA癌细胞系**中进行了验证，并使用AmpliconClassifier重新确认cyclic/ecDNA结构。([PubMed Central (PMC)][2])
+
+### 对你特别重要
+
+如果你的数据是：
+
+> **Tumor PacBio HiFi WGS**
+
+那么我会把这篇的优先级放到非常高。
+
+因为CoRAL明确设计成：
+
+> **PacBio/ONT long-read → ecDNA amplicon reconstruction**
+
+而不是单纯eccDNA检测。
+
+---
+
+# 4. 第三篇：Decoil，Genome Research 2024
+
+### ③ Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil
+
+**Genome Research, 2024**
+
+[Genome Research / Decoil 原文](https://genome.cshlp.org/content/34/9/1355?utm_source=chatgpt.com)
+
+这篇也属于：
+
+> **method + benchmark**
+
+而且benchmark非常有价值。
+
+Decoil作者建立了自己的：
+
+> **ecDNA simulation benchmark dataset**
+
+模拟：
+
+* simple circularization
+* multi-region
+* multichromosomal
+* nested duplication
+* foldback
+* complex rearrangement
+
+等不同复杂度的ecDNA topology。([PubMed Central (PMC)][3])
+
+然后比较：
+
+* **Decoil**
+* **CReSIL**
+* **Shasta**
+
+在不同复杂度和coverage下的表现。
+
+### 结果
+
+对于简单ecDNA topology：
+
+> Decoil可以高保真重建。
+
+对于复杂topology：
+
+> 在超过1900个复杂模拟中，超过70%的模拟可以达到normalized largest contig >0.6。
+
+而且总体上：
+
+> **Decoil优于Shasta和CReSIL。**
+
+([PubMed Central (PMC)][3])
+
+这篇特别适合你，因为Decoil直接利用：
+
+```text
+BAM
++
+SV
++
+coverage
+        ↓
+breakpoint graph
+        ↓
+ecDNA reconstruction
+```
+
+所以和你目前的：
+
+> **PacBio HiFi + SV calling**
+
+非常匹配。
+
+---
+
+# 5. CReSIL本身：虽然不是近3年严格意义上的新benchmark，但非常重要
+
+### ④ CReSIL: accurate identification of extrachromosomal circular DNA from long-read sequences
+
+**Briefings in Bioinformatics, 2023**
+
+[CReSIL全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC10144670/?utm_source=chatgpt.com)
+
+这篇本身也是：
+
+> **method + comparative benchmark**
+
+作者比较了：
+
+* CReSIL
+* NanoCircle
+* eccDNA_RCA_nanopore
+* ecc_finder
+* Flye
+
+并在不同测序深度：
+
+* 100×
+* 50×
+* 10×
+* 5×
+* 3×
+
+下进行测试。([PubMed Central (PMC)][4])
+
+特别值得注意：
+
+> CReSIL在模拟数据中即使降到3×仍保持很高的F1，而其他工具随coverage下降明显。([PubMed Central (PMC)][4])
+
+所以：
+
+### 如果你要做long-read ecDNA benchmark：
+
+**CReSIL一定应该作为baseline。**
+
+---
+
+# 6. 近3年真正值得放进“benchmark对比矩阵”的工具
+
+综合这几篇论文，我建议你不要只看工具名称，而是分成两个问题。
+
+## 第一类：eccDNA detection
+
+| 工具                      | Long-read |    需要富集 | 主要用途                              |
+| ----------------------- | --------: | ------: | --------------------------------- |
+| **CReSIL**              |         ✓ |     否/可 | eccDNA detection + reconstruction |
+| **NanoCircle**          |         ✓ |    通常需要 | simple/complex eccDNA             |
+| **eccDNA_RCA_nanopore** |         ✓ |     RCA | circular DNA                      |
+| **ecc_finder**          |         ✓ |    通常需要 | mapping/assembly                  |
+| **Flec**                |         ✓ |     RCA | full-length eccDNA                |
+| **ECCFP**               |         ✓ | 主要针对TGS | full-pass eccDNA                  |
+
+其中2024 Nature Communications benchmark直接比较的是前四组。([Nature][1])
+
+---
+
+# 7. 第二类：癌症ecDNA结构重建
+
+这个类别和普通eccDNA检测一定要分开。
+
+| 工具                       | Long-read | 癌症ecDNA |  复杂结构 |        推荐 |
+| ------------------------ | --------: | ------: | ----: | --------: |
+| **CoRAL**                |         ✓ |       ✓ | ⭐⭐⭐⭐⭐ | **★★★★★** |
+| **Decoil**               |         ✓ |       ✓ | ⭐⭐⭐⭐⭐ | **★★★★★** |
+| **CReSIL**               |         ✓ |      部分 |   ⭐⭐⭐ |      ★★★★ |
+| **AA/AmpliconArchitect** |         × |       ✓ |  ⭐⭐⭐⭐ |      ★★★★ |
+| **AmpliconSuite**        |      ×/间接 |       ✓ |  ⭐⭐⭐⭐ |      ★★★★ |
+
+所以不能简单说：
+
+> “CReSIL是benchmark第一名，所以一定比CoRAL好。”
+
+这是**错误的比较**。
+
+因为它们解决的问题不完全一样。
+
+---
+
+# 8. 一个非常关键的区别
+
+### Nature Communications 2024 benchmark测的是：
+
+> **eccDNA detection**
+
+而：
+
+### CoRAL / Decoil benchmark测的是：
+
+> **ecDNA structure reconstruction**
+
+这两个概念不同。
+
+例如：
+
+```text
+一个癌细胞：
+
+chr7
+  │
+  ├── MYC
+  ├── enhancer
+  │
+  └── SV
+       │
+       ▼
+      ecDNA
+       │
+       ├── 500 kb
+       ├── 1.2 Mb
+       ├── multiple duplications
+       ├── foldback
+       └── multi-chromosomal
+```
+
+你真正想知道的可能不是：
+
+> “有没有circle？”
+
+而是：
+
+> **这个ecDNA到底由哪些segment组成？**
+
+那么应该使用：
+
+**CoRAL / Decoil**
+
+而不是只用CReSIL。
+
+---
+
+# 9. 近3年benchmark文章的重要性排序
+
+如果你的目的就是：
+
+> **“我要做一个新的ecDNA detection benchmark”**
+
+我会这样排序：
+
+### 🥇 第一名
+
+**Comparative analysis of methodologies for detecting extrachromosomal circular DNA**
+
+**Nature Communications, 2024**
+
+这是最标准的：
+
+> **eccDNA detection benchmark**
+
+([Nature][1])
+
+---
+
+### 🥈 第二名
+
+**CoRAL accurately resolves extrachromosomal DNA genome structures with long-read sequencing**
+
+**Genome Research, 2024**
+
+最重要的：
+
+> **long-read cancer ecDNA reconstruction benchmark**
+
+([PubMed Central (PMC)][2])
+
+---
+
+### 🥉 第三名
+
+**Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil**
+
+**Genome Research, 2024**
+
+特别重要的是：
+
+> **复杂ecDNA topology + mixture + long-read benchmark**
+
+([PubMed Central (PMC)][3])
+
+---
+
+### 第4名
+
+**CReSIL: accurate identification of extrachromosomal circular DNA from long-read sequences**
+
+**Briefings in Bioinformatics, 2023**
+
+这是理解：
+
+> **long-read eccDNA caller如何benchmark**
+
+最重要的基础方法论文之一。([PubMed Central (PMC)][4])
+
+---
+
+# 10. 但有一个很大的研究空白
+
+这个其实对你非常重要。
+
+2024 Nature Communications那篇benchmark自己就明确指出：
+
+> 目前可用于**non-enriched WGS long-read**的eccDNA detection pipeline仍然比较有限，因此当时的benchmark主要针对**eccDNA-enriched long-read data**。([Nature][1])
+
+这意味着：
+
+## 目前还缺一个真正系统的：
+
+> **PacBio HiFi/ONT WGS → cancer ecDNA detection benchmark**
+
+尤其是：
+
+```text
+PacBio HiFi WGS
+       vs
+ONT WGS
+       ↓
+CoRAL
+Decoil
+CReSIL
+AA/AmpliconSuite
+SV callers
+       ↓
+统一ground truth
+       ↓
+Sensitivity
+Specificity
+F1
+breakpoint accuracy
+cycle accuracy
+copy-number accuracy
+length accuracy
+```
+
+这样的系统benchmark。
+
+这对你目前的数据非常有意义。
+
+---
+
+# 11. 如果你准备做自己的benchmark，我建议直接按照下面这个框架
+
+你现在如果是：
+
+> **Tumor PacBio HiFi + Normal PacBio HiFi**
+
+我建议不要简单重复2024 Nature Communications的工作，而是做：
+
+### Benchmark 1：不同caller
+
+```text
+CoRAL
+Decoil
+CReSIL
+AmpliconArchitect
+AmpliconSuite
+```
+
+### Benchmark 2：不同SV输入
+
+```text
+pbsv
+Sniffles2
+cuteSV
+Severus
+Savana
+```
+
+### Benchmark 3：不同测序深度
+
+```text
+5×
+10×
+15×
+20×
+30×
+40×
+60×
+```
+
+### Benchmark 4：不同ecDNA复杂度
+
+```text
+Simple circle
+       ↓
+Single chromosome
+       ↓
+Multi-region
+       ↓
+Nested duplication
+       ↓
+Foldback
+       ↓
+Multi-chromosomal
+       ↓
+Multiple co-existing ecDNA
+```
+
+### Benchmark 5：不同ecDNA长度
+
+```text
+10 kb
+50 kb
+100 kb
+500 kb
+1 Mb
+2 Mb
+5 Mb
+10 Mb
+```
+
+最后评价：
+
+```text
+                    ┌─ detection
+                    ├─ breakpoint
+                    ├─ cycle
+                    ├─ structure
+Ground truth ───────┼─ copy number
+                    ├─ length
+                    ├─ gene content
+                    └─ enhancer content
+```
+
+---
+
+## 12. 对你目前项目，我尤其推荐的组合
+
+如果你准备拿自己的**PacBio HiFi肿瘤数据**做ecDNA研究，我会把这4篇作为核心benchmark文献：
+
+| 文献                                           |   年份 | 期刊                          | 主要价值                                |
+| -------------------------------------------- | ---: | --------------------------- | ----------------------------------- |
+| **CReSIL**                                   | 2023 | Briefings in Bioinformatics | long-read eccDNA detection baseline |
+| **Comparative analysis of methodologies...** | 2024 | **Nature Communications**   | **系统eccDNA detection benchmark**    |
+| **Decoil**                                   | 2024 | **Genome Research**         | **复杂ecDNA结构benchmark**              |
+| **CoRAL**                                    | 2024 | **Genome Research**         | **PacBio/ONT ecDNA结构重建benchmark**   |
+
+其中**2024年这三篇放在一起看非常重要**：Nature Communications回答“**谁能检测到circle**”，Decoil回答“**复杂circle怎么重构**”，CoRAL进一步回答“**如何利用long reads提高复杂ecDNA结构的准确性**”。([Nature][1])
+
+另外，截至我这次检索，**2025–2026年还没有发现一篇已经在主流高水平期刊正式发表、且覆盖CReSIL + CoRAL + Decoil + 其他新工具、并专门针对PacBio HiFi/ONT非富集WGS做全面ecDNA detection benchmark的论文**；2026年已经出现新的Cycle-Extractor预印本，并与CoRAL、Decoil、AA进行了比较，但目前仍是bioRxiv预印本，因此不建议把它和上述正式发表的文章等量齐观。([生物预印本][5])
+
+**所以，如果你的目的是寻找一个可以进一步做文章的benchmark空白点，我认为“PacBio HiFi非富集WGS条件下的ecDNA detection + structure reconstruction系统benchmark”仍然有明显空间。**
+
+[1]: https://www.nature.com/articles/s41467-024-53496-8?utm_source=chatgpt.com "Comparative analysis of methodologies for detecting extrachromosomal circular DNA | Nature Communications"
+[2]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11529860/?utm_source=chatgpt.com "CoRAL accurately resolves extrachromosomal DNA genome structures with long-read sequencing - PMC"
+[3]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11529853/?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil - PMC"
+[4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC10144670/?utm_source=chatgpt.com "CReSIL: accurate identification of extrachromosomal circular DNA from long-read sequences - PMC"
+[5]: https://www.biorxiv.org/content/10.64898/2026.03.10.710955v1?utm_source=chatgpt.com "Fast and accurate resolution of ecDNA sequence using Cycle-Extractor | bioRxiv"
+
