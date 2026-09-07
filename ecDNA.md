@@ -2347,5 +2347,986 @@ Hi-C / ec3D
 [3]: https://genome.cshlp.org/content/early/2024/10/03/gr279123124?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil | Genome Research"
 [4]: https://www.nature.com/articles/s41467-025-67614-7?utm_source=chatgpt.com "Reconstructing the three-dimensional architecture of extrachromosomal DNA with ec3D | Nature Communications"
 
+---
+
+# 如何准备ecDNA benchmark的数据
+
+
+可以。对于你前面规划的 **“新一代 ecDNA benchmark”**，数据准备其实是整个项目最核心的部分。我的建议是不要只准备一套模拟数据，而是建立一个 **四层 benchmark data system**：
+
+> **Simulation → controlled spike-in → validated cell lines → real tumors**
+
+这样才能同时回答“算法在理想条件下怎么样”和“真实 PacBio HiFi 肿瘤中到底怎么样”。
+
+现有 2024 年 *Nature Communications* benchmark 已经做了 10,000 个 circular + 10,000 个 linear DNA 的模拟，并测试了不同深度和 chimeric DNA 比例；但它明确主要针对 eccDNA/enriched 数据，且作者指出 **non-enriched WGS-LR 的方法比较仍不足**。([Nature][1]) 这正是你可以往前推进的地方。
+
+---
+
+# 一、我建议最终建立 4 类数据集
+
+```text
+                         ecDNA Benchmark Dataset
+                                  │
+          ┌───────────────────────┼───────────────────────┐
+          │                       │                       │
+      Tier 1                  Tier 2                  Tier 3/4
+    Simulation              Spike-in / Mix         Real biological
+          │                       │                       │
+    完全已知答案             半真实 ground truth       Cell line / Tumor
+          │                       │                       │
+          └───────────────┬───────┴───────────────────────┘
+                          ↓
+                PacBio HiFi / ONT / Illumina
+                          ↓
+             CReSIL / CoRAL / Decoil / AA
+                          ↓
+                    Benchmark
+```
+
+其中我认为**最重要的是 Tier 2 + Tier 3**，因为单纯 simulation 很容易被审稿人质疑。
+
+---
+
+# 二、Tier 1：建立标准化 ecDNA simulation library
+
+第一步不要直接生成 FASTQ。
+
+先建立一个：
+
+> **ecDNA structural truth library**
+
+也就是一个“已知答案”的 ecDNA 数据库。
+
+---
+
+## 1. 先设计 10 类 ecDNA topology
+
+建议第一版至少：
+
+| ID  | topology                        |    难度 |
+| --- | ------------------------------- | ----: |
+| T01 | simple circle                   |     ★ |
+| T02 | inversion                       |    ★★ |
+| T03 | tandem duplication              |    ★★ |
+| T04 | deletion + circle               |    ★★ |
+| T05 | fold-back                       |   ★★★ |
+| T06 | nested duplication              |   ★★★ |
+| T07 | multi-chromosomal               |   ★★★ |
+| T08 | multiple ecDNA sharing segments |  ★★★★ |
+| T09 | ecDNA + HSR                     |  ★★★★ |
+| T10 | highly complex rearranged ecDNA | ★★★★★ |
+
+例如 T01：
+
+```text
+chr8:A ─ chr8:B ─ chr8:C
+             │
+             └──────────────┐
+                            ↓
+                     ecDNA-A
+                     A → B → C → A
+```
+
+T07：
+
+```text
+chr7:A
+   ↓
+chr8:B
+   ↓
+chr12:C
+   ↓
+chr7:D
+   ↓
+ecDNA
+```
+
+T08 更重要：
+
+```text
+ecDNA-1:
+A → B → C → D → A
+
+ecDNA-2:
+A → B → E → F → A
+```
+
+两个 ecDNA **共享 A/B**。
+
+这类结构正是结构解卷积最困难的情况，Decoil 的工作也专门讨论了复杂、异质 ecDNA 重建。([Genome Research][2])
+
+---
+
+# 三、不要只生成“圆形 FASTA”
+
+每个 simulated ecDNA 最好保存完整 truth。
+
+例如：
+
+```text
+ecDNA_T08_001/
+├── truth.fa
+├── truth.bed
+├── truth.tsv
+├── junctions.tsv
+├── segments.tsv
+└── metadata.json
+```
+
+`truth.tsv`：
+
+```text
+ecDNA_ID    topology    length    copy_number
+E001        simple      125000    20
+E002        inversion   180000    15
+E003        complex     420000    30
+```
+
+`segments.tsv`：
+
+```text
+ecDNA_ID    order    chr     start       end       strand
+E003        1         chr7    1000000     1050000   +
+E003        2         chr8    5000000     5080000   +
+E003        3         chr7    2000000     2050000   -
+E003        4         chr12   8000000     8200000   +
+```
+
+`junctions.tsv`：
+
+```text
+ecDNA_ID    junction    chr1    pos1    strand1    chr2    pos2    strand2
+E003        J1           chr7    1050000 +          chr8    5000000 +
+E003        J2           chr8    5080000 +          chr7    2000000 -
+E003        J3           chr7    2050000 -          chr12   8000000 +
+E003        J4           chr12   8200000 +          chr7    1000000 +
+```
+
+**后面所有 benchmark 都基于这些 truth，而不是根据软件结果反推答案。**
+
+---
+
+# 四、Tier 1 的模拟因素
+
+不要只改变 sequencing depth。
+
+建议做一个正交设计：
+
+### A. ecDNA complexity
+
+```text
+simple
+moderate
+complex
+very_complex
+```
+
+### B. ecDNA size
+
+```text
+1 kb
+5 kb
+10 kb
+50 kb
+100 kb
+500 kb
+1 Mb
+5 Mb
+```
+
+尤其要重点增加：
+
+> **>10 kb、>100 kb、>1 Mb**
+
+因为 2024 benchmark 自己也指出其模拟数据中 >10 kb ecDNA 比例偏低，这限制了对长 ecDNA 的评价。([Nature][1])
+
+---
+
+# 五、最重要：不要只模拟 ecDNA abundance
+
+建议增加：
+
+```text
+ecDNA abundance
+```
+
+例如：
+
+```text
+100 copies
+50 copies
+20 copies
+10 copies
+5 copies
+2 copies
+1 copy
+```
+
+或者使用 VAF-like：
+
+```text
+50%
+20%
+10%
+5%
+1%
+0.1%
+```
+
+这样你可以回答：
+
+> **ecDNA copy number 到什么程度才能被检测？**
+
+---
+
+# 六、加入 tumor purity
+
+这个对于你的项目非常重要。
+
+例如：
+
+```text
+100% tumor
+75%
+50%
+25%
+10%
+5%
+1%
+```
+
+构造：
+
+```text
+Tumor genome
+     +
+Normal genome
+```
+
+例如：
+
+```text
+50X total sequencing
+```
+
+在：
+
+```text
+50% tumor purity
+```
+
+时：
+
+```text
+25X tumor
+25X normal
+```
+
+在：
+
+```text
+10% tumor purity
+```
+
+时：
+
+```text
+5X tumor
+45X normal
+```
+
+这会让 benchmark 非常接近临床真实情况。
+
+---
+
+# 七、测序深度矩阵
+
+针对你的 PacBio HiFi：
+
+```text
+60X
+40X
+30X
+20X
+15X
+10X
+5X
+2X
+1X
+```
+
+我建议重点：
+
+```text
+10X
+15X
+20X
+30X
+40X
+```
+
+因为你最终很可能需要回答：
+
+> **PacBio HiFi 做 ecDNA detection 至少需要多少 coverage？**
+
+---
+
+# 八、read length 也要控制
+
+这是 PacBio HiFi benchmark 非常值得做的地方。
+
+可以从真实 PacBio HiFi reads 中 downsample/read-length filter：
+
+```text
+5 kb
+10 kb
+15 kb
+20 kb
+25 kb
+30 kb
+40 kb
+50 kb
+```
+
+然后：
+
+```text
+same ecDNA
+        ↓
+different read length
+        ↓
+CReSIL / CoRAL / Decoil
+```
+
+最终可以得到：
+
+> **复杂 ecDNA 结构需要多长的 HiFi read 才能可靠恢复？**
+
+这个结果会比单纯的 F1 更有意义。
+
+---
+
+# 九、Tier 2：做“半真实”Spike-in 数据
+
+这是我最推荐你增加的一层。
+
+不要完全依赖模拟。
+
+可以使用：
+
+```text
+真实 tumor genomic DNA
+          +
+已知结构 ecDNA
+          ↓
+混合
+          ↓
+PacBio HiFi sequencing
+```
+
+这样：
+
+* genomic DNA 是真实的
+* repeat 是真实的
+* sequencing error 是真实的
+* GC bias 是真实的
+* mapping ambiguity 是真实的
+
+只有 ecDNA 是你知道答案的。
+
+---
+
+# 十、Spike-in ecDNA 从哪里来？
+
+有三个选择。
+
+### 方案 A：合成 circular DNA
+
+最好。
+
+例如：
+
+```text
+10 kb
+50 kb
+100 kb
+500 kb
+1 Mb
+```
+
+构建具有已知：
+
+```text
+sequence
+junction
+orientation
+copy number
+```
+
+的 circular DNA。
+
+---
+
+### 方案 B：已有 plasmid/circular DNA
+
+成本较低，可以做第一版 proof-of-concept。
+
+---
+
+### 方案 C：真实 cancer ecDNA
+
+最好，但实验难度最高。
+
+可以选择已经有明确 ecDNA 结构的癌细胞系。
+
+---
+
+# 十一、Spike-in 最重要的是设计“真实背景”
+
+不要：
+
+```text
+ecDNA + clean reference genome
+```
+
+这太简单。
+
+应该：
+
+```text
+Real tumor DNA
+      +
+ecDNA
+```
+
+最好进一步：
+
+```text
+Real tumor DNA
+      +
+Normal DNA
+      +
+ecDNA
+```
+
+形成：
+
+```text
+tumor purity
+×
+ecDNA abundance
+```
+
+两个维度同时变化。
+
+---
+
+# 十二、Tier 3：真实 cell line benchmark
+
+这一层非常重要。
+
+选择：
+
+> **已经被多种实验手段证明存在 ecDNA 的癌细胞系**
+
+然后收集：
+
+```text
+PacBio HiFi
+ONT
+Illumina WGS
+```
+
+最好再有：
+
+```text
+Hi-C
+FISH
+optical mapping
+RNA-seq
+```
+
+这样建立：
+
+```text
+Experimental consensus truth
+```
+
+而不是：
+
+> “CReSIL 认为有 ecDNA，所以它就是真实 ecDNA”。
+
+---
+
+# 十三、真实 cell line 的 ground truth 怎么定义？
+
+我建议采用：
+
+## Level 1
+
+至少：
+
+```text
+FISH positive
++
+long-read spanning junction
+```
+
+---
+
+## Level 2
+
+```text
+FISH
++
+SV
++
+CNV
++
+long-read
+```
+
+---
+
+## Level 3
+
+最强：
+
+```text
+FISH
++
+optical mapping
++
+PacBio/ONT
++
+Hi-C
++
+RNA
+```
+
+定义为：
+
+> **Gold-standard ecDNA**
+
+---
+
+# 十四、Tier 4：真实 tumor cohort
+
+最后才进入真正的 cancer cohort。
+
+建议第一版：
+
+```text
+20–50 tumors
+```
+
+最好有：
+
+```text
+Tumor PacBio HiFi
+Normal PacBio HiFi
+```
+
+你现在正好可以利用这个体系。
+
+每个 tumor：
+
+```text
+Tumor HiFi
+Normal HiFi
+       │
+       ├── SV
+       ├── CNV
+       ├── CReSIL
+       ├── CoRAL
+       └── Decoil
+```
+
+最后得到：
+
+```text
+Consensus ecDNA
+```
+
+---
+
+# 十五、你现有的 Tumor/Normal PacBio HiFi 特别适合这样利用
+
+你之前已经规划了：
+
+```text
+Tumor
+ ↓
+DeepSomatic / ClairS
+ ↓
+SNV/Indel
+
+Tumor + Normal
+ ↓
+Severus
+NanoMonSV
+Sniffles
+Savana
+ ↓
+somatic SV
+```
+
+这个不要丢。
+
+直接把它变成 benchmark 的辅助 truth：
+
+```text
+                 Tumor HiFi
+                     │
+        ┌────────────┼────────────┐
+        │            │            │
+       CNV          SV          ecDNA
+        │            │            │
+        └────────────┼────────────┘
+                     ↓
+              structural truth
+```
+
+---
+
+# 十六、Fiber-seq 可以作为第二层验证
+
+你已经有 Fiber-seq，这个非常有价值。
+
+对于确定的 ecDNA：
+
+```text
+ecDNA sequence
+      ↓
+Fiber-seq
+      ↓
+m6A
+      ↓
+chromatin accessibility
+      ↓
+FIRE
+```
+
+这样可以验证：
+
+> 一个软件重建出来的 ecDNA，是否真的具有独立的染色质调控结构？
+
+这已经从：
+
+**algorithm benchmark**
+
+升级成：
+
+**functional benchmark**。
+
+---
+
+# 十七、建议建立统一的数据目录
+
+最终项目建议设计成：
+
+```text
+ecDNA-Benchmark/
+│
+├── 00_reference/
+│   ├── GRCh38.fa
+│   ├── GRCh38.fa.fai
+│   └── GRCh38.mmi
+│
+├── 01_simulation/
+│   ├── topology/
+│   │   ├── T01_simple/
+│   │   ├── T02_inversion/
+│   │   ├── T03_duplication/
+│   │   └── ...
+│   │
+│   ├── depth/
+│   ├── purity/
+│   ├── abundance/
+│   └── read_length/
+│
+├── 02_spikein/
+│   ├── 10kb/
+│   ├── 50kb/
+│   ├── 100kb/
+│   ├── 500kb/
+│   └── 1Mb/
+│
+├── 03_cellline/
+│   ├── PacBio/
+│   ├── ONT/
+│   ├── Illumina/
+│   ├── HiC/
+│   └── FISH/
+│
+├── 04_tumor/
+│   ├── tumor/
+│   ├── normal/
+│   ├── HiFi/
+│   ├── ONT/
+│   ├── Illumina/
+│   ├── FiberSeq/
+│   └── RNA/
+│
+├── 05_truth/
+│   ├── ecDNA_truth.tsv
+│   ├── segments.tsv
+│   ├── junctions.tsv
+│   └── copy_number.tsv
+│
+└── 06_results/
+    ├── CReSIL/
+    ├── CoRAL/
+    ├── Decoil/
+    ├── AmpliconSuite/
+    └── benchmark/
+```
+
+---
+
+# 十八、数据量不要一开始就做得特别大
+
+我建议先做一个 **Pilot benchmark**。
+
+### Pilot：
+
+```text
+10 topology
+×
+5 depth
+×
+4 purity
+×
+3 abundance
+```
+
+就是：
+
+```text
+10 × 5 × 4 × 3 = 600 datasets
+```
+
+如果每个 dataset：
+
+```text
+3 replicates
+```
+
+就是：
+
+```text
+1,800 datasets
+```
+
+已经非常够用了。
+
+---
+
+# 十九、然后再扩展
+
+正式版：
+
+```text
+Topology       10
+Depth           8
+Purity          6
+Abundance       6
+Read length     6
+Platform        2
+Replicate       3
+```
+
+理论上：
+
+```text
+10 × 8 × 6 × 6 × 6 × 2 × 3
+```
+
+会达到几十万组合，完全没必要全部做。
+
+所以应该使用：
+
+> **factorial design / Latin hypercube sampling**
+
+而不是暴力组合。
+
+---
+
+# 二十、一个非常重要的设计：训练集和测试集必须分开
+
+如果未来你开发自己的 benchmark tool 或算法，这一点非常重要。
+
+应该：
+
+```text
+Training / Development
+        │
+        ├── T01
+        ├── T02
+        ├── T03
+        └── ...
+        
+Hidden Test Set
+        │
+        ├── T08
+        ├── T09
+        └── T10
+```
+
+尤其不要：
+
+> 用同一批 simulated ecDNA topology 调参，再用同样的数据宣布方法最好。
+
+否则 benchmark 很容易被认为存在 overfitting。
+
+---
+
+# 二十一、最好做一个“blind benchmark”
+
+这是我特别推荐你加入的。
+
+例如：
+
+```text
+Benchmark dataset
+       ↓
+隐藏 truth
+       ↓
+给 CReSIL / CoRAL / Decoil 开发者
+       ↓
+提交结果
+       ↓
+服务器自动评分
+```
+
+最终：
+
+> **ecDNA Benchmark Challenge**
+
+甚至可以做成 GitHub + Docker/Singularity：
+
+```text
+ecDNA-Benchmark
+        ↓
+run_benchmark.sh
+        ↓
+results.tsv
+        ↓
+automatic scoring
+```
+
+这会让数据集具有长期价值，而不仅仅是论文 supplement。
+
+---
+
+# 二十二、最终建议的“Gold-standard”数据组成
+
+如果是我来设计你的项目，我会这样分配：
+
+| 数据层    | 数据                            | 目的                    |   重要性 |
+| ------ | ----------------------------- | --------------------- | ----: |
+| Tier 1 | Simulation                    | 精确计算 F1               |   ★★★ |
+| Tier 2 | Real genome + synthetic ecDNA | controlled benchmark  | ★★★★★ |
+| Tier 3 | ecDNA cell lines              | biological truth      | ★★★★★ |
+| Tier 4 | real tumors                   | clinical relevance    | ★★★★★ |
+| Tier 5 | Fiber-seq/Hi-C/RNA            | functional validation |  ★★★★ |
+
+**不要把 2024 benchmark 的 simulation 数据直接作为你的核心数据集。** 它可以作为 baseline/reproducibility dataset，因为其代码和 template 已经公开；但你的核心创新应该是 **non-enriched PacBio HiFi/ONT WGS + complex ecDNA + controlled spike-in + tumor/normal + multi-omic validation**。2024 年 benchmark 的代码和模板已经公开在 `QuKunLab/eccDNABenchmarking`，因此你完全可以先复现它作为 baseline，再在此基础上扩展。([Nature][1])
+
+---
+
+# 二十三、如果结合你现在的实验条件，我最推荐的实际路线
+
+你现在已经有 **Tumor/Normal PacBio HiFi + Fiber-seq**，所以我不会建议你先花几个月做大量纯模拟。
+
+我会按下面顺序：
+
+```text
+             Phase 1
+        复现2024 benchmark
+                │
+                ↓
+       获得 baseline results
+                │
+                ↓
+             Phase 2
+       建立10种ecDNA topology
+                │
+                ↓
+       PacBio HiFi simulation
+                │
+       ┌────────┼─────────┐
+       ↓        ↓         ↓
+     depth    purity    abundance
+       │        │         │
+       └────────┼─────────┘
+                ↓
+             Phase 3
+       Real DNA + ecDNA spike-in
+                │
+                ↓
+             Phase 4
+        真实ecDNA cell lines
+                │
+                ↓
+             Phase 5
+       你的Tumor/Normal HiFi
+                │
+        ┌───────┼────────┐
+        ↓       ↓        ↓
+       CNV     SV     ecDNA callers
+        │       │        │
+        └───────┼────────┘
+                ↓
+          Consensus truth
+                │
+        ┌───────┼─────────┐
+        ↓       ↓         ↓
+    Fiber-seq  Hi-C     RNA-seq
+        │       │         │
+        └───────┼─────────┘
+                ↓
+       ecDNA sequence → structure
+                ↓
+          chromatin → function
+```
+
+### 最关键的一点
+
+**你的 benchmark 的“核心数据集”最好不是 FASTQ，而是一个有明确 ground truth 的 `ecDNA structural truth set`。**
+
+也就是说，每一个 benchmark case 从一开始就必须知道：
+
+```text
+1. ecDNA 是否存在
+2. ecDNA 有多长
+3. 来自哪些 chromosome
+4. segment 顺序
+5. segment orientation
+6. 所有 circular junction
+7. copy number
+8. ecDNA abundance
+9. tumor purity
+10. 是否存在多个共存 ecDNA
+11. 是否共享 genomic segments
+12. 是否存在 HSR
+```
+
+然后再根据这个 truth 去生成 **PacBio HiFi / ONT / Illumina FASTQ**。
+
+这样你的文章最后就不是：
+
+> “我们跑了 5 个软件，CoRAL F1 最高。”
+
+而是：
+
+> **“我们建立了一个具有已知结构、丰度、复杂度和肿瘤背景的 ecDNA benchmark，并系统定义了 long-read ecDNA detection 和 reconstruction 在不同测序深度、tumor purity、read length 和 structural complexity 下的可靠性边界。”**
+
+这才是一个真正有机会成为**领域标准 benchmark dataset**的设计。
+
+如果你下一步要实际开始做，我建议先从 **“10种 ecDNA topology 的 truth 文件怎么构建 + 如何自动生成 PacBio HiFi FASTQ”** 开始；这一部分我可以直接给你设计成一套 **Python + samtools + minimap2 + PBSIM2/Badread 的可重复 benchmark 数据生成 pipeline**，包括 `truth.tsv`、SV VCF、ecDNA FASTA、PacBio HiFi FASTQ 和 600 个 benchmark case 的自动生成规则。
+
+[1]: https://www.nature.com/articles/s41467-024-53496-8?utm_source=chatgpt.com "Comparative analysis of methodologies for detecting extrachromosomal circular DNA | Nature Communications"
+[2]: https://genome.cshlp.org/content/early/2024/10/03/gr279123124?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil | Genome Research"
 
 
