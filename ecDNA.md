@@ -3330,3 +3330,1778 @@ automatic scoring
 [2]: https://genome.cshlp.org/content/early/2024/10/03/gr279123124?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil | Genome Research"
 
 
+# 最近两年预印的文章中有哪些文章是关于三代测序数据检测exDNA工具、算法或者基础研究的文章
+
+可以。我按**“2024-09-08 ～ 2026-09-08，重点看预印本；主题必须与三代测序（ONT/PacBio）检测、重建、解析 ecDNA/eccDNA 或其基础生物学直接相关”**重新检索了一遍。
+
+先说结论：**近两年真正直接针对“长读长测序 + ecDNA/eccDNA 算法”的预印本并不多，但出现了几个非常值得关注的新方向。**其中对你现在做的 **PacBio HiFi ecDNA benchmark** 最重要的是 **ECCFP、ecLego3、Cycle-Extractor（CE）**；另外有几篇长读长驱动的 ecDNA 基础研究可以作为 benchmark 的真实数据/生物学验证背景。
+
+---
+
+# 一、最值得关注的 5 篇
+
+| 年份            | 文章                                       | 类型       | 测序                            | 核心内容                                                | 对你项目的重要性 |
+| ------------- | ---------------------------------------- | -------- | ----------------------------- | --------------------------------------------------- | -------- |
+| **2026**      | **Cycle-Extractor (CE)**                 | 新算法      | ONT + PacBio/long-read        | 从 breakpoint graph 重建 ecDNA cycle                   | ⭐⭐⭐⭐⭐    |
+| **2025/2026** | **ECCFP**                                | 新算法      | **ONT long-read + RCA**       | 利用连续 full-pass 检测 eccDNA                            | ⭐⭐⭐⭐⭐    |
+| **2025**      | **ecLego3 / ecDNA Atlas**                | 新算法+基础研究 | **single-molecule long-read** | de novo circular genome assembly，构建 GBM ecDNA atlas | ⭐⭐⭐⭐⭐    |
+| **2025**      | **Landscape of ecDNA in HGSOC**          | 基础研究     | **ONT long-read WGS**         | 12例HGSOC肿瘤/转移瘤 ecDNA landscape                      | ⭐⭐⭐⭐     |
+| **2025**      | **ecDNA replication is disorganised...** | 基础研究     | **ultra-long ONT**            | ecDNA复制动力学、复制压力                                     | ⭐⭐⭐⭐     |
+
+下面逐篇说。
+
+---
+
+# 1. Cycle-Extractor（CE）：目前最值得你关注的新算法
+
+### Fast and accurate resolution of ecDNA sequence using Cycle-Extractor
+
+**Faizrahnemoon et al.，bioRxiv，2026**
+
+预印本：
+
+[Cycle-Extractor bioRxiv 原文](https://www.biorxiv.org/content/10.64898/2026.03.10.710955v1?utm_source=chatgpt.com)
+
+发表时间：**2026-03-13 / version 2: 2026-04-15**。([生物预印本][1])
+
+这是我认为**目前最值得加入你 ecDNA benchmark 的新方法**。
+
+### 它解决什么问题？
+
+CE 的输入不是简单地寻找一个 circle，而是：
+
+```text
+long-read sequencing
+       ↓
+breakpoint graph
+       ↓
+Cycle-Extractor
+       ↓
+ecDNA cycle reconstruction
+```
+
+核心思想是：
+
+> 从 breakpoint graph 中寻找最大 length-weighted-copy-number 的 ecDNA cycle。
+
+它采用：
+
+* Mixed Integer Linear Programming（MILP）
+* cycle traversal
+* copy-number information
+* breakpoint graph
+
+来重建 ecDNA。
+
+作者比较了：
+
+```text
+CE
+CoRAL
+Decoil
+AmpliconArchitect
+```
+
+在 simulated ecDNA 和 cancer cell lines 上进行测试。([生物预印本][1])
+
+### 最关键的结果
+
+CE：
+
+* 与 CoRAL 的准确度接近
+* 优于 AA 和 Decoil
+* 平均比 CoRAL **快约 40×**
+* 可以同时使用 short-read 和 long-read
+* long-read 输入能够得到更加完整的 ecDNA structure
+
+一个非常有意思的例子是：
+
+```text
+PC3 MYC ecDNA
+
+short-read → 690 kb
+long-read CE → 4.2 Mb
+```
+
+而且作者使用 **CRISPR-CATCH** 对大的 ecDNA 结构进行了验证。([生物预印本][1])
+
+### 对你的项目意味着什么？
+
+你之前计划：
+
+```text
+CReSIL
+CoRAL
+Decoil
+AmpliconArchitect
+```
+
+我现在建议升级成：
+
+```text
+CReSIL
+   ↓
+CoRAL
+   ↓
+Decoil
+   ↓
+Cycle-Extractor
+   ↓
+AmpliconArchitect / AmpliconSuite
+```
+
+尤其是 **CE 应该加入你的 benchmark**。
+
+---
+
+# 2. ECCFP：针对 long-read eccDNA detection 的新算法
+
+### ECCFP: A consecutive full pass-based bioinformatic analysis for eccDNA identification using Nanopore sequencing data
+
+**Li et al.**
+
+bioRxiv：
+
+[ECCFP bioRxiv 原文](https://www.biorxiv.org/content/10.1101/2025.05.13.653627v1?utm_source=chatgpt.com)
+
+预印本时间：**2025-05-16**。([生物预印本][2])
+
+随后已经正式发表：
+
+**iMetaOmics，2026-02-03**。([DOI][3])
+
+---
+
+## ECCFP 的思路和 CReSIL/CoRAL 很不一样
+
+ECCFP 专门针对：
+
+```text
+RCA enrichment
+      ↓
+Nanopore sequencing
+      ↓
+long concatemer reads
+      ↓
+eccDNA detection
+```
+
+核心是寻找：
+
+> **Consecutive Full Passes**
+
+也就是一个 read 中出现：
+
+```text
+A → B → C → D
+A → B → C → D
+A → B → C → D
+```
+
+这种连续重复的 circular DNA full-pass。
+
+然后：
+
+```text
+candidate eccDNA
+       ↓
+Boyer–Moore majority voting
+       ↓
+unique eccDNA
+       ↓
+circular consensus sequence
+```
+
+([DOI][3])
+
+---
+
+## 它和 CReSIL 的定位不同
+
+这是非常重要的一点。
+
+### CReSIL
+
+主要：
+
+```text
+long-read WGS
+     ↓
+breakpoint + coverage
+     ↓
+eccDNA
+```
+
+CReSIL 当前官方版本主要针对 Nanopore。([GitHub][4])
+
+### ECCFP
+
+主要：
+
+```text
+Circle-Seq / RCA
+     ↓
+ONT long reads
+     ↓
+full-pass
+     ↓
+eccDNA consensus
+```
+
+因此 ECCFP 更适合：
+
+> **小型 eccDNA + RCA enrichment**
+
+而不是你现在关注的：
+
+> **tumor WGS + PacBio HiFi + megabase ecDNA**
+
+这个区别非常重要。
+
+---
+
+# 3. ecLego3：非常值得你关注
+
+### An Atlas of Extrachromosomal DNA Structures Illuminates Its Evolution and Biogenesis in Cancer
+
+**Wong et al.**
+
+bioRxiv：
+
+[ecDNA Atlas / ecLego3 预印本](https://www.biorxiv.org/content/10.64898/2025.12.24.696443v1?utm_source=chatgpt.com)
+
+发布时间：
+
+**2025-12-25**。([生物预印本][5])
+
+---
+
+## 这是“基础研究 + 新算法”的结合
+
+作者使用：
+
+> **single-molecule long-read sequencing + de novo circular genome assembler**
+
+开发：
+
+### **ecLego3**
+
+然后对：
+
+```text
+primary GBM
+      vs
+recurrent GBM
+```
+
+进行 longitudinal analysis。
+
+最终解析了：
+
+> **23 个 ecDNA genomes**
+
+涉及多个 GBM oncogenes。([ResearchGate][6])
+
+---
+
+## ecLego3 和 CoRAL/Decoil 的区别
+
+这一点非常有意思。
+
+CoRAL：
+
+```text
+reference genome
+       ↓
+SV
+       ↓
+breakpoint graph
+       ↓
+cycle reconstruction
+```
+
+Decoil：
+
+```text
+long-read
+ ↓
+SV
+ ↓
+breakpoint graph
+ ↓
+LASSO
+ ↓
+multiple ecDNA deconvolution
+```
+
+而 ecLego3 更接近：
+
+```text
+long reads
+     ↓
+de novo assembly
+     ↓
+circular genome assembly
+     ↓
+ecDNA sequence
+```
+
+也就是说：
+
+> **它不是简单地在 reference genome 上拼 breakpoint graph，而是试图直接获得 ecDNA 的完整 sequence。**
+
+这对于你想做的 **PacBio HiFi ecDNA structural reconstruction benchmark** 非常重要。
+
+---
+
+# 4. HGSOC：long-read WGS 的真实肿瘤研究
+
+### Landscape of extrachromosomal DNA characteristics in high-grade serous ovarian cancer via long-read sequencing
+
+**Sun et al.，Cell Reports，2025**
+
+正式发表：
+
+**2025-10-28**。([PubMed][7])
+
+虽然现在已经不是预印本，但它属于你要求的“最近两年研究”，而且非常值得作为真实 benchmark 数据参考。
+
+研究：
+
+```text
+12 HGSOC patients
++
+6 normal fallopian tube
+```
+
+使用：
+
+> **long-read WGS**
+
+分析 ecDNA。([PubMed][7])
+
+---
+
+## 特别值得你注意的是它实际用了：
+
+```text
+ONT long-read WGS
+        ↓
+Sniffles2
+        ↓
+CReSIL
+        ↓
+Decoil
+        ↓
+Mosdepth
+```
+
+作者定义：
+
+```text
+eccDNA:
+length < 100 kb
+AND
+length-weighted CN < 3
+
+ecDNA:
+length > 100 kb
+AND
+length-weighted CN > 3
+```
+
+([科学直通车][8])
+
+这套定义和你的研究非常接近。
+
+---
+
+# 5. ecDNA replication：ultra-long ONT 做 ecDNA 基础生物学
+
+### ecDNA replication is disorganised and vulnerable to replication stress
+
+**Jaworski et al.，bioRxiv，2025**
+
+[bioRxiv 原文](https://www.biorxiv.org/content/10.1101/2025.03.22.644567v1?utm_source=chatgpt.com)
+
+发布时间：
+
+**2025-03-23**。([生物预印本][9])
+
+这个不是一个新的 ecDNA caller，但是是一个非常值得纳入“基础研究”部分的工作。
+
+他们使用：
+
+```text
+ultra-long Oxford Nanopore sequencing
++
+DNAscent
+```
+
+研究 ecDNA replication dynamics。([生物预印本][10])
+
+这说明三代测序不仅能：
+
+```text
+detect ecDNA
+```
+
+还可以进一步研究：
+
+```text
+ecDNA replication
+ecDNA replication fork
+replication stress
+ecDNA evolution
+```
+
+---
+
+# 6. PacBio HiFi：一个非常值得你关注的 2025 preprint
+
+### Satellite DNA fragility accompanies complex genome rearrangements and ecDNA oncogene amplification in canine osteosarcomas
+
+**Yilmaz et al.**
+
+bioRxiv：
+
+[PacBio HiFi 犬骨肉瘤 ecDNA 预印本](https://www.biorxiv.org/content/10.64898/2025.12.31.697157?utm_source=chatgpt.com)
+
+发布时间：
+
+**2025-12-31**。([PubMed][11])
+
+这个与你的项目尤其相关，因为它明确使用：
+
+> **PacBio HiFi WGS**
+
+而且是：
+
+```text
+matched tumor
++
+blood
+```
+
+共 4 只纯种犬。([PubMed Central (PMC)][12])
+
+研究重点是：
+
+```text
+satellite DNA
+      ↓
+genome fragility
+      ↓
+complex SV
+      ↓
+ecDNA oncogene amplification
+```
+
+所以如果你的 benchmark 要强调：
+
+> **PacBio HiFi 能不能比 ONT 更准确地解析复杂 ecDNA？**
+
+这篇非常值得引用。
+
+---
+
+# 7. An enhancement of eccDNA enrichment：实验方法也很重要
+
+### An Enhancement of Extrachromosomal Circular DNA Enrichment and Amplification to Address the Extremely Low Overlap Between Replicates
+
+这是一个非常值得注意的**实验方法学研究**。
+
+核心问题：
+
+```text
+Circle-seq
+   ↓
+RCA
+   ↓
+long-read sequencing
+```
+
+为什么不同 replicate 的 eccDNA overlap 极低？
+
+作者发现：
+
+> RCA 条件本身会严重影响 long-read eccDNA reconstruction。
+
+尤其是：
+
+* Exonuclease V
+* CRISPR-Cas9 mitochondrial linearization
+* random hexamer concentration
+* gDNA input
+
+都会影响最终的：
+
+```text
+concatemeric tandem copy
+        ↓
+long-read
+        ↓
+eccDNA reconstruction
+```
+
+([PubMed Central (PMC)][13])
+
+他们将 replicate overlap 从：
+
+```text
+<1%
+```
+
+提高到：
+
+```text
+>50%
+```
+
+这是非常重要的结果。([PubMed Central (PMC)][13])
+
+---
+
+# 8. Oncogene Silencing via ecDNA Micronucleation
+
+### Oncogene Silencing via ecDNA Micronucleation
+
+**Brückner et al.，bioRxiv，2025**
+
+[Oncogene Silencing via ecDNA Micronucleation](https://pubmed.ncbi.nlm.nih.gov/40321211/?utm_source=chatgpt.com)
+
+预印本：
+
+**2025-04-18**。([PubMed][14])
+
+这个研究不是 caller，但是属于非常好的 ecDNA 基础研究。
+
+使用：
+
+```text
+single-cell sequencing
++
+live-cell imaging
++
+single-micronucleus sequencing
++
+computational modelling
+```
+
+研究 ecDNA 如何进入 micronucleus。([PubMed Central (PMC)][15])
+
+对于你的项目，它可以作为：
+
+> **ecDNA structural heterogeneity / evolution / cell-to-cell variation**
+
+这一部分的生物学背景。
+
+---
+
+# 二、如果严格限定“工具/算法”，近两年最值得整理的是
+
+我会把它们分成三类：
+
+### A. Long-read WGS ecDNA detection
+
+| 工具                       | 数据                        | 主要任务                              |
+| ------------------------ | ------------------------- | --------------------------------- |
+| **CReSIL**               | ONT long-read             | eccDNA detection                  |
+| **Decoil**               | ONT long-read             | complex ecDNA reconstruction      |
+| **CoRAL**                | ONT/PacBio long-read      | ecDNA architecture reconstruction |
+| **CE / Cycle-Extractor** | short + long reads        | ecDNA cycle reconstruction        |
+| **ecLego3**              | single-molecule long-read | de novo circular genome assembly  |
+| **ECCFP**                | ONT + RCA                 | eccDNA detection                  |
+
+其中前两个老一些：
+
+* CReSIL：更早
+* Decoil：preprint 其实是 **2023-11-17**，所以严格说已经不属于“最近两年预印本”了。([Sciety][16])
+
+但是它们仍然应该作为 benchmark baseline。
+
+---
+
+# 三、对你现在的 PacBio HiFi 项目，我建议重点比较这 6 个
+
+你的数据是：
+
+> **Tumor/Normal PacBio HiFi WGS**
+
+所以我不建议简单照搬所有 eccDNA 工具。
+
+我会设计成：
+
+```text
+                 PacBio HiFi WGS
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+       SV/CNV                     ecDNA
+          │                         │
+   pbsv / Sniffles2             CReSIL*
+          │                         │
+          └────────────┬────────────┘
+                       │
+                amplified regions
+                       │
+           ┌───────────┼───────────┐
+           │           │           │
+         CoRAL       Decoil       CE
+           │           │           │
+           └───────────┼───────────┘
+                       │
+                 ecDNA structure
+                       │
+                 ecLego3
+                       │
+             de novo sequence
+```
+
+其中：
+
+**CReSIL、Decoil 原生偏 ONT；CoRAL 明确设计为可处理 ONT/PacBio；CE 同时支持 short/long reads。** CoRAL 的原始论文明确指出其方法可用于 Oxford Nanopore 或 PacBio。([生物预印本][17])
+
+---
+
+# 四、这里其实出现了一个非常重要的研究空白
+
+把近两年的工作放在一起看，会发现一个很明显的问题：
+
+### 现在的研究主要集中在：
+
+```text
+ONT
+│
+├── CReSIL
+├── Decoil
+├── ECCFP
+└── ecDNA biology
+```
+
+以及：
+
+```text
+ONT/PacBio
+│
+├── CoRAL
+└── CE
+```
+
+但是：
+
+> **针对 PacBio HiFi WGS 的 ecDNA detection + structural reconstruction 的系统 benchmark 仍然非常缺乏。**
+
+尤其缺：
+
+```text
+PacBio HiFi
+       ×
+ecDNA size
+       ×
+copy number
+       ×
+tumor purity
+       ×
+read depth
+       ×
+structural complexity
+       ×
+repeat content
+       ×
+multiple co-existing ecDNAs
+```
+
+这种系统 benchmark。
+
+这恰好与你现在想做的方向高度吻合。
+
+---
+
+# 五、我建议你的文章最终不要只做“工具性能比较”
+
+目前已经有 benchmark 工作比较不同 eccDNA detection 方法，例如 2024 年 Nature Communications 的系统比较已经发现，在 >10× long-read 数据中 CReSIL 表现突出。([Nature][18])
+
+所以如果你现在再写：
+
+> “我们比较 CReSIL、CoRAL、Decoil、CE 谁最好”
+
+**创新性可能不够。**
+
+更有价值的是：
+
+## **PacBio HiFi / ONT ecDNA Benchmarking Atlas**
+
+设计：
+
+```text
+             ecDNA Benchmark
+                    │
+       ┌────────────┼────────────┐
+       │            │            │
+    Detection   Reconstruction  Quantification
+       │            │            │
+       ↓            ↓            ↓
+    CReSIL       CoRAL          CN
+    ECCFP        Decoil         abundance
+                 CE
+                 ecLego3
+```
+
+再系统改变：
+
+### ① ecDNA size
+
+```text
+10 kb
+50 kb
+100 kb
+500 kb
+1 Mb
+2 Mb
+5 Mb
+```
+
+### ② PacBio HiFi depth
+
+```text
+1×
+2×
+5×
+10×
+15×
+20×
+30×
+40×
+60×
+```
+
+### ③ ecDNA abundance
+
+```text
+0.1%
+1%
+5%
+10%
+20%
+50%
+```
+
+### ④ tumor purity
+
+```text
+1%
+5%
+10%
+25%
+50%
+75%
+100%
+```
+
+### ⑤ topology
+
+```text
+simple circle
+inversion
+duplication
+deletion
+fold-back
+chromothripsis
+multi-chromosomal
+nested amplification
+ecDNA + HSR
+multiple competing ecDNAs
+```
+
+然后比较：
+
+```text
+Breakpoint recall
+Breakpoint precision
+Segment recall
+Segment order accuracy
+Orientation accuracy
+Cycle accuracy
+Copy-number accuracy
+Full-length sequence identity
+ecDNA abundance accuracy
+Runtime
+Memory
+```
+
+---
+
+## 一个特别值得做的创新点
+
+你现在已经有 **Tumor PacBio HiFi + Fiber-seq**，所以完全可以把 benchmark 从：
+
+> **“谁能检测到 ecDNA？”**
+
+升级成：
+
+> **“谁能从 single-molecule long reads 中正确恢复 ecDNA 的 sequence、structure、copy number 和 chromatin state？”**
+
+最终：
+
+```text
+PacBio HiFi
+      │
+      ├── SV
+      ├── ecDNA
+      ├── CN
+      └── sequence
+              │
+              ↓
+         ecDNA structure
+              │
+       ┌──────┴──────┐
+       ↓             ↓
+   Fiber-seq       Hi-C
+       │             │
+chromatin       3D structure
+accessibility
+       │             │
+       └──────┬──────┘
+              ↓
+       functional ecDNA
+```
+
+这会比单纯做一个 **“CReSIL vs CoRAL vs Decoil”** 的 benchmark 强很多。
+
+**如果你愿意，我下一步可以继续给你整理一份更完整的表：`2024–2026 所有涉及 ONT/PacBio/ecDNA/eccDNA 的预印本 + 正式论文（约15–25篇）`，逐篇列出 `文章、预印本日期、正式发表日期、数据类型、ONT/PacBio、是否WGS、工具、算法核心、数据规模、是否有ground truth、是否适合加入你的benchmark`，并把其中真正的“算法论文”和“生物学应用论文”分开。**
+
+[1]: https://www.biorxiv.org/content/10.64898/2026.03.10.710955v1?utm_source=chatgpt.com "Fast and accurate resolution of ecDNA sequence using Cycle-Extractor | bioRxiv"
+[2]: https://www.biorxiv.org/content/10.1101/2025.05.13.653627v1?utm_source=chatgpt.com "ECCFP: a consecutive full pass based bioinformatic ..."
+[3]: https://doi.org/10.1002/imo2.70080?utm_source=chatgpt.com "ECCFP: A consecutive full pass‐based bioinformatic analysis for eccDNA identification from long‐read sequencing data - Li - 2026 - iMetaOmics - Wiley Online Library"
+[4]: https://github.com/visanuwan/cresil?utm_source=chatgpt.com "GitHub - visanuwan/cresil: CReSIL: Accurate Identification of Extrachromosomal Circular DNA from Long-read Sequences · GitHub"
+[5]: https://www.biorxiv.org/content/10.64898/2025.12.24.696443v1?utm_source=chatgpt.com "An Atlas of Extrachromosomal DNA Structures Illuminates ..."
+[6]: https://www.researchgate.net/scientific-contributions/Meng-Fan-Huang-2164375652?utm_source=chatgpt.com "Meng-Fan Huang's research works | University of Washington, Seattle (UW) and other places"
+[7]: https://pubmed.ncbi.nlm.nih.gov/41014559/?utm_source=chatgpt.com "Landscape of extrachromosomal DNA characteristics in high-grade serous ovarian cancer via long-read sequencing."
+[8]: https://www.sciencedirect.com/science/article/pii/S2211124725011143?utm_source=chatgpt.com "Landscape of extrachromosomal DNA characteristics in high-grade serous ovarian cancer via long-read sequencing - ScienceDirect"
+[9]: https://www.biorxiv.org/content/10.1101/2025.03.22.644567v1?utm_source=chatgpt.com "ecDNA replication is disorganised and vulnerable to ..."
+[10]: https://www.biorxiv.org/content/10.1101/2025.03.22.644567.full.pdf?utm_source=chatgpt.com "ecDNA replication is disorganised and vulnerable to ..."
+[11]: https://pubmed.ncbi.nlm.nih.gov/41509377/?utm_source=chatgpt.com "Satellite DNA fragility accompanies complex genome ..."
+[12]: https://pmc.ncbi.nlm.nih.gov/articles/PMC12776269/?utm_source=chatgpt.com "Satellite DNA fragility accompanies complex genome ... - PMC"
+[13]: https://pmc.ncbi.nlm.nih.gov/articles/PMC13014928/?utm_source=chatgpt.com "An enhancement of extrachromosomal circular DNA enrichment and amplification to address the extremely low overlap between replicates - PMC"
+[14]: https://pubmed.ncbi.nlm.nih.gov/40321211/?utm_source=chatgpt.com "Oncogene Silencing via ecDNA Micronucleation - PubMed"
+[15]: https://pmc.ncbi.nlm.nih.gov/articles/PMC12047879/?utm_source=chatgpt.com "Oncogene Silencing via ecDNA Micronucleation - PMC"
+[16]: https://sciety.org/articles/activity/10.1101/gr.279123.124?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil | Sciety"
+[17]: https://www.biorxiv.org/content/10.1101/2024.02.15.580594v2.full?utm_source=chatgpt.com "CoRAL accurately resolves extrachromosomal DNA genome structures with long-read sequencing | bioRxiv"
+[18]: https://www.nature.com/articles/s41467-024-53496-8?utm_source=chatgpt.com "Comparative analysis of methodologies for detecting extrachromosomal circular DNA | Nature Communications"
+
+---
+
+# 给我整理一份更完整的表
+
+可以。我这次按**2024-09-08 至 2026-09-08**作为“最近两年”的主时间窗重新检索，并把**算法/工具、方法学、真实肿瘤应用、基础生物学**分开。需要特别说明：**真正直接针对“三代测序 + ecDNA/eccDNA”的新算法其实不多**，但近两年出现了几个很重要的方向，尤其是 **Cycle-Extractor、ecLego3、ECCFP**。
+
+## 一、最近两年最完整的核心文献表
+
+### A. 直接针对三代测序 ecDNA/eccDNA 的算法/工具
+
+| 年份            | 文章/工具                          | 预印本/发表                           | 测序技术                                | 数据类型             | 核心任务                     | 算法核心                                       | 是否适合你的PacBio HiFi benchmark |
+| ------------- | ------------------------------ | -------------------------------- | ----------------------------------- | ---------------- | ------------------------ | ------------------------------------------ | --------------------------- |
+| **2026**      | **Cycle-Extractor (CE)**       | bioRxiv 2026                     | ONT + PacBio/long-read + short-read | WGS              | **ecDNA结构重建**            | breakpoint graph + MILP + cycle extraction | ⭐⭐⭐⭐⭐                       |
+| **2025/2026** | **ecLego3**                    | bioRxiv 2025                     | single-molecule long-read           | WGS              | **de novo ecDNA序列/结构组装** | circular genome assembler                  | ⭐⭐⭐⭐⭐                       |
+| **2025/2026** | **ECCFP**                      | bioRxiv 2025 → iMetaOmics 2026   | **ONT**                             | RCA/long-read    | eccDNA检测+全长序列            | consecutive full-pass + Boyer–Moore        | ⭐⭐⭐                         |
+| **2024**      | **CoRAL**                      | bioRxiv → Genome Research 2024   | **ONT + PacBio**                    | WGS              | **ecDNA结构重建**            | breakpoint graph + quadratic programming   | ⭐⭐⭐⭐⭐                       |
+| **2024**      | **Decoil**                     | bioRxiv → Genome Research 2024   | ONT                                 | WGS              | **复杂ecDNA重建/去卷积**        | breakpoint graph + LASSO                   | ⭐⭐⭐⭐                        |
+| **2024**      | **eccDNA-pipe**                | Briefings in Bioinformatics 2024 | short + long reads                  | WGS/RCA等         | eccDNA综合分析               | integrated pipeline                        | ⭐⭐                          |
+| **2024**      | **eccDNA detection benchmark** | Nature Communications 2024       | ONT/PacBio相关long-read               | WGS + Circle-seq | **方法系统比较**               | benchmark                                  | ⭐⭐⭐⭐⭐                       |
+
+其中 **CE、ecLego3、ECCFP** 是最近两年新增、最值得关注的三个方向。下面详细展开。
+
+---
+
+# 二、1. Cycle-Extractor（CE）——目前最新、与你项目最相关
+
+### Fast and accurate resolution of ecDNA sequence using Cycle-Extractor
+
+**Faizrahnemoon et al.**
+
+[bioRxiv预印本](https://www.biorxiv.org/content/10.64898/2026.03.10.710955v2.full-text?utm_source=chatgpt.com)
+
+预印本：
+
+* v1：2026-03-13
+* v2：2026-04-15
+
+([生物预印本][1])
+
+### 技术路线
+
+```text
+Long-read / short-read
+        │
+        ↓
+Breakpoint graph
+        │
+        ↓
+Cycle-Extractor
+        │
+        ├── MILP
+        ├── cycle traversal
+        └── copy-number weighting
+        │
+        ↓
+ecDNA cycle
+```
+
+CE 的一个很重要的特点是：
+
+> **不是简单“找 circle”，而是寻找 maximum length-weighted-copy-number cycle。**
+
+作者比较：
+
+```text
+CE
+CoRAL
+Decoil
+AmpliconArchitect
+```
+
+在 simulated ecDNA 和 cancer cell lines 上测试。CE 在模拟数据上的表现与 CoRAL 接近，同时总体优于 AA 和 Decoil；速度平均约为 CoRAL 的 **40×**。([生物预印本][1])
+
+一个非常有价值的案例：
+
+```text
+PC3 / MYC ecDNA
+
+short-read → ~690 kb
+
+ONT long-read + CE
+           ↓
+        ~4.2 Mb
+```
+
+并通过 CRISPR-CATCH 对大的 ecDNA 分子进行了验证。([生物预印本][1])
+
+### 对你最重要的意义
+
+**CE 应该加入你现在的 benchmark。**
+
+你原来的：
+
+```text
+CReSIL
+CoRAL
+Decoil
+AmpliconArchitect
+```
+
+建议更新成：
+
+```text
+CReSIL
+CoRAL
+Decoil
+Cycle-Extractor
+ecLego3
+AmpliconArchitect/AmpliconSuite
+```
+
+---
+
+# 三、2. ecLego3——“直接组装ecDNA”的新方向
+
+### An Atlas of Extrachromosomal DNA Structures Illuminates Its Evolution and Biogenesis in Cancer
+
+**Wong et al.**
+
+[bioRxiv预印本](https://www.biorxiv.org/content/10.64898/2025.12.24.696443v1.full-text?utm_source=chatgpt.com)
+
+发布时间：**2025-12-25**。([生物预印本][2])
+
+核心方法：
+
+> **ecLego3：customized circular genome assembler**
+
+作者利用：
+
+> single-molecule long-read sequencing
+
+构建 GBM 的 ecDNA atlas。([生物预印本][2])
+
+最终分析了纵向的：
+
+```text
+Primary GBM
+     ↓
+Recurrent GBM
+```
+
+并重建了大量 ecDNA 结构。
+
+### 与 CoRAL/Decoil 最大区别
+
+CoRAL：
+
+```text
+reference genome
+      ↓
+SV
+      ↓
+breakpoint graph
+      ↓
+cycle
+```
+
+ecLego3：
+
+```text
+long reads
+     ↓
+de novo assembly
+     ↓
+circular genome
+     ↓
+ecDNA sequence
+```
+
+所以它实际上代表一个新的路线：
+
+> **reference-guided reconstruction → de novo ecDNA assembly**
+
+这对你做 benchmark 非常重要，因为它可以回答：
+
+**“reference-based breakpoint graph 和 de novo assembly，谁更适合 PacBio HiFi 的 ecDNA？”**
+
+---
+
+# 四、3. ECCFP——专门针对 RCA + Nanopore
+
+### ECCFP: A consecutive full pass-based bioinformatic analysis for eccDNA identification from long-read sequencing data
+
+[ECCFP正式论文](https://onlinelibrary.wiley.com/doi/10.1002/imo2.70080?utm_source=chatgpt.com)
+
+预印本：2025-05-16；2026 年正式发表。([Wiley Online Library][3])
+
+它的模式是：
+
+```text
+eccDNA
+ ↓
+RCA
+ ↓
+concatemer
+ ↓
+ONT long read
+ ↓
+consecutive full-pass
+ ↓
+candidate eccDNA
+ ↓
+Boyer–Moore voting
+ ↓
+consensus eccDNA
+```
+
+作者使用：
+
+* 6 个 simulated datasets
+* 2 个 spike-in real datasets
+* 29 个公开 real datasets
+
+进行评估。([Wiley Online Library][3])
+
+### 但是对于你的项目要注意
+
+ECCFP主要解决：
+
+> **RCA-enriched eccDNA**
+
+而你的方向是：
+
+> **tumor PacBio HiFi WGS / ecDNA**
+
+因此：
+
+**ECCFP 不应该作为你的核心 PacBio ecDNA caller。**
+
+但是非常适合作为：
+
+> **RCA/富集型 eccDNA benchmark baseline**
+
+---
+
+# 五、4. CoRAL——你的 PacBio HiFi benchmark 必须保留
+
+### CoRAL accurately resolves extrachromosomal DNA genome structures with long-read sequencing
+
+**Zhu et al., Genome Research, 2024**
+
+[CoRAL论文](https://genome.cshlp.org/content/34/9/1344?utm_source=chatgpt.com)
+
+CoRAL 明确支持：
+
+```text
+Oxford Nanopore
++
+PacBio
+```
+
+这一点非常重要。([PubMed Central (PMC)][4])
+
+核心：
+
+```text
+Long reads
+    ↓
+SV
+    ↓
+Breakpoint graph
+    ↓
+Quadratic programming
+    ↓
+cycle/walk
+    ↓
+ecDNA structure
+```
+
+它同时优化：
+
+* parsimony
+* explained copy number
+* long-read mapping consistency
+
+([PubMed Central (PMC)][4])
+
+作者在：
+
+```text
+simulation
++
+10 cell-line datasets
+```
+
+上进行 benchmark。([PubMed Central (PMC)][4])
+
+### 对你特别重要
+
+这是目前这些工具中，**最明确针对 PacBio/ONT long-read ecDNA reconstruction 的核心方法之一**。
+
+因此：
+
+> **CoRAL = PacBio HiFi benchmark 的一级 baseline**
+
+---
+
+# 六、5. Decoil——复杂ecDNA / 多ecDNA去卷积
+
+### Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil
+
+**Giurgiu et al., Genome Research, 2024**
+
+[Decoil论文](https://genome.cshlp.org/content/34/9/1355?utm_source=chatgpt.com)
+
+核心问题：
+
+```text
+ecDNA A: ABC
+ecDNA B: BCD
+
+共享：
+     B
+```
+
+普通 breakpoint graph 很难判断：
+
+```text
+ABC + BCD
+```
+
+还是：
+
+```text
+ABCD
+```
+
+Decoil 的核心：
+
+```text
+Long-read
+   ↓
+SV + coverage
+   ↓
+weighted breakpoint graph
+   ↓
+simple circles
+   ↓
+circle quantification
+   ↓
+candidate selection
+   ↓
+LASSO
+   ↓
+multiple ecDNA
+```
+
+([PubMed Central (PMC)][5])
+
+它特别适合你的 benchmark 中这一类：
+
+> **multiple co-existing ecDNAs + shared genomic footprint**
+
+因此建议：
+
+**Decoil = 复杂ecDNA benchmark的核心工具。**
+
+---
+
+# 七、6. eccDNA-pipe——综合型工具
+
+### eccDNA-pipe: an integrated pipeline for identification, analysis and visualization of eccDNA
+
+2024，*Briefings in Bioinformatics*。([OUP Academic][6])
+
+它不是像 CoRAL/Decoil 那样专门做大型 ecDNA cycle reconstruction，而更偏：
+
+```text
+eccDNA detection
++
+annotation
++
+visualization
++
+downstream analysis
+```
+
+因此：
+
+### 适合：
+
+```text
+small/intermediate eccDNA
+```
+
+### 不适合作为：
+
+```text
+megabase ecDNA structural reconstruction
+```
+
+所以你的 benchmark 可以把它放到：
+
+> **secondary eccDNA detection pipeline**
+
+而不是核心 ecDNA reconstruction 工具。
+
+---
+
+# 八、7. 2024 Nature Communications：目前最重要的 eccDNA benchmark
+
+### Comparative analysis of methodologies for detecting extrachromosomal circular DNA
+
+Nature Communications, 2024.
+
+[Nature Communications原文](https://www.nature.com/articles/s41467-024-53496-8?utm_source=chatgpt.com)
+
+这篇对你非常重要，因为它已经系统比较了：
+
+```text
+7 pipelines
++
+11 analysis modes
++
+7 simulated datasets
++
+7 experimental methods
+```
+
+其中一个重要结论：
+
+> **long-read sequencing 深度 >10× 时，CReSIL 是表现最好的 long-read eccDNA pipeline。**
+
+([Nature][7])
+
+因此你未来文章一定应该引用它。
+
+但同时它留下了一个很明显的 gap：
+
+> **针对非富集 PacBio HiFi WGS、复杂 megabase ecDNA、不同 copy number/purity/depth 的系统 benchmark 仍然不足。**
+
+这正是你可以切入的地方。
+
+---
+
+# 九、三代测序 ecDNA 基础研究类
+
+这部分虽然不是 caller，但对你写文章 Introduction/Discussion 很有价值。
+
+| 年份      | 研究                                              | 技术                  | 研究问题                | 与你的项目关系 |
+| ------- | ----------------------------------------------- | ------------------- | ------------------- | ------- |
+| 2025    | **Landscape of ecDNA in HGSOC**                 | ONT long-read WGS   | 临床肿瘤ecDNA landscape | ⭐⭐⭐⭐⭐   |
+| 2025    | **ecDNA replication is disorganised...**        | ultra-long ONT      | ecDNA replication   | ⭐⭐⭐⭐    |
+| 2025    | **Satellite DNA fragility...**                  | **PacBio HiFi WGS** | 复杂SV + ecDNA        | ⭐⭐⭐⭐⭐   |
+| 2025    | **ecDNA Atlas / ecLego3**                       | single-molecule LR  | GBM ecDNA evolution | ⭐⭐⭐⭐⭐   |
+| 2025    | **Enhancer activation from TEs in ecDNA**       | ONT ultra-long      | ecDNA enhancer/TE   | ⭐⭐⭐⭐    |
+| 2025/26 | **Aberrant inheritance of ecDNA...**            | ONT                 | ecDNA inheritance   | ⭐⭐⭐     |
+| 2025/26 | **Selective degradation of oncogenic ecDNA...** | ONT                 | ecDNA biology       | ⭐⭐⭐     |
+
+---
+
+# 十、HGSOC：临床肿瘤中直接使用 long-read WGS
+
+### Landscape of extrachromosomal DNA characteristics in high-grade serous ovarian cancer via long-read sequencing
+
+**Sun et al., Cell Reports, 2025**
+
+[Cell Reports原文](https://www.cell.com/cell-reports/fulltext/S2211-1247%2825%2901114-3?utm_source=chatgpt.com)
+
+数据：
+
+```text
+12 HGSOC patients
++
+paired metastatic tumors
++
+6 normal fallopian tube tissues
+```
+
+采用：
+
+> long-read whole-genome sequencing
+
+研究 ecDNA 的：
+
+* structural variation
+* copy number
+* methylation
+* enhancer
+* transposon activation
+* gene expression
+
+([科学直通车][8])
+
+这篇对于你尤其有价值，因为它把：
+
+```text
+ecDNA
++
+SV
++
+CN
++
+methylation
++
+enhancer
++
+TE
++
+expression
+```
+
+连起来了。
+
+---
+
+# 十一、ecDNA replication：ultra-long ONT
+
+### ecDNA replication is disorganised and vulnerable to replication stress
+
+**Jaworski et al., 2025**
+
+[bioRxiv预印本](https://www.biorxiv.org/content/10.1101/2025.03.22.644567v1?utm_source=chatgpt.com)
+
+作者使用：
+
+```text
+ultra-long ONT
++
+DNAscent
+```
+
+研究：
+
+```text
+replication fork
+      ↓
+ecDNA replication
+      ↓
+replication stress
+```
+
+而且同时分析：
+
+```text
+bulk DNA
++
+FACS-isolated ecDNA
+```
+
+([PubMed Central (PMC)][9])
+
+这说明 long-read 的用途已经从：
+
+> “检测 ecDNA”
+
+进一步发展到：
+
+> **研究 ecDNA replication dynamics。**
+
+---
+
+# 十二、PacBio HiFi：这篇与你尤其相关
+
+### Satellite DNA fragility accompanies complex genome rearrangements and ecDNA oncogene amplification in canine osteosarcomas
+
+**Yilmaz et al., 2025**
+
+[bioRxiv预印本](https://www.biorxiv.org/content/10.64898/2025.12.31.697157v1.full-text?utm_source=chatgpt.com)
+
+核心数据：
+
+> **PacBio HiFi whole-genome sequencing**
+
+研究对象：
+
+```text
+canine osteosarcoma
++
+matched blood
+```
+
+发现：
+
+```text
+satellite DNA
+      ↓
+genome fragility
+      ↓
+complex SV
+      ↓
+ecDNA
+      ↓
+oncogene amplification
+```
+
+([生物预印本][10])
+
+### 这篇特别值得你关注
+
+因为它说明：
+
+> **PacBio HiFi WGS 已经可以用于复杂 ecDNA + SV 的真实肿瘤研究。**
+
+而你现在的：
+
+```text
+Tumor PacBio HiFi
++
+Normal PacBio HiFi
++
+Fiber-seq
+```
+
+实际上可以做得比这类工作更深入。
+
+---
+
+# 十三、还有一个非常值得关注的方向：TE → ecDNA
+
+### Enhancer activation from transposable elements in ecDNA
+
+2025，*Nature Cell Biology*。
+
+[Nature Cell Biology原文](https://www.nature.com/articles/s41556-025-01788-6?utm_source=chatgpt.com)
+
+作者使用：
+
+> Oxford Nanopore Ultra-Long DNA sequencing
+
+并用：
+
+> **CoRAL**
+
+重建 COLO320DM 的 ecDNA amplicons。([Nature][11])
+
+这篇很有意思，因为它把：
+
+```text
+ecDNA
+ ↓
+TE
+ ↓
+enhancer
+ ↓
+oncogene expression
+```
+
+连接起来。
+
+如果你后面想把你的 **TE/PanTE研究** 和 ecDNA 项目结合起来，这篇非常值得看。
+
+---
+
+# 十四、把这些工具放到一张“技术地图”里
+
+我认为现在整个领域已经形成了下面这个结构：
+
+```text
+                       ecDNA / eccDNA
+                              │
+              ┌───────────────┴───────────────┐
+              │                               │
+         eccDNA detection                ecDNA reconstruction
+              │                               │
+       ┌──────┼──────┐              ┌─────────┼──────────┐
+       │      │      │              │         │          │
+     CReSIL  FLED   ECCFP         CoRAL     Decoil       CE
+       │      │      │              │         │          │
+      WGS    RCA    RCA            WGS       WGS        WGS
+      ONT    ONT    ONT          ONT/PacBio  ONT      ONT/LR
+                                                      │
+                                                      │
+                                                  ecLego3
+                                                      │
+                                               de novo assembly
+```
+
+---
+
+# 十五、对 PacBio HiFi 来说，我建议你真正 benchmark 的工具组合
+
+如果你的数据确定是：
+
+> **Tumor + Normal PacBio HiFi WGS**
+
+我建议不要把所有工具平铺，而是分层。
+
+## 第一层：ecDNA detection
+
+```text
+CReSIL
+```
+
+虽然 CReSIL 最初主要针对 ONT，但它可以作为一个 cross-platform baseline。
+
+---
+
+## 第二层：SV/CNV evidence
+
+```text
+pbsv
+Sniffles2
+cuteSV
+mosdepth
+CNVkit
+```
+
+得到：
+
+```text
+SV
++
+CN
++
+amplified regions
+```
+
+---
+
+## 第三层：ecDNA reconstruction
+
+重点：
+
+```text
+CoRAL
+Decoil
+Cycle-Extractor
+```
+
+这是你的核心 benchmark。
+
+---
+
+## 第四层：de novo reconstruction
+
+```text
+ecLego3
+```
+
+作为：
+
+> reference-free / assembly-based 方法
+
+---
+
+## 第五层：RCA-based eccDNA
+
+```text
+ECCFP
+FLED
+```
+
+仅作为：
+
+> enriched eccDNA benchmark
+
+不要和 WGS ecDNA caller 直接混在同一组评分。
+
+---
+
+# 十六、我认为最值得做的 benchmark 设计
+
+根据现在这些论文，你可以把 benchmark 分成：
+
+### Benchmark I：Detection
+
+```text
+CReSIL
+ECCFP
+FLED
+```
+
+评价：
+
+```text
+Precision
+Recall
+F1
+Breakpoint recall
+False positive rate
+```
+
+---
+
+### Benchmark II：Structure reconstruction
+
+```text
+CoRAL
+Decoil
+Cycle-Extractor
+ecLego3
+```
+
+评价：
+
+```text
+Breakpoint accuracy
+Segment recall
+Segment order
+Orientation
+Cycle accuracy
+CN accuracy
+Full-length reconstruction
+```
+
+---
+
+### Benchmark III：复杂度
+
+设计：
+
+```text
+Simple circle
+      ↓
+Deletion circle
+      ↓
+Inversion
+      ↓
+Duplication
+      ↓
+Fold-back
+      ↓
+Multi-region
+      ↓
+Multi-chromosomal
+      ↓
+Shared footprint
+      ↓
+Multiple ecDNA
+      ↓
+ecDNA + HSR
+```
+
+Decoil 本身就把 ecDNA 按复杂程度分成了多个 topology，这个思路非常适合拿来构建你的 simulation truth set。([Genome Research][12])
+
+---
+
+# 十七、最关键的研究空白
+
+综合目前这些文章，我认为你的项目最有潜力的地方并不是：
+
+> **“我们比较了几个 ecDNA caller。”**
+
+而应该是：
+
+### **Long-read ecDNA Benchmark for PacBio HiFi**
+
+重点解决：
+
+```text
+              PacBio HiFi
+                   │
+        ┌──────────┼──────────┐
+        ↓          ↓          ↓
+      Detect    Reconstruct  Quantify
+        │          │          │
+      CReSIL    CoRAL        CN
+                Decoil       abundance
+                 CE
+              ecLego3
+                   │
+                   ↓
+              Ground Truth
+                   │
+        ┌──────────┼──────────┐
+        ↓          ↓          ↓
+      FISH       Hi-C      Fiber-seq
+                              │
+                              ↓
+                     chromatin accessibility
+```
+
+尤其是：
+
+**PacBio HiFi + complex ecDNA + tumor purity + copy number + read depth + Fiber-seq validation**
+
+这一组合，目前明显比单纯的 ONT ecDNA benchmark 更有新意。
+
+---
+
+## 十八、最后给你一个“优先级清单”
+
+如果你准备马上开始读文献，我建议按这个顺序：
+
+### 第一优先级 ⭐⭐⭐⭐⭐
+
+1. **Cycle-Extractor — 2026**
+2. **ecLego3 — 2025**
+3. **CoRAL — 2024**
+4. **Decoil — 2024**
+5. **2024 Nature Communications eccDNA benchmark**
+
+### 第二优先级 ⭐⭐⭐⭐
+
+6. **ECCFP — 2025/2026**
+7. **HGSOC long-read ecDNA — 2025**
+8. **PacBio HiFi canine osteosarcoma — 2025**
+9. **ecDNA replication + ultra-long ONT — 2025**
+10. **TE enhancer activation in ecDNA — 2025**
+
+### 第三优先级 ⭐⭐⭐
+
+11. eccDNA-pipe
+12. FLED
+13. CReSIL
+14. 其他 RCA-based eccDNA 方法
+
+其中 **FLED 和 CReSIL 虽然已经超过严格的“两年”窗口，但千万不要从 benchmark 文献中删掉**：FLED 是典型的 **RCA + ONT full-length eccDNA** 方法，而 CReSIL 是当前 long-read eccDNA detection 的重要 baseline。FLED 的核心是利用 RCA 产生的 tandem copies，通过两个 directed graphs 重建 full-length eccDNA；CReSIL 则是 construction-based rolling-circle amplification 思路。([PubMed][13])
+
+**如果以你目前的“肿瘤 Tumor/Normal PacBio HiFi + Fiber-seq + ecDNA”项目为目标，我最建议下一步直接做一张更实用的“工具对比矩阵”：把 `CReSIL / FLED / ECCFP / CoRAL / Decoil / CE / ecLego3 / AmpliconArchitect / AmpliconSuite` 的 `输入数据、是否支持PacBio、是否支持ONT、是否需要RCA、是否需要CNV、是否需要SV、是否能处理multi-ecDNA、是否能处理shared footprint、是否能输出完整sequence、是否能处理>1 Mb ecDNA、运行时间、GitHub、安装方法` 全部列出来。这个表会直接对应你后面 benchmark 的方法学设计。**
+
+[1]: https://www.biorxiv.org/content/10.64898/2026.03.10.710955v1?utm_source=chatgpt.com "Fast and accurate resolution of ecDNA sequence using Cycle-Extractor | bioRxiv"
+[2]: https://www.biorxiv.org/content/10.64898/2025.12.24.696443v1.full-text?utm_source=chatgpt.com "An Atlas of Extrachromosomal DNA Structures Illuminates ..."
+[3]: https://onlinelibrary.wiley.com/doi/10.1002/imo2.70080?utm_source=chatgpt.com "ECCFP: A consecutive full pass‐based bioinformatic analysis for eccDNA identification from long‐read sequencing data - Li - 2026 - iMetaOmics - Wiley Online Library"
+[4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11529860/?utm_source=chatgpt.com "CoRAL accurately resolves extrachromosomal DNA genome structures with long-read sequencing - PMC"
+[5]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11529853/?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil - PMC"
+[6]: https://academic.oup.com/bib/article/25/2/bbae034/7606639?utm_source=chatgpt.com "eccDNA-pipe: an integrated pipeline for identification, analysis ..."
+[7]: https://www.nature.com/articles/s41467-024-53496-8?utm_source=chatgpt.com "Comparative analysis of methodologies for detecting extrachromosomal circular DNA | Nature Communications"
+[8]: https://www.sciencedirect.com/science/article/pii/S2211124725011143?utm_source=chatgpt.com "Landscape of extrachromosomal DNA characteristics in high-grade serous ovarian cancer via long-read sequencing - ScienceDirect"
+[9]: https://pmc.ncbi.nlm.nih.gov/articles/PMC12311790/?utm_source=chatgpt.com "ecDNA replication is disorganized and vulnerable to ... - PMC"
+[10]: https://www.biorxiv.org/content/10.64898/2025.12.31.697157v1.full-text?utm_source=chatgpt.com "Satellite DNA fragility accompanies complex genome ..."
+[11]: https://www.nature.com/articles/s41556-025-01788-6?utm_source=chatgpt.com "Enhancer activation from transposable elements in ..."
+[12]: https://genome.cshlp.org/content/early/2024/08/21/gr.279123.124.full.pdf?utm_source=chatgpt.com "Reconstructing extrachromosomal DNA structural heterogeneity from long-read sequencing data using Decoil"
+[13]: https://pubmed.ncbi.nlm.nih.gov/37930031/?utm_source=chatgpt.com "FLED: a full-length eccDNA detector for long-reads sequencing data - PubMed"
