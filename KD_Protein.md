@@ -1828,3 +1828,384 @@ CAL prediction
 [7]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11361772/?utm_source=chatgpt.com "Sex-Specific Susceptibility Loci Associated With Coronary Artery Aneurysms in Patients With Kawasaki Disease - PMC"
 [8]: https://www.tandfonline.com/doi/full/10.1080/1744666X.2024.2383236?utm_source=chatgpt.com "Proteomics approach for biomarker discovery in Kawasaki disease: Expert Review of Clinical Immunology: Vol 20 , No 12 - Get Access"
 
+---
+
+# SERPINA3和SERPINC1基因有什么功能，他们有什么关系
+
+
+**SERPINA3 和 SERPINC1 是两个非常值得放在一起看的基因**：它们都属于 **SERPIN（serine protease inhibitor）家族**，都是分泌到血浆中的丝氨酸蛋白酶抑制剂，但**主要靶点和生物学功能完全不同**。
+
+如果结合你现在做的 **KD/CAL + DIA proteomics**，这两个蛋白放在一起尤其值得关注，因为它们分别连接了 **炎症/中性粒细胞蛋白酶** 和 **凝血系统**。
+
+---
+
+## 1. 两个基因分别是什么？
+
+| 基因           | 蛋白                  | 常用名称                  | 主要功能                  |
+| ------------ | ------------------- | --------------------- | --------------------- |
+| **SERPINA3** | α1-antichymotrypsin | AACT / ACT            | 炎症、急性期反应、抑制中性粒细胞蛋白酶   |
+| **SERPINC1** | Antithrombin        | AT / Antithrombin III | 抗凝血、抑制 thrombin、FXa 等 |
+
+两者都是 SERPIN 家族成员，但属于不同的 SERPIN clade：SERPINA3 属于 **clade A**，SERPINC1 属于 **clade C**。([PubMed Central (PMC)][1])
+
+---
+
+# 2. SERPINA3：主要是“炎症蛋白酶抑制”
+
+### SERPINA3 → α1-antichymotrypsin
+
+它是一种**急性期蛋白（acute-phase protein）**，在炎症状态下通常升高。
+
+它可以抑制：
+
+* **Cathepsin G**
+* **Chymotrypsin**
+* mast cell chymase 等
+
+尤其值得注意的是 **neutrophil cathepsin G**。([PubMed][2])
+
+可以简单画成：
+
+```text
+感染 / 炎症
+     ↓
+中性粒细胞活化
+     ↓
+Cathepsin G ↑
+     ↓
+组织蛋白水解 / 炎症反应
+     ↑
+     │
+ SERPINA3
+     │
+     └── 抑制 Cathepsin G
+```
+
+所以 SERPINA3 可以理解成：
+
+> **炎症环境下，对中性粒细胞蛋白酶的一种“刹车”。**
+
+不过 SERPINA3 并不是单纯的“抗炎蛋白”。它的作用具有明显的**疾病和组织环境依赖性**，目前其完整生理功能仍没有完全阐明。([PubMed][2])
+
+---
+
+# 3. SERPINC1：主要是“凝血系统的刹车”
+
+SERPINC1 编码：
+
+> **Antithrombin（抗凝血酶，AT，旧称 Antithrombin III）**
+
+这是凝血系统非常核心的天然抗凝蛋白。
+
+主要抑制：
+
+* **Thrombin / FIIa**
+* **Factor Xa**
+* Factor IXa
+* Factor XIa
+* Factor XIIa
+
+其中 thrombin 和 FXa 是最重要的。([国家生物技术信息中心][3])
+
+所以：
+
+```text
+Coagulation cascade
+       ↓
+   Thrombin ↑
+       ↓
+     Fibrin
+       ↓
+     血栓
+       
+SERPINC1 / Antithrombin
+       ↓
+抑制 thrombin + FXa
+       ↓
+   抑制凝血
+```
+
+而且 **heparin / heparan sulfate 可以显著增强 Antithrombin 的抗凝活性**。([PubMed Central (PMC)][4])
+
+因此 SERPINC1 可以简单理解为：
+
+> **血液凝固系统的天然“刹车”。**
+
+SERPINC1 缺陷会增加血栓形成风险，这是临床上非常经典的遗传性血栓倾向之一。([国家生物技术信息中心][3])
+
+---
+
+# 4. 那么 SERPINA3 和 SERPINC1 有什么关系？
+
+这里最重要的一点：
+
+### 它们不是直接的上下游基因。
+
+也就是说，不应该简单理解成：
+
+```text
+SERPINA3 → SERPINC1
+```
+
+或者：
+
+```text
+SERPINC1 → SERPINA3
+```
+
+目前更合理的理解是：
+
+> **它们是同一家族的不同成员，在不同的 protease systems 中发挥抑制作用，但共同参与“炎症—蛋白水解—凝血”的稳态调控。**
+
+SERPIN 家族本身就是一个非常大的蛋白酶调控系统，参与：
+
+* inflammation
+* coagulation
+* fibrinolysis
+* complement
+* extracellular proteolysis
+
+等过程。([PubMed][5])
+
+---
+
+# 5. 从疾病机制上，它们可以形成一个很有意思的“炎症—凝血轴”
+
+这个对于你的 **KD/CAL** 项目特别重要。
+
+可以把它理解成：
+
+```text
+             Infection / inflammation
+                       │
+             ┌─────────┴─────────┐
+             ↓                   ↓
+      Neutrophil activation   Endothelial injury
+             ↓                   ↓
+       Cathepsin G ↑          Tissue factor
+             ↓                   ↓
+       SERPINA3 ─┤          Coagulation
+                                 ↓
+                              Thrombin
+                                 ↓
+                         Fibrin / platelet
+                                 ↓
+                              Thrombosis
+                                 ↑
+                         SERPINC1 ─┤
+```
+
+所以：
+
+### SERPINA3
+
+主要反映：
+
+> **炎症 / neutrophil protease regulation**
+
+### SERPINC1
+
+主要反映：
+
+> **coagulation / anticoagulant regulation**
+
+而二者之间的共同生物学背景就是：
+
+> **炎症与凝血系统之间的 cross-talk。**
+
+---
+
+# 6. 这对你的 KD/CAL 研究特别有意思
+
+因为 Kawasaki disease，尤其是 CAL，涉及：
+
+```text
+系统性炎症
+      ↓
+中性粒细胞活化
+      ↓
+血管内皮损伤
+      ↓
+血小板/凝血系统活化
+      ↓
+血管重塑
+      ↓
+Coronary artery lesions
+```
+
+所以如果你的 DIA 数据里面出现：
+
+```text
+SERPINA3 ↑
+SERPINC1 ↓
+```
+
+或者：
+
+```text
+SERPINA3 ↑
+SERPINC1 ↑
+```
+
+都值得进一步研究。
+
+**不要仅仅看它们单独的 fold change。**
+
+我反而建议你计算：
+
+$$
+\text{SERPINA3/SERPINC1}
+$$
+
+即：
+
+$$
+\log_2(\text{SERPINA3})-
+\log_2(\text{SERPINC1})
+$$
+
+把它作为一个：
+
+> **inflammation–coagulation balance phenotype**
+
+来分析。
+
+---
+
+# 7. 如果你在你的数据里看到 SERPINA3/SERPINC1 ratio，很值得进一步做
+
+比如：
+
+| CAL组 | SERPINA3 | SERPINC1 | SERPINA3/SERPINC1 |
+| ---- | -------: | -------: | ----------------: |
+| CAL0 |        低 |        高 |                 低 |
+| CAL1 |        ↑ |        高 |                 ↑ |
+| CAL2 |       ↑↑ |        ↓ |                ↑↑ |
+| CAL3 |      ↑↑↑ |       ↓↓ |               ↑↑↑ |
+
+如果出现这种趋势：
+
+$$
+\text{SERPINA3}/\text{SERPINC1}
+\uparrow
+$$
+
+随着 CAL severity 增加，那么它就可能代表：
+
+> **炎症性蛋白酶活性调控相对于抗凝能力发生失衡。**
+
+这比单独说：
+
+> SERPINA3 是 CAL biomarker
+
+会有更强的机制解释。
+
+---
+
+# 8. 更进一步：你可以把它和 pQTL / rQTL 接起来
+
+这其实和你上一条问的 **protein ratio pQTL** 非常契合。
+
+你可以构造：
+
+$$
+R=\log_2(SERPINA3)-\log_2(SERPINC1)
+$$
+
+然后：
+
+### Step 1
+
+分别做：
+
+```text
+SNP → SERPINA3
+SNP → SERPINC1
+```
+
+### Step 2
+
+再做：
+
+```text
+SNP → SERPINA3/SERPINC1
+```
+
+也就是：
+
+```text
+                   SNP
+                /       \
+               ↓         ↓
+          SERPINA3    SERPINC1
+               \         /
+                \       /
+                 ↓     ↓
+             SERPINA3/
+              SERPINC1
+                   ↓
+                  CAL
+```
+
+如果发现某个 SNP：
+
+```text
+SERPINA3 ↑
+SERPINC1 ↓
+```
+
+同时：
+
+```text
+SERPINA3/SERPINC1 ↑
+```
+
+并且：
+
+```text
+SERPINA3/SERPINC1 ↑ → CAL severity ↑
+```
+
+那么就可以进一步形成一个非常漂亮的：
+
+> **genetic → proteomic balance → coronary lesion**
+
+机制链。
+
+---
+
+## 9. 但有一个需要特别注意的地方
+
+**SERPINA3/SERPINC1 ratio 并不能直接等同于“炎症/凝血活性比值”。**
+
+因为蛋白浓度 ≠ 蛋白实际 enzymatic activity。
+
+例如 SERPINC1 的抗凝功能还受到：
+
+* heparin/heparan sulfate
+* thrombin
+* FXa
+* protein modification
+* consumption
+
+等因素影响。([PubMed Central (PMC)][4])
+
+因此论文里更严谨的表述应该是：
+
+> **SERPINA3/SERPINC1 protein ratio reflects the relative circulating abundance of an inflammation-associated protease inhibitor and a major anticoagulant protein**
+
+而不要直接说：
+
+> “SERPINA3/SERPINC1 ratio represents inflammation/coagulation activity.”
+
+---
+
+### 对你目前的 KD 项目，我会把这两个蛋白放进一个更大的 **“inflammation–proteolysis–coagulation–endothelial injury” module** 中，而不仅仅作为两个孤立蛋白分析。SERPINA3 和 SERPINC1 恰好位于这个轴的两个不同位置，具有很好的机制互补性。([PubMed][2])
+
+[1]: https://pmc.ncbi.nlm.nih.gov/articles/PMC3880077/?utm_source=chatgpt.com "Update of the human and mouse SERPIN gene superfamily - PMC"
+[2]: https://pubmed.ncbi.nlm.nih.gov/36672665/?utm_source=chatgpt.com "SERPINA3: Stimulator or Inhibitor of Pathological Changes - PubMed"
+[3]: https://www.ncbi.nlm.nih.gov/books/NBK545295/?utm_source=chatgpt.com "Biochemistry, Antithrombin III - StatPearls - NCBI Bookshelf"
+[4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC9110684/?utm_source=chatgpt.com "Anticoagulant SERPINs: Endogenous Regulators of Hemostasis and Thrombosis - PMC"
+[5]: https://pubmed.ncbi.nlm.nih.gov/1452519/?utm_source=chatgpt.com "Structure and mechanism of action of serpins - PubMed"
+
+
