@@ -3018,3 +3018,320 @@ SERPINA3/SERPINC1 ↑ → CAL severity ↑
 [5]: https://pubmed.ncbi.nlm.nih.gov/1452519/?utm_source=chatgpt.com "Structure and mechanism of action of serpins - PubMed"
 
 
+
+---
+
+# 临床上与川崎病类似的症状的感染有哪些
+
+有，而且这对你现在做**川崎病（KD）蛋白组学/诊断模型**特别重要。临床上KD最容易与一些**感染性发热伴皮疹、结膜炎、口腔黏膜改变、淋巴结肿大或休克**的疾病混淆。AHA把麻疹、腺病毒、肠道病毒、猩红热、葡萄球菌/链球菌毒素综合征等明确列为KD鉴别诊断。([AHajournals][1])
+
+### 1. 最重要的KD感染性鉴别诊断
+
+| 感染/疾病                | 病原体                         | 与KD相似的表现           | 更有提示性的区别                                    | KD研究中的价值 |
+| -------------------- | --------------------------- | ------------------ | ------------------------------------------- | -------- |
+| **腺病毒感染**            | Adenovirus                  | 高热、结膜炎、咽炎、皮疹、淋巴结   | **咽部/眼部分泌物明显、渗出性咽炎/结膜炎**更支持腺病毒；KD通常为非渗出性结膜炎 | ⭐⭐⭐⭐⭐    |
+| **猩红热**              | A组链球菌 GAS                   | 发热、皮疹、草莓舌、咽炎       | 咽痛明显、扁桃体渗出、砂纸样皮疹；链球菌检测阳性                    | ⭐⭐⭐⭐⭐    |
+| **麻疹**               | Measles virus               | 高热、皮疹、结膜炎、口腔改变     | **咳嗽+流涕+结膜炎**，Koplik斑，皮疹通常从面部向下扩散           | ⭐⭐⭐⭐     |
+| **葡萄球菌中毒性休克综合征 TSS** | *S. aureus*                 | 高热、皮疹、结膜充血、黏膜改变、脱屑 | **低血压/休克、多器官功能障碍**非常突出                      | ⭐⭐⭐⭐⭐    |
+| **链球菌中毒性休克 STSS**    | GAS                         | 高热、皮疹、休克、炎症反应      | 快速进展的脓毒性休克、多器官损伤                            | ⭐⭐⭐⭐⭐    |
+| **肠道病毒感染**           | Enterovirus                 | 发热、皮疹、口腔改变、结膜炎     | **口腔疱疹/溃疡、手足口、疱疹样皮疹**更典型                    | ⭐⭐⭐      |
+| **流感**               | Influenza                   | 高热、炎症、肌痛、结膜症状      | 呼吸道症状、肌痛更突出                                 | ⭐⭐⭐      |
+| **RSV**              | Respiratory syncytial virus | 发热、呼吸道症状           | 咳嗽、喘息、细支气管炎                                 | ⭐⭐       |
+| **人偏肺病毒**            | hMPV                        | 发热、呼吸道症状           | 呼吸道症状占主导                                    | ⭐⭐       |
+| **EBV感染**            | Epstein–Barr virus          | 发热、淋巴结、皮疹          | 明显咽扁桃体炎、后颈淋巴结、肝脾大                           | ⭐⭐⭐      |
+| **CMV感染**            | CMV                         | 发热、淋巴结             | 婴幼儿/免疫异常者更明显，临床表现不同                         | ⭐⭐       |
+| **细菌性脓毒症**           | 多种细菌                        | 高热、炎症、休克、皮疹        | 感染灶、菌血症、器官功能障碍                              | ⭐⭐⭐⭐⭐    |
+| **脑膜炎球菌感染**          | *N. meningitidis*           | 高热、皮疹、休克           | **紫癜/瘀斑、脑膜刺激征、快速休克**                        | ⭐⭐⭐⭐     |
+| **钩端螺旋体病**           | *Leptospira*                | 高热、结膜充血、皮疹         | 动物/水暴露、黄疸、肾损伤、肌痛                            | ⭐⭐       |
+| **立克次体感染**           | Rickettsia spp.             | 发热、皮疹、结膜充血         | 蜱虫暴露、焦痂等                                    | ⭐⭐       |
+
+AHA特别指出，**腺病毒是最容易与KD混淆的病毒感染之一**；如果同时存在明显的渗出性咽炎和渗出性结膜炎，腺病毒更加可能，而KD通常不是这种表现。([AHajournals][2])
+
+---
+
+## 2. 其中最值得纳入你的KD蛋白组学对照组的是这几类
+
+如果你的目标是建立：
+
+> **“KD vs 其他感染性发热疾病”**
+
+而不是简单做：
+
+> **KD vs Healthy**
+
+那么我最推荐考虑下面这些对照：
+
+### 第一梯队
+
+**① 腺病毒感染**
+
+这是最重要的一个。
+
+因为：
+
+> KD ↔ Adenovirus
+
+两者都可以：
+
+* 高热
+* 结膜充血
+* 皮疹
+* 咽部改变
+* 淋巴结肿大
+* CRP/WBC升高
+
+因此特别适合寻找：
+
+> **KD-specific protein signature**
+
+而不是单纯寻找“炎症蛋白”。
+
+---
+
+### ② 猩红热/GAS感染
+
+也非常重要。
+
+因为：
+
+**KD**
+
+可以出现：
+
+* 草莓舌
+* 口唇红裂
+* 皮疹
+
+而：
+
+**Scarlet fever**
+
+也有：
+
+* 草莓舌
+* 发热
+* 弥漫性皮疹
+* 咽炎
+
+因此是非常典型的临床鉴别诊断。AHA明确把scarlet fever列为KD鉴别诊断。([AHajournals][1])
+
+---
+
+### ③ TSS / STSS
+
+这个对你的研究尤其有价值。
+
+因为：
+
+> **KDSS vs bacterial toxic shock**
+
+可能非常难区分。
+
+两者都可以：
+
+* 高热
+* 皮疹
+* 结膜充血
+* 炎症因子升高
+* 血小板异常
+* 心肌损伤
+* 低血压
+* 多器官损伤
+
+TSS/STSS最大的提示特点是：
+
+> **休克 + 多器官功能障碍**
+
+CDC也指出儿童TSS与KD、KD shock syndrome等疾病存在诊断重叠。([疾病控制与预防中心][3])
+
+---
+
+# 3. 如果是为了做你的DIA蛋白组，我建议设计成这样的队列
+
+你现在已经有KD患者的：
+
+> **Acute + Recovery + CAL分组**
+
+如果以后能补充感染性发热对照，我会非常推荐：
+
+```text
+                         Pediatric fever cohort
+                                  │
+             ┌────────────────────┼───────────────────┐
+             ↓                    ↓                   ↓
+        Kawasaki disease     Viral infection     Bacterial infection
+             │                    │                   │
+       ┌─────┴─────┐       ┌──────┴──────┐       ┌────┴─────┐
+       ↓           ↓       ↓             ↓       ↓          ↓
+     nCAL         CAL   Adenovirus    Enterovirus  GAS     TSS/STSS
+       │           │
+       ↓           ↓
+   Dilation     Aneurysm
+```
+
+这样你的机器学习问题就从：
+
+> **KD vs healthy**
+
+升级成：
+
+> **KD vs infectious febrile controls**
+
+再进一步：
+
+> **KD-CAL vs KD-nCAL**
+
+最后：
+
+> **Dilation vs aneurysm**
+
+这个设计的临床价值会高很多。
+
+---
+
+# 4. 蛋白组学上最值得区分的几个生物学模块
+
+从你目前关注的蛋白来看，我建议重点观察：
+
+### KD特征
+
+**Complement**
+
+C3/C4/C5/C6/CFB/CFH
+
+↓
+
+**Coagulation**
+
+SERPINE1/F2/FGA/FGB/FGG/SERPINC1
+
+↓
+
+**Endothelial injury**
+
+VTN/FBN2/HRG/BST1
+
+↓
+
+**CAL**
+
+---
+
+### 腺病毒/病毒感染特征
+
+更应该关注：
+
+**IFN response**
+
+CXCL10
+IFIT1
+IFIT2
+IFIT3
+MX1
+OAS1/OAS2/OAS3
+ISG15
+
+这类蛋白可能帮助你的模型区分：
+
+> **“病毒感染导致的系统性炎症”**
+
+和
+
+> **“KD导致的血管炎症/内皮损伤”**
+
+---
+
+### 细菌感染特征
+
+重点可以关注：
+
+**SAA1/SAA2
+CRP
+LBP
+PCT相关通路
+S100A8/A9/A12
+SERPINA1
+Complement**
+
+这里会特别难，因为KD本身也会强烈激活中性粒细胞和急性期反应。
+
+所以：
+
+> **S100A8/A9、CRP、SAA1**
+
+虽然对判断“炎症严重程度”很好，但未必是好的**KD特异性marker**。
+
+---
+
+# 5. 对你目前研究最关键的一点
+
+如果你最终想做的是：
+
+> **“基于多模态机器学习的KD相关冠状动脉损伤风险预测”**
+
+那么最好把疾病任务拆成两个模型：
+
+### Model 1：KD diagnostic model
+
+```text
+KD
+vs
+Adenovirus
+vs
+GAS/Scarlet fever
+vs
+Other viral infection
+vs
+Bacterial infection
+```
+
+输入：
+
+**Clinical + CBC + CRP/ESR + DIA proteins**
+
+目标：
+
+> **KD identification**
+
+---
+
+### Model 2：CAL prediction model
+
+在已经诊断为KD的人中：
+
+```text
+KD-nCAL
+       ↓
+KD-dilation
+       ↓
+KD-aneurysm
+```
+
+输入：
+
+**Clinical + DIA + WGS/PRS**
+
+目标：
+
+> **CAL severity prediction**
+
+这样可以避免一个常见问题：
+
+> 模型实际上学到的是“感染 vs 非感染”，却被解释成“KD vs non-KD”。
+
+---
+
+另外，**SARS-CoV-2相关MIS-C**也一定要考虑。CDC明确指出MIS-C可以表现得非常类似KD，包括发热、胃肠道症状、皮疹、结膜改变、休克和心脏受累；因此在近年的KD队列研究中，它是一个非常重要的鉴别疾病。([疾病控制与预防中心][4])
+
+如果你的目标是做**KD蛋白组学诊断模型**，我会把最终的感染性对照优先级定为：
+
+> **腺病毒 ＞ GAS/猩红热 ＞ MIS-C ＞ TSS/STSS ＞ 其他病毒感染 ＞ 普通细菌感染**
+
+其中**腺病毒 + GAS + MIS-C**是我最建议优先纳入的三个对照组。
+
+[1]: https://www.ahajournals.org/doi/pdf/10.1161/cir.0000000000000484?download=true&utm_source=chatgpt.com "Diagnosis, Treatment, and Long-Term Management of Kawasaki Disease: A Scientific Statement for Health Professionals From the American Heart Association"
+[2]: https://www.ahajournals.org/doi/pdf/10.1161/cir.0000000000000484?utm_source=chatgpt.com "Diagnosis, Treatment, and Long-Term Management of Kawasaki Disease: A Scientific Statement for Health Professionals From the American Heart Association"
+[3]: https://wwwnc.cdc.gov/eid/article/26/6/19-0783_article?utm_source=chatgpt.com "Manifestations of Toxic Shock Syndrome in Children, Columbus, Ohio, USA, 2010–2017 - Volume 26, Number 6—June 2020 - Emerging Infectious Diseases journal - CDC"
+[4]: https://www.cdc.gov/kawasaki/about/index.html?utm_source=chatgpt.com "About Kawasaki Disease | Kawasaki Disease | CDC"
+
+
