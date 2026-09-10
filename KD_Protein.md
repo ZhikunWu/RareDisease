@@ -1,3 +1,397 @@
+# 将上述几篇文章中KD或者CAL相关的蛋白列一个详细的表
+
+可以。我重新核对了前面提到的几篇原始论文后，建议把蛋白分成 **“直接验证/重点候选”** 和 **“蛋白组中显著但仅作为通路/差异蛋白出现”** 两类。这样对你后面做自己的DIA候选蛋白筛选更有用。
+
+下面先整理 **2024–2026年这些文章中明确报道、并且与KD或CAL直接相关的蛋白**。
+
+### 1. 近三年KD/CAL蛋白组学核心蛋白汇总
+
+| 蛋白           | Gene     | 研究                      | 样本/技术              | KD/CAL中的变化 | 主要意义                     | 证据等级  |
+| ------------ | -------- | ----------------------- | ------------------ | ---------- | ------------------------ | ----- |
+| **SERPINE1** | SERPINE1 | Wang 2024               | Plasma, **DIA-MS** | **CAL ↑**  | 纤溶抑制、内皮损伤、凝血/血管重塑        | ⭐⭐⭐⭐⭐ |
+| **BST1**     | BST1     | Zhang 2026              | Serum, **4D-DIA**  | **CAL ↑↑** | 先天免疫、细胞黏附、炎症             | ⭐⭐⭐⭐⭐ |
+| **HRG**      | HRG      | Ohnishi 2025            | Serum, LC/MS       | **CAL ↓**  | 凝血/免疫调节、血管稳态             | ⭐⭐⭐⭐⭐ |
+| **SERPINA1** | SERPINA1 | 2025 exosome            | Plasma exosome     | **CAA ↓**  | 抗蛋白酶、炎症/中性粒细胞            | ⭐⭐⭐⭐⭐ |
+| **GNAI2**    | GNAI2    | 2025 exosome            | Plasma exosome     | **CAA ↓**  | GPCR/G-protein signaling | ⭐⭐⭐⭐⭐ |
+| **C3**       | C3       | 2025 exosome；2025 serum | Serum/exosome      | KD ↑；CAA相关 | 补体激活、炎症                  | ⭐⭐⭐⭐⭐ |
+| **C6**       | C6       | 2025 serum proteomics   | Serum              | KD相关、恢复期变化 | MAC/补体                   | ⭐⭐⭐⭐  |
+| **S100A8**   | S100A8   | 2025 exosome            | Plasma exosome     | KD/CAA相关   | 中性粒细胞、炎症                 | ⭐⭐⭐⭐  |
+| **S100A9**   | S100A9   | 2025 exosome            | Plasma exosome     | KD vs FC显著 | 炎症、髓系细胞/NETs             | ⭐⭐⭐⭐  |
+| **S100A12**  | S100A12  | 2025 exosome            | Plasma exosome     | KD相关       | 中性粒细胞炎症                  | ⭐⭐⭐⭐  |
+| **CFHR3**    | CFHR3    | 2025 exosome            | Plasma exosome     | KD相关       | 补体调控                     | ⭐⭐⭐⭐  |
+| **CFHR4**    | CFHR4    | 2025 exosome            | Plasma exosome     | KD相关       | 补体/炎症调节                  | ⭐⭐⭐⭐  |
+| **CXCL10**   | CXCL10   | Zhang 2026              | 4D-DIA             | KD ↑，CAL ↑ | IFN/趋化因子、免疫炎症            | ⭐⭐⭐⭐  |
+| **EPS8**     | EPS8     | Zhang 2026              | 4D-DIA             | KD ↑，CAL ↑ | 细胞骨架/信号转导                | ⭐⭐⭐   |
+| **FBN2**     | FBN2     | Zhang 2026              | 4D-DIA             | KD ↑，CAL ↑ | ECM/血管结构                 | ⭐⭐⭐⭐  |
+| **SKIC2**    | SKIC2    | Zhang 2026              | 4D-DIA             | KD ↑，CAL ↑ | RNA代谢相关                  | ⭐⭐⭐   |
+| **EPB41L1**  | EPB41L1  | Zhang 2026              | 4D-DIA             | KD ↑，CAL ↑ | 细胞骨架/膜结构                 | ⭐⭐⭐   |
+| **APOA1**    | APOA1    | 2025 KDSS/相关蛋白组         | Plasma             | KD/重症相关    | HDL、脂质代谢、抗炎              | ⭐⭐⭐   |
+| **APOA2**    | APOA2    | 2025 KDSS/相关蛋白组         | Plasma             | KD/重症相关    | 脂质代谢                     | ⭐⭐⭐   |
+| **APOM**     | APOM     | 2025 KDSS               | Plasma             | KDSS相关     | HDL/S1P、内皮稳态             | ⭐⭐⭐   |
+| **TTR**      | TTR      | 2025 KDSS               | Plasma             | KDSS相关     | 负急性期蛋白/营养及炎症             | ⭐⭐⭐   |
+| **VTN**      | VTN      | 2025 KDSS               | Plasma             | **KDSS ↑** | 细胞黏附、内皮屏障                | ⭐⭐⭐⭐  |
+| **C2**       | C2       | 2025 KDSS               | Plasma             | KD/KDSS相关  | 补体经典途径                   | ⭐⭐⭐   |
+| **C5**       | C5       | 2025 KDSS               | Plasma             | KD/KDSS相关  | 补体炎症                     | ⭐⭐⭐   |
+| **C8B**      | C8B      | 2025 KDSS               | Plasma             | KD/KDSS相关  | MAC                      | ⭐⭐⭐   |
+| **C9**       | C9       | 2025 KDSS               | Plasma             | KD/KDSS相关  | MAC                      | ⭐⭐⭐   |
+| **CFHR1**    | CFHR1    | 2025 KDSS               | Plasma             | KD/KDSS相关  | 补体调控                     | ⭐⭐⭐   |
+| **F11**      | F11      | 2025 KDSS               | Plasma             | KD/KDSS相关  | 凝血                       | ⭐⭐⭐   |
+| **F13B**     | F13B     | 2025 KDSS               | Plasma             | KD/KDSS相关  | 凝血/纤维蛋白稳定                | ⭐⭐⭐   |
+| **FGG**      | FGG      | 2025 KDSS               | Plasma             | KD/KDSS相关  | 纤维蛋白原                    | ⭐⭐⭐   |
+| **FGL1**     | FGL1     | 2025 KDSS               | Plasma             | KD/KDSS相关  | 炎症/肝脏代谢                  | ⭐⭐⭐   |
+| **SERPIND1** | SERPIND1 | 2025 KDSS               | Plasma             | KD/KDSS相关  | 抗凝血                      | ⭐⭐⭐   |
+| **TF**       | TF       | TF                      | 2025 KDSS          | KD/KDSS相关  | 铁代谢/炎症                   | ⭐⭐⭐   |
+| **S100A8**   | S100A8   | KDSS/CAA                | Plasma             | KD/CAL相关   | 中性粒细胞                    | ⭐⭐⭐⭐  |
+| **MUC5B**    | MUC5B    | 2025 KDSS               | Plasma             | KDSS相关     | 黏液/上皮相关                  | ⭐⭐    |
+| **LDHB**     | LDHB     | 2025 KDSS               | Plasma             | KDSS相关     | 能量代谢                     | ⭐⭐    |
+
+其中最重要的CAL相关结果来自三篇研究：
+
+* **SERPINE1：CAL升高**
+* **BST1：CAL升高**
+* **HRG：CAL降低**
+* **SERPINA1：CAA降低**
+* **GNAI2：CAA降低**
+
+这些是我认为最值得你在自己的DIA数据中优先验证的5个蛋白。([科学直通车][1])
+
+---
+
+# 2. SERPINE1：目前最值得关注的CAL蛋白之一
+
+2024年的DIA-MS研究直接针对KD-CAL进行分析，发现：
+
+> **SERPINE1在KD-CAL患者中显著升高。**
+
+而且作者进一步做了独立队列ELISA验证以及动物和细胞实验。([科学直通车][1])
+
+| 项目      | SERPINE1                                 |
+| ------- | ---------------------------------------- |
+| Gene    | SERPINE1                                 |
+| Protein | Plasminogen activator inhibitor-1, PAI-1 |
+| KD      | ↑                                        |
+| CAL     | **↑↑**                                   |
+| IVIG后   | nCAL下降更明显；CAL持续异常                        |
+| 主要通路    | fibrinolysis / coagulation               |
+| 生物学     | 抑制tPA/uPA                                |
+| 与CAL关系  | 内皮损伤、血栓形成、血管重塑                           |
+| 验证      | ELISA + mouse + HCAEC                    |
+| 推荐程度    | **★★★★★**                                |
+
+这个蛋白特别适合你的**急性期→恢复期**设计。
+
+你可以直接计算：
+
+$$
+\Delta SERPINE1 =
+Z_{recovery}-Z_{acute}
+$$
+
+然后比较：
+
+**normal CAL → dilation → aneurysm**
+
+如果CAL组恢复期仍然维持较高SERPINE1，就会非常有意义。
+
+---
+
+# 3. BST1：2026年最新4D-DIA CAL候选
+
+这篇文章与你的数据类型非常接近。
+
+作者使用4D-DIA：
+
+* 2575 proteins
+* CAL vs nCAL：**213 DEPs**
+* 122 ↑
+* 91 ↓
+
+其中：
+
+> **BST1是CAL组中特异升高、且CAL vs nCAL差异最突出的蛋白。**
+
+随后在：
+
+**35 CAL + 61 nCAL + 30 HC**
+
+的独立队列进行ELISA验证。
+
+BST1：
+
+* CAL ↑
+* 与最大冠脉 **Z-score正相关**
+* ROC AUC = **0.9052**
+* IVIG治疗后下降。([PubMed Central (PMC)][2])
+
+此外，该研究中：
+
+**CXCL10、EPS8、FBN2、SKIC2、EPB41L1**
+
+是nCAL vs HC中最明显升高的5个蛋白，而且在CAL vs HC中也升高，因此更像是**KD共同炎症表型**，而BST1更接近**CAL-specific marker**。([PubMed Central (PMC)][2])
+
+---
+
+# 4. HRG：CAL保护性/下降型蛋白
+
+2025年Ohnishi等人的研究非常有意思。
+
+在299例KD患者中选择：
+
+* 5 CAL
+* 5 nCAL
+
+进行LC/MS蛋白组学。
+
+发现有**6个蛋白在CAL患者中降低**，其中：
+
+> **HRG的浓度和统计学显著性最突出。**
+
+随后进行了ELISA验证，CAL患者HRG水平较低。([Wiley Online Library][3])
+
+因此：
+
+| 蛋白      | CAL方向 |
+| ------- | ----- |
+| **HRG** | **↓** |
+
+HRG与凝血、免疫调节和血管稳态有关。
+
+不过需要特别注意：
+
+> 这篇发现队列只有 **5 vs 5**。
+
+所以在你的约200例数据中，如果HRG能够重复出现，证据价值会明显高于原研究。
+
+---
+
+# 5. SERPINA1、GNAI2：CAA严重程度
+
+2025年的血浆外泌体蛋白组研究设计非常值得你参考，因为它直接分成：
+
+**HC → FC → KD-nCAA → small/medium CAA → giant CAA**
+
+发现：
+
+### SERPINA1
+
+KD + CAA：
+
+**↓**
+
+### GNAI2
+
+KD + CAA：
+
+**↓**
+
+并且两者都经过Western blot验证。([PubMed][4])
+
+该研究还发现：
+
+* 91个蛋白特异于CAA
+* 主要富集 **NETs + complement**
+* 102个蛋白与small/medium CAA相关
+* 34个蛋白与giant CAA相关。([PubMed][4])
+
+这个设计与你想做的：
+
+> **Normal → dilation → aneurysm**
+
+非常接近。
+
+---
+
+# 6. Complement相关蛋白非常值得重点关注
+
+这几篇研究有一个非常明显的共同点：
+
+> **Complement system反复出现。**
+
+尤其是：
+
+| 蛋白        | 研究                 | 主要意义                           |
+| --------- | ------------------ | ------------------------------ |
+| **C3**    | 2025 serum/exosome | 补体核心蛋白                         |
+| **C6**    | 2025 serum         | MAC                            |
+| **C2**    | 2025 KDSS          | classical complement           |
+| **C5**    | 2025 KDSS          | 炎症/MAC                         |
+| **C8B**   | 2025 KDSS          | MAC                            |
+| **C9**    | 2025 KDSS          | MAC                            |
+| **CFHR1** | 2025 KDSS/exosome  | alternative pathway regulation |
+| **CFHR3** | 2025 exosome       | complement regulation          |
+| **CFHR4** | 2025 exosome       | complement/inflammation        |
+
+2025年的KD serum proteomics明确把 **C3、C6和A1AT**作为KD进展/恢复的候选蛋白；另一项CAA外泌体蛋白组则发现C3、CFHR3、CFHR4等补体相关蛋白，并且CAA特异蛋白明显富集于补体和NETs。([PubMed Central (PMC)][5])
+
+---
+
+# 7. S100家族也值得重点关注
+
+尤其：
+
+**S100A8 → S100A9 → S100A12**
+
+这是一个比较典型的：
+
+> **neutrophil / innate inflammation**
+
+信号。
+
+2025年CAA外泌体研究中：
+
+* S100A8
+* S100A9
+* S100A12
+
+均进入重要DEPs。
+
+其中S100A9还进行了Western blot验证。([MDPI][6])
+
+不过需要注意一个非常重要的问题：
+
+> **外泌体蛋白的变化方向不一定等于血浆总蛋白的变化方向。**
+
+例如该研究发现外泌体S100A9在KD vs febrile control中下降，而文献中的血清/细胞研究经常报道KD急性期S100A9升高。作者也讨论了这一差异可能与S100A9进入外泌体、与纤维蛋白原相互作用等有关。([MDPI][6])
+
+所以你自己的**DIA血浆总蛋白**不能直接照搬exosome结果的FC方向。
+
+---
+
+# 8. 目前可以形成一个很漂亮的KD-CAL蛋白网络
+
+如果把这些研究整合起来，我认为可以分成 **5个模块**：
+
+```text
+                    Kawasaki disease
+                           │
+            ┌──────────────┼──────────────┐
+            ↓              ↓              ↓
+       Inflammation     Complement      Lipid/ECM
+            │              │              │
+      S100A8/A9/A12       C3/C6        FBN2
+      CXCL10              CFHR3/4       APOA1
+            │              │              │
+            └──────────────┼──────────────┘
+                           ↓
+                    Endothelial injury
+                           │
+              ┌────────────┴────────────┐
+              ↓                         ↓
+          Coagulation              Cell adhesion
+              │                         │
+          SERPINE1                     BST1
+          SERPINC1                     FBN2
+          F11/F13B                     EPS8
+          FGG
+              │
+              ↓
+          CAL / CAA
+              │
+       ┌──────┴──────┐
+       ↓             ↓
+   dilation       aneurysm
+       │             │
+       └──────┬──────┘
+              ↓
+     vascular remodeling
+```
+
+其中我认为与你自己的DIA数据**最值得做验证的核心集合**是：
+
+### 第一梯队：直接CAL候选
+
+**SERPINE1
+BST1
+HRG
+SERPINA1
+GNAI2**
+
+### 第二梯队：KD/CAL炎症-补体
+
+**C3
+C6
+CFHR3
+CFHR4
+S100A8
+S100A9
+S100A12
+CXCL10**
+
+### 第三梯队：血管/ECM/脂质
+
+**FBN2
+APOA1
+APOA2
+APOM
+VTN
+TTR**
+
+### 第四梯队：凝血
+
+**F11
+F13B
+FGG
+FGL1
+SERPIND1**
+
+---
+
+## 9. 对你自己的DIA数据，我建议直接做这个“文献候选蛋白面板”
+
+如果你现在有约200例、每例**acute + recovery DIA**，我建议不要只验证SERPINE1一个蛋白，而是做一个：
+
+**Literature-supported KD-CAL protein panel**
+
+| 模块                  | 首选蛋白                         |
+| ------------------- | ---------------------------- |
+| CAL-specific        | **BST1, SERPINE1**           |
+| CAL-protective/down | **HRG, SERPINA1, GNAI2**     |
+| Complement          | **C3, C6, CFHR3, CFHR4**     |
+| Neutrophil          | **S100A8, S100A9, S100A12**  |
+| Inflammation        | **CXCL10**                   |
+| ECM                 | **FBN2**                     |
+| Coagulation         | **SERPIND1, F11, F13B, FGG** |
+| Lipid/endothelium   | **APOA1, APOM, VTN**         |
+
+然后对每个蛋白同时计算：
+
+$$
+\text{Acute level}
+$$
+
+$$
+\text{Recovery level}
+$$
+
+$$
+\Delta Protein =
+Z_{Recovery}-Z_{Acute}
+$$
+
+以及：
+
+$$
+Normal < Dilation < Aneurysm
+$$
+
+的**CAL severity trend**。
+
+这会比单纯做“KD vs control”的DEPs更有价值，因为现有研究已经分别提示了 **SERPINE1、BST1、HRG、SERPINA1/GNAI2、C3/C6** 等候选，但目前不同研究的样本量、样本类型和技术平台差异很大。([科学直通车][1])
+
+**特别提醒：**上表中的“KD ↑/↓”不能理解成所有研究中的统一方向；尤其是**血浆总蛋白、血清蛋白、外泌体蛋白**不能直接比较FC方向。因此你自己的DIA矩阵应该以原始蛋白定量结果重新验证，而不是按文献方向强制筛选。
+
+如果你愿意，我下一步可以继续把这些蛋白整理成一个更适合你直接做分析的 **“KD-CAL文献候选蛋白清单”**，增加 **UniProt ID、蛋白功能、KEGG通路、是否有pQTL、是否有KD GWAS证据、是否适合做ratio-QTL、你200例DIA中应该优先检查acute/recovery/CAL哪个维度**，最后给你一个约 **30–50个蛋白的优先级表**。
+
+[1]: https://www.sciencedirect.com/science/article/pii/S1567576924012190?utm_source=chatgpt.com "Plasma proteomic profiling reveals that SERPINE1 is a potential biomarker associated with coronary artery lesions in Kawasaki disease - ScienceDirect"
+[2]: https://pmc.ncbi.nlm.nih.gov/articles/PMC13006371/?utm_source=chatgpt.com "Identification of Serum BST1 as a Biomarker to Predict Coronary Artery Lesions in Children with Kawasaki Disease Based on 4D-DIA Quantitative Proteomics - PMC"
+[3]: https://onlinelibrary.wiley.com/doi/10.1111/ped.70164?utm_source=chatgpt.com "Quantitative serum proteomics to identify candidate biomarkers of coronary artery lesions in Kawasaki disease - Ohnishi - 2025 - Pediatrics International - Wiley Online Library"
+[4]: https://pubmed.ncbi.nlm.nih.gov/40141310/?utm_source=chatgpt.com "Plasma Exosomal-Derived SERPINA1 and GNAI2 Downregulation as Potential Diagnostic Biomarkers of Kawasaki Disease with Coronary Artery Aneurysms."
+[5]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11846444/?utm_source=chatgpt.com "Proteomic insights into molecular alterations associated with Kawasaki disease in children - PMC"
+[6]: https://www.mdpi.com/1422-0067/26/6/2668?utm_source=chatgpt.com "Plasma Exosomal-Derived SERPINA1 and GNAI2 Downregulation as Potential Diagnostic Biomarkers of Kawasaki Disease with Coronary Artery Aneurysms | MDPI"
+
+
+---
+
 # 查找近三年发表的关于川崎病蛋白质组学研究得到文章
 
 可以。按**近三年（2023年9月—2026年9月）**检索，目前川崎病（KD）蛋白质组学文献数量并不算多，但其中有几篇与你现在的**DIA血浆蛋白组 + 急性/恢复期 + CAL分层**研究非常直接相关。
