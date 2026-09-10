@@ -1,3 +1,418 @@
+# 查找近三年发表的关于川崎病蛋白质组学研究得到文章
+
+可以。按**近三年（2023年9月—2026年9月）**检索，目前川崎病（KD）蛋白质组学文献数量并不算多，但其中有几篇与你现在的**DIA血浆蛋白组 + 急性/恢复期 + CAL分层**研究非常直接相关。
+
+我建议重点关注下面 **7篇**。
+
+### 1. 最值得重点参考：SERPINE1与CAL
+
+**Wang N, et al.**
+**Plasma proteomic profiling reveals that SERPINE1 is a potential biomarker associated with coronary artery lesions in Kawasaki disease.**
+*International Immunopharmacology*, 2024;139:112698.
+DOI: 10.1016/j.intimp.2024.112698. ([PubMed][1])
+
+这是目前与你研究设计**最接近的一篇**。
+
+* 样本：健康对照、KD、KD-CAL、KD-nCAL
+* 技术：**DIA-MS plasma proteomics**
+* 设计：包括**IVIG前后**
+* CAL相关分析
+* 后续采用独立队列 **ELISA验证**
+* 还进行了 **CAWS小鼠模型 + HCAEC细胞实验**
+* 关键蛋白：**SERPINE1（PAI-1）**
+* CAL组SERPINE1升高
+* ROC：**AUC = 0.824**
+* IVIG后，nCAL组SERPINE1下降，而CAL组仍维持较高水平。 ([PubMed][1])
+
+**对你的启发非常大：**
+
+> 急性期蛋白 → IVIG后变化 → CAL持续异常
+
+正好可以对应你现在的：
+
+> **acute DIA → recovery DIA → Δprotein → CAL**
+
+所以这篇建议作为你论文/基金中的**直接文献依据**。
+
+---
+
+### 2. 2025：HRG与CAL
+
+**Ohnishi Y, et al.**
+**Quantitative serum proteomics to identify candidate biomarkers of coronary artery lesions in Kawasaki disease.**
+*Pediatrics International*, 2025;67:e70164.
+DOI: 10.1111/ped.70164. ([PubMed][2])
+
+研究来自日本山口大学。
+
+设计非常值得你注意：
+
+* 从299例KD患者中选取
+* **5例CAL + 5例non-CAL**
+* LC/MS serum proteomics
+* 找到6个CAL相关蛋白
+* 其中 **HRG（histidine-rich glycoprotein）**差异最显著
+* CAL患者HRG水平降低
+
+作者认为：
+
+> **HRG可能成为KD-CAL预测生物标志物。** ([PubMed][2])
+
+不过它最大的局限是发现队列非常小（5 vs 5）。
+
+所以如果你的样本量约200例，那么你的研究在**统计功效和分层能力上明显更有优势**。
+
+---
+
+### 3. 2026：BST1 + 4D-DIA + CAL
+
+**Zhang S, et al.**
+**Identification of Serum BST1 as a Biomarker to Predict Coronary Artery Lesions in Children with Kawasaki Disease Based on 4D-DIA Quantitative Proteomics.**
+*Journal of Inflammation Research*, 2026;19:570480.
+DOI: 10.2147/JIR.S570480. ([PubMed][3])
+
+这篇与你的技术路线也**非常接近**。
+
+### Discovery cohort
+
+* KD-CAL：8
+* KD-nCAL：7
+* Healthy control：4
+* **4D-DIA quantitative proteomics**
+* 共鉴定 **2575 proteins**
+* CAL vs nCAL得到 **213 DEPs**
+
+其中：
+
+> **BST1在CAL组中特异性升高。**
+
+随后：
+
+### Validation cohort
+
+* KD-CAL：35
+* KD-nCAL：61
+* HC：30
+* ELISA验证
+
+BST1：
+
+* CAL组升高
+* 与冠脉 **Z-score正相关**
+* ROC **AUC = 0.9052**
+
+富集到：
+
+* innate immune response
+* cell adhesion
+* complement and coagulation cascades
+* extracellular exosome
+* cellular metabolism。 ([PubMed][3])
+
+**这篇对你的项目尤其重要。**
+
+因为它说明：
+
+> **DIA蛋白组 → CAL差异蛋白 → 通路 → 单蛋白验证 → Z-score/ROC**
+
+已经成为目前KD-CAL蛋白组学研究比较典型的路线。
+
+---
+
+### 4. 2025：KD-CAL外泌体蛋白组
+
+**Plasma Exosomal-Derived SERPINA1 and GNAI2 Downregulation as Potential Diagnostic Biomarkers of Kawasaki Disease with Coronary Artery Aneurysms.**
+*International Journal of Molecular Sciences*, 2025. ([PubMed Central (PMC)][4])
+
+这篇比较有意思，因为不是普通血浆蛋白，而是：
+
+> **plasma exosomal proteomics**
+
+设计包括：
+
+* HC
+* KD without CAA
+* KD + small/medium CAA
+* KD + giant CAA
+* febrile controls
+
+发现：
+
+* KD患者共有 **104 DEPs**
+* CAA特异性DEPs：**91**
+* 这些蛋白主要涉及：
+
+  * NETs
+  * complement
+  * platelet activation
+* 小/中型CAA：102 DEPs
+* giant CAA：34 DEPs
+* 重点候选：
+
+  * **SERPINA1**
+  * **GNAI2**
+
+而且随着CAA严重程度，还可以看到不同的蛋白表达/通路模式。 ([PubMed Central (PMC)][4])
+
+这篇与你现在想做的：
+
+> **normal → dilation → aneurysm**
+
+这种**CAL严重程度梯度分析**特别值得参考。
+
+---
+
+### 5. 2025：KD急性期 vs 恢复期蛋白组
+
+**Proteomic insights into molecular alterations associated with Kawasaki disease in children.**
+2025. ([PubMed][5])
+
+这个研究与你的**急性期/恢复期配对DIA**思路尤其接近。
+
+样本：
+
+| 组别                         |  n |
+| -------------------------- | -: |
+| Acute KD                   | 20 |
+| Febrile bacterial controls | 20 |
+| Recovered KD               |  8 |
+
+蛋白组结果：
+
+* Acute KD vs control：
+
+  * 92 proteins ↑
+  * 101 proteins ↓
+* Recovered KD：
+
+  * 537 proteins ↑
+  * 231 proteins ↓
+* 有 **56 proteins**在acute/recovery之间呈现相反变化模式。
+
+重点通路：
+
+* **Complement and coagulation cascades**
+* AMPK
+* PI3K-Akt
+
+候选蛋白：
+
+* **C3**
+* **C6**
+* **A1AT/SERPINA1**。 ([PubMed][5])
+
+这篇对你非常有参考价值，因为你现在的设计可以进一步做成：
+
+> **paired acute–recovery longitudinal proteomics**
+
+而不仅仅是：
+
+> acute KD vs control。
+
+---
+
+### 6. 2025：KD shock syndrome蛋白组
+
+**Up-regulated vitronectin in Kawasaki disease shock syndrome serves as a potential biomarker.**
+*Translational Pediatrics*, 2025. ([转化医学小儿科][6])
+
+研究：
+
+> KD vs Kawasaki disease shock syndrome（KDSS）
+
+采用：
+
+> **TMT-based plasma proteomics**
+
+共分析455个血浆蛋白：
+
+* 58 ↑
+* 52 ↓
+* 13个重点DEPs
+* **Vitronectin (VTN)**得到验证
+
+主要涉及：
+
+* cell activation signaling
+* inflammatory cascades
+* endopeptidase activity
+* endothelial barrier dysfunction。 ([转化医学小儿科][6])
+
+这篇更适合参考KD**重症/炎症表型**，对CAL不是最直接。
+
+---
+
+### 7. 2025：牙龈沟液蛋白组
+
+**Fan X, et al.**
+**New biomarkers of Kawasaki disease identified by gingival crevicular fluid proteomics.**
+*Frontiers in Molecular Biosciences*, 2025;12:1597412. ([PubMed][7])
+
+样本：
+
+* KD：27
+* HC：18
+
+方法：
+
+> **DIA quantitative proteomics + MRM-MS**
+
+发现：
+
+> 197 DEPs
+
+其中：
+
+* 174 ↑
+* 23 ↓
+
+MRM验证12个蛋白：
+
+**IFIT3、UB2L6、HP、A1AT、HSP90AA1、HNRPC、HSP90AB1、SAA1、MX1、B2M、FKBP4、TRAP1**
+
+主要富集：
+
+* NOD-like receptor signaling
+* ER protein processing
+* influenza pathway
+
+这篇更偏向**KD诊断标志物**，而不是CAL预测。 ([PubMed][7])
+
+---
+
+# 按你的研究方向排序
+
+如果你的目的是给目前的**“KD急性期/恢复期DIA + CAL分组 + WGS + 多模态机器学习”**项目找文献，我建议优先级如下：
+
+| 优先级   | 研究                       | 技术                 | 主要目标               | 对你价值           |
+| ----- | ------------------------ | ------------------ | ------------------ | -------------- |
+| ⭐⭐⭐⭐⭐ | Wang 2024                | **DIA-MS**         | CAL                | **最接近**        |
+| ⭐⭐⭐⭐⭐ | Zhang 2026               | **4D-DIA**         | CAL                | **非常接近**       |
+| ⭐⭐⭐⭐⭐ | Ohnishi 2025             | LC/MS              | CAL                | CAL蛋白标志物       |
+| ⭐⭐⭐⭐⭐ | 2025 Proteomic insights  | Proteomics         | **acute/recovery** | **非常适合你的纵向设计** |
+| ⭐⭐⭐⭐  | 2025 Exosomal proteomics | Exosome proteomics | CAA严重程度            | 适合CAL梯度        |
+| ⭐⭐⭐   | 2025 KDSS                | TMT                | 重症/KDSS            | 重症机制           |
+| ⭐⭐⭐   | 2025 GCF                 | DIA + MRM          | KD诊断               | 诊断方向           |
+
+---
+
+# 最值得你重点关注的蛋白
+
+把近三年这些研究放在一起，可以看到一些比较有意思的重复出现的生物学轴：
+
+### ① Complement / coagulation
+
+反复出现：
+
+**C3、C6、SERPINA1/A1AT、SERPINE1**
+
+这与你之前发现的 **Complement and coagulation cascades** 非常吻合。2025年的血清蛋白组研究也直接观察到了急性→恢复期的补体/凝血级联变化。 ([PubMed Central (PMC)][8])
+
+---
+
+### ② Endothelial injury / vascular remodeling
+
+重点：
+
+**SERPINE1 → coagulation/fibrinolysis/endothelial dysfunction**
+
+**BST1 → inflammation/cell adhesion**
+
+**HRG → CAL**
+
+**VTN → endothelial barrier**
+
+因此可以形成一个比较漂亮的KD-CAL机制框架：
+
+> **Systemic inflammation → complement activation → endothelial injury → coagulation/platelet activation → vascular remodeling → CAL**
+
+---
+
+### ③ Neutrophil / NETs
+
+尤其是CAA外泌体蛋白组：
+
+> CAA-specific proteins → **NET formation + complement**
+
+这与你现在如果考虑：
+
+> neutrophil / lymphocyte + proteomics + CAL
+
+会非常契合。 ([PubMed Central (PMC)][4])
+
+---
+
+# 对你目前200例DIA数据，我认为真正有价值的创新点
+
+目前文献最大的共同问题其实很明显：
+
+**很多发现队列非常小。**
+
+例如：
+
+* SERPINE1研究虽然有多队列验证，但蛋白组发现仍属于候选筛选模式；
+* HRG研究发现队列只有 **5 CAL vs 5 non-CAL**；
+* BST1研究发现队列只有 **8 CAL + 7 nCAL + 4 HC**。 ([PubMed][2])
+
+所以如果你有约**200例KD患者，每个人都有急性期 + 恢复期DIA**，你的优势不是简单地“再找几个DEPs”，而应该明确做成：
+
+> **Large longitudinal KD proteomic cohort**
+
+进一步做：
+
+**① Acute vs Recovery**
+
+↓
+
+**② CAL normal / dilation / aneurysm**
+
+↓
+
+**③ Time × CAL interaction**
+
+↓
+
+**④ CAL severity trend**
+
+↓
+
+**⑤ WGCNA / protein modules**
+
+↓
+
+**⑥ pQTL / WGS**
+
+↓
+
+**⑦ Protein–genotype integration**
+
+↓
+
+**⑧ multimodal ML**
+
+↓
+
+**⑨ CAL prediction + early intervention decision**
+
+这会比单纯重复“DIA找SERPINE1/BST1/HRG”明显更有创新性。
+
+另外，你前面关注的 **SERPINA3、SERPINC1、ENPP2、SERPINE1** 其实可以进一步组成一个很有意思的**炎症–凝血–内皮–脂质信号轴**，这比单独做DEG/DEP列表更适合作为你后续文章的机制主线。
+
+如果你愿意，我下一步可以继续给你整理一张 **“2023–2026年川崎病蛋白质组学全部核心文章（约15–20篇）”**，按 **年份、期刊、样本量、样本类型、DIA/TMT/iTRAQ、KD/CAL分组、蛋白数量、核心蛋白、验证方式、AUC、主要通路、与你200例DIA研究的可借鉴点** 做成一张完整表格。
+
+[1]: https://pubmed.ncbi.nlm.nih.gov/39029232/?utm_source=chatgpt.com "Plasma proteomic profiling reveals that SERPINE1 is a potential biomarker associated with coronary artery lesions in Kawasaki disease - PubMed"
+[2]: https://pubmed.ncbi.nlm.nih.gov/40851226/?utm_source=chatgpt.com "Quantitative serum proteomics to identify candidate biomarkers of coronary artery lesions in Kawasaki disease - PubMed"
+[3]: https://pubmed.ncbi.nlm.nih.gov/41877833/?utm_source=chatgpt.com "Identification of Serum BST1 as a Biomarker to Predict Coronary Artery Lesions in Children with Kawasaki Disease Based on 4D-DIA Quantitative Proteomics."
+[4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11942354/?utm_source=chatgpt.com "Plasma Exosomal-Derived SERPINA1 and GNAI2 Downregulation as Potential Diagnostic Biomarkers of Kawasaki Disease with Coronary Artery Aneurysms - PMC"
+[5]: https://pubmed.ncbi.nlm.nih.gov/39984993/?utm_source=chatgpt.com "Proteomic insights into molecular alterations associated with Kawasaki disease in children."
+[6]: https://tp.amegroups.org/article/view/139820/html?utm_source=chatgpt.com "Up-regulated vitronectin in Kawasaki disease shock syndrome serves as a potential biomarker - Wei - Translational Pediatrics"
+[7]: https://pubmed.ncbi.nlm.nih.gov/40421421/?utm_source=chatgpt.com "New biomarkers of Kawasaki disease identified by gingival crevicular fluid proteomics."
+[8]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11846444/?utm_source=chatgpt.com "Proteomic insights into molecular alterations associated with Kawasaki disease in children - PMC"
+
+
+
+---
+
 # KD_Protein Project
 
 现在有两百个川崎病人血浆样本，有发病急性期和恢复期两个时期，每个时期进行DIA的蛋白组测序，川崎病人根据冠状动脉损伤情况分为四类，同时这些样本都进行了WGS测序，现在想分析与川崎病发病风险及冠状动脉损伤相关的蛋白，制定一个深度、详细、全面的研究方案
