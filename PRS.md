@@ -628,3 +628,1111 @@ PGS Catalog 的标准 scoring file 也以 variant ID/位置、effect allele、ot
 
 [1]: https://www.pgscatalog.org/downloads/?utm_source=chatgpt.com "PGS Catalog - Download Information"
 
+
+# 写一套从 GWAS结果 → harmonization → LD clumping → PRSice-2 → PRS计算 → CAL关联分析 → 最佳P阈值选择 的完整 Linux 命令
+
+可以。下面给你一套**可以直接放到 Linux/HPC 上执行的完整流程**。我按照你目前的场景来设计：
+
+> **KD GWAS summary statistics → harmonization → QC → LD clumping → PRSice-2 → 计算 KD-PRS → CAL 关联 → P-value threshold 选择 → 最终模型**
+
+先强调一个关键点：如果你的 GWAS 是**外部 KD GWAS**，而你的约 200 例是独立的 KD 队列，那么这个流程非常合适。若你的 200 例全部都是 KD，没有健康/非KD对照，那么 **KD-PRS不能用来验证“是否患KD”**，而应主要用于 **CAL风险/严重程度**分析。
+
+---
+
+# 1. 推荐目录结构
+
+```bash
+mkdir -p KD_PRS/{00_raw,01_harmonization,02_qc,03_clump,04_prs,05_cal,06_result,log}
+cd KD_PRS
+```
+
+建议：
+
+```text
+KD_PRS/
+├── 00_raw/
+│   ├── KD_GWAS.txt
+│   └── target.pgen/pvar/psam
+├── 01_harmonization/
+├── 02_qc/
+├── 03_clump/
+├── 04_prs/
+├── 05_cal/
+├── 06_result/
+└── log/
+```
+
+---
+
+# 2. 软件准备
+
+建议至少：
+
+```bash
+plink2 --version
+R --version
+```
+
+以及：
+
+```text
+PRSice.R
+PRSice_linux
+```
+
+PRSice-2 官方文档支持 base GWAS + target genotype，并可以同时进行 LD clumping、不同 P 阈值的 PRS 构建和 phenotype association。([Sam Choi][1])
+
+设置：
+
+```bash
+export PRSICE=/path/to/PRSice.R
+export PRSICE_BIN=/path/to/PRSice_linux
+```
+
+---
+
+# 3. 第一步：检查你的 KD GWAS
+
+假设原始文件：
+
+```text
+KD_GWAS.txt
+```
+
+例如：
+
+```text
+SNP CHR BP A1 A2 BETA SE P EAF N
+rs123 1 123456 A G 0.15 0.03 5e-8 0.32 5000
+rs456 1 234567 C T -0.08 0.02 4e-5 0.41 5000
+```
+
+先：
+
+```bash
+head KD_GWAS.txt
+```
+
+检查：
+
+```bash
+awk 'NR==1{print NF; print $0}' KD_GWAS.txt
+```
+
+以及：
+
+```bash
+awk 'NR>1 && $7 !~ /^[0-9.eE+-]+$/ {print; exit}' KD_GWAS.txt
+```
+
+---
+
+# 4. GWAS harmonization：最重要的一步
+
+PRS最容易出问题的其实不是 PRSice，而是：
+
+> **GWAS effect allele 和 target genotype allele 没有正确对应。**
+
+最终我们希望得到：
+
+```text
+SNP
+CHR
+BP
+A1      # effect allele
+A2      # other allele
+BETA
+SE
+P
+EAF
+N
+```
+
+例如：
+
+```text
+rs123 A G 0.15 0.03 5e-8
+```
+
+其中：
+
+```text
+A1 = effect allele
+BETA = A1对应的效应
+```
+
+---
+
+# 5. 如果GWAS给的是 OR
+
+例如：
+
+```text
+SNP A1 A2 OR SE P
+```
+
+则：
+
+$$
+BETA=\ln(OR)
+$$
+
+可以：
+
+```bash
+awk 'BEGIN{OFS="\t"}
+NR==1{
+    print "SNP","A1","A2","BETA","SE","P";
+    next
+}
+{
+    print $1,$2,$3,log($4),$5,$6
+}' KD_GWAS_OR.txt > 01_harmonization/KD_GWAS_PRS.txt
+```
+
+**注意：这个命令只适用于你的第4列确实是 OR。**
+
+---
+
+# 6. 去除明显有问题的 SNP
+
+建议先：
+
+```bash
+awk 'BEGIN{OFS="\t"}
+NR==1{print;next}
+$1!="." &&
+$4!="." &&
+$5!="." &&
+$6!="." &&
+$7!="." &&
+$7>0 &&
+$7<=1 &&
+$4!=$5 &&
+$4~/^[ACGT]$/ &&
+$5~/^[ACGT]$/ &&
+$6== $6
+' KD_GWAS_PRS.txt \
+> 01_harmonization/KD_GWAS_PRS.clean.txt
+```
+
+不过如果你的列结构不同，必须按实际列号修改。
+
+---
+
+# 7. 特别处理 A/T、C/G palindromic SNP
+
+这一步非常重要。
+
+以下 SNP：
+
+```text
+A/T
+T/A
+C/G
+G/C
+```
+
+如果没有可靠的 EAF，很难判断 effect allele 是否发生 strand flip。
+
+因此：
+
+### 有 EAF
+
+可以保留非高频 palindromic SNP，例如：
+
+```text
+EAF < 0.42
+```
+
+### 没有 EAF
+
+建议直接删除：
+
+```bash
+awk 'BEGIN{OFS="\t"}
+NR==1{print;next}
+!(
+ ($4=="A"&&$5=="T") ||
+ ($4=="T"&&$5=="A") ||
+ ($4=="C"&&$5=="G") ||
+ ($4=="G"&&$5=="C")
+)' KD_GWAS_PRS.clean.txt \
+> KD_GWAS_PRS.harmonized.txt
+```
+
+---
+
+# 8. Target WGS首先进行 QC
+
+假设你的 target：
+
+```text
+target.pgen
+target.pvar
+target.psam
+```
+
+先：
+
+```bash
+plink2 \
+  --pfile target \
+  --geno 0.02 \
+  --mind 0.02 \
+  --make-pgen \
+  --out 02_qc/target.qc
+```
+
+如果是高质量 WGS，也可以使用：
+
+```text
+--geno 0.01
+--mind 0.01
+```
+
+但 PRS 的关键是：
+
+> **GWAS中的 SNP 和 target 中的 SNP 能够正确匹配。**
+
+---
+
+# 9. 统一 genome build
+
+这一点必须先确认。
+
+例如：
+
+```text
+KD GWAS     GRCh37
+Target WGS  GRCh38
+```
+
+那么：
+
+```text
+GRCh37 GWAS
+      ↓
+LiftOver
+      ↓
+GRCh38
+      ↓
+allele harmonization
+```
+
+**不要直接按照 rsID 匹配后就计算 PRS。**
+
+如果两边都是：
+
+```text
+GRCh38
+```
+
+则继续。
+
+---
+
+# 10. 提取GWAS与target共有SNP
+
+先获得 target SNP：
+
+```bash
+plink2 \
+  --pfile 02_qc/target.qc \
+  --write-snplist \
+  --out 02_qc/target
+```
+
+然后：
+
+```bash
+awk 'NR==FNR{a[$1]=1;next} NR==1 || ($1 in a)' \
+    02_qc/target.snplist \
+    01_harmonization/KD_GWAS_PRS.harmonized.txt \
+    > 02_qc/KD_GWAS.target_overlap.txt
+```
+
+检查：
+
+```bash
+wc -l 02_qc/KD_GWAS.target_overlap.txt
+```
+
+---
+
+# 11. 最重要：allele harmonization
+
+你最好把 GWAS 和 target 的：
+
+```text
+SNP
+REF
+ALT
+```
+
+一起比较。
+
+例如 target：
+
+```bash
+plink2 \
+  --pfile 02_qc/target.qc \
+  --freq \
+  --out 02_qc/target
+```
+
+得到：
+
+```text
+target.afreq
+```
+
+然后检查：
+
+```text
+GWAS A1/A2
+      ↕
+Target REF/ALT
+```
+
+合法情况：
+
+```text
+GWAS A1=A
+GWAS A2=G
+
+Target A/G
+```
+
+或者：
+
+```text
+GWAS A1=A
+GWAS A2=G
+
+Target G/A
+```
+
+第二种需要交换 effect allele 对应关系。
+
+---
+
+# 12. 如果你的GWAS来自公开数据库，推荐直接使用经过harmonization的文件
+
+如果有：
+
+```text
+GWAS SSF
+PGS Catalog
+```
+
+或者作者提供的标准化 summary statistics，优先使用。
+
+因为手动处理：
+
+```text
+strand
+effect allele
+REF/ALT
+palindromic SNP
+build
+```
+
+非常容易出现方向错误。
+
+---
+
+# 13. LD clumping
+
+这里有两种方式。
+
+## 方案A：直接用PRSice-2
+
+我更推荐这个。
+
+例如：
+
+```bash
+Rscript $PRSICE \
+  --prsice $PRSICE_BIN \
+  --base 01_harmonization/KD_GWAS_PRS.harmonized.txt \
+  --target 02_qc/target.qc \
+  --snp SNP \
+  --A1 A1 \
+  --A2 A2 \
+  --stat BETA \
+  --beta \
+  --pvalue P \
+  --clump-kb 250 \
+  --clump-r2 0.1 \
+  --clump-p 1 \
+  --out 04_prs/KD_PRS
+```
+
+PRSice会按照不同 P-value threshold 建立 PRS。
+
+---
+
+# 14. 但是我更推荐你使用一个独立LD reference
+
+你现在只有约200个KD target。
+
+**不要太依赖这200个人估计LD。**
+
+最好使用：
+
+```text
+East Asian LD reference
+```
+
+例如：
+
+```text
+1000 Genomes EAS
+```
+
+或者与你研究人群更接近的 EAS reference panel。
+
+PLINK2 官方文档也说明，`--clump` 的 genotype reference 可以与进行关联分析的数据集不同，关键是应包含目标 SNP 并具有相似的群体结构。([COG Genomics][2])
+
+---
+
+# 15. 如果用PLINK2自己clumping
+
+假设你的文件：
+
+```text
+SNP A1 A2 BETA P
+```
+
+可以：
+
+```bash
+plink2 \
+  --pfile EAS_LD_reference \
+  --clump 01_harmonization/KD_GWAS_PRS.harmonized.txt \
+  --clump-id-field SNP \
+  --clump-p-field P \
+  --clump-a1-field A1 \
+  --clump-p1 1 \
+  --clump-p2 1 \
+  --clump-r2 0.1 \
+  --clump-kb 250 \
+  --clump-unphased \
+  --out 03_clump/KD
+```
+
+PLINK2 的 `--clump` 本质上根据 P 值和 LD 把相关 SNP 聚成 clump；`--clump-r2`、`--clump-kb` 控制 LD 和距离。([COG Genomics][3])
+
+---
+
+# 16. PRS threshold建议
+
+不要只用：
+
+```text
+P < 5e-8
+```
+
+建议：
+
+```text
+5e-8
+1e-6
+1e-5
+1e-4
+1e-3
+0.01
+0.05
+0.1
+0.2
+0.3
+0.5
+1
+```
+
+可以让 PRSice 自动搜索。
+
+---
+
+# 17. 完整PRSice-2命令
+
+假设：
+
+```text
+KD_GWAS_PRS.harmonized.txt
+```
+
+包含：
+
+```text
+SNP A1 A2 BETA SE P
+```
+
+Target：
+
+```text
+target.qc
+```
+
+Phenotype：
+
+```text
+CAL.pheno
+```
+
+例如：
+
+```text
+FID IID CAL
+KD001 KD001 0
+KD002 KD002 1
+KD003 KD003 0
+...
+```
+
+运行：
+
+```bash
+Rscript $PRSICE \
+  --prsice $PRSICE_BIN \
+  --base 01_harmonization/KD_GWAS_PRS.harmonized.txt \
+  --target 02_qc/target.qc \
+  --snp SNP \
+  --A1 A1 \
+  --A2 A2 \
+  --stat BETA \
+  --beta \
+  --pvalue P \
+  --clump-kb 250 \
+  --clump-r2 0.1 \
+  --clump-p 1 \
+  --lower 5e-8 \
+  --upper 1 \
+  --interval 1e-5 \
+  --pheno 05_cal/CAL.pheno \
+  --pheno-col CAL \
+  --binary-target T \
+  --cov-file 05_cal/covariates.txt \
+  --cov-col PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,AGE,SEX \
+  --out 04_prs/KD_PRS
+```
+
+---
+
+# 18. 注意一个PRSice参数问题
+
+不同 PRSice-2 版本的参数名称可能略有差异。
+
+所以先：
+
+```bash
+Rscript $PRSICE --help
+```
+
+确认：
+
+```text
+--cov-file
+--cov-col
+--pheno
+--pheno-col
+```
+
+等参数。
+
+不要直接复制一个旧版本教程中的全部参数。
+
+---
+
+# 19. PRSice会得到什么？
+
+一般会产生类似：
+
+```text
+KD_PRS.best
+KD_PRS.summary
+KD_PRS.sscore
+KD_PRS.log
+KD_PRS
+```
+
+其中最重要的是：
+
+```text
+KD_PRS.best
+```
+
+它会告诉你：
+
+```text
+最佳P threshold
+最佳PRS
+R²
+P
+```
+
+例如假设：
+
+```text
+PT = 0.001
+R² = 0.087
+P = 0.004
+```
+
+那么说明：
+
+> P<0.001筛选得到的 KD-PRS 在当前数据中与 CAL 的关联最好。
+
+---
+
+# 20. 但这里有一个非常重要的统计问题
+
+**不能直接把PRSice找到的“最佳P阈值”当成最终无偏结果。**
+
+因为你是在：
+
+```text
+同一个数据集
+```
+
+里：
+
+```text
+尝试12个P threshold
+        ↓
+选择P值最小的
+        ↓
+报告这个P值
+```
+
+这会产生 **winner's curse / threshold selection bias**。
+
+因此最好：
+
+```text
+Discovery
+    ↓
+选择P threshold
+    ↓
+Independent validation
+    ↓
+最终报告
+```
+
+如果你现在只有约200个KD患者，可以考虑：
+
+### 5-fold CV
+
+例如：
+
+```text
+Fold 1
+  train 80%
+  test 20%
+
+Fold 2
+  train 80%
+  test 20%
+
+...
+```
+
+在训练集选择最佳 threshold：
+
+```text
+P < 5e-8
+P < 1e-6
+...
+P < 1
+```
+
+然后在测试集评估。
+
+---
+
+# 21. 你的CAL phenotype如果是四分类
+
+你之前提到你的KD样本现在是**四类CAL状态**。
+
+那么不要简单粗暴地：
+
+```text
+CAL = 0/1
+```
+
+我建议同时做三种模型。
+
+---
+
+## 模型1：CAL vs non-CAL
+
+如果定义：
+
+```text
+0 = no coronary lesion
+1 = coronary lesion
+```
+
+使用：
+
+```R
+glm(
+    CAL ~ PRS + AGE + SEX + PC1 + PC2 + ... + PC10,
+    family = binomial
+)
+```
+
+---
+
+# 22. 模型2：四分类CAL
+
+例如：
+
+```text
+0 = normal
+1 = dilation
+2 = aneurysm
+3 = severe aneurysm
+```
+
+使用：
+
+```R
+library(nnet)
+
+fit <- multinom(
+    CAL4 ~ PRS + AGE + SEX + PC1 + PC2 + PC3 + PC4 + PC5,
+    data = dat
+)
+```
+
+---
+
+# 23. 模型3：CAL严重程度ordinal
+
+如果四类本身有明确的严重程度顺序：
+
+```text
+normal
+   ↓
+dilation
+   ↓
+aneurysm
+   ↓
+giant aneurysm
+```
+
+那么**优先推荐 ordinal logistic regression**。
+
+```R
+library(MASS)
+
+fit <- polr(
+    CAL4 ~ PRS + AGE + SEX + PC1 + PC2 + PC3 + PC4 + PC5,
+    data = dat,
+    Hess = TRUE
+)
+```
+
+这样可以直接检验：
+
+$$
+PRS \rightarrow CAL\ severity
+$$
+
+---
+
+# 24. 如果你有最大Z-score
+
+我反而非常推荐这个。
+
+例如：
+
+```text
+Maximum_Z
+```
+
+可以：
+
+```R
+fit <- lm(
+    Maximum_Z ~ PRS + AGE + SEX + PC1 + PC2 + PC3 + PC4 + PC5,
+    data = dat
+)
+
+summary(fit)
+```
+
+这个分析比把连续的 Z-score 强行分类更加充分利用信息。
+
+---
+
+# 25. 最佳P threshold怎么选择？
+
+最终建议同时报告：
+
+| P threshold | SNP数量 | OR/β |  P | AUC | R² |
+| ----------: | ----: | ---: | -: | --: | -: |
+|        5e-8 |       |      |    |     |    |
+|        1e-6 |       |      |    |     |    |
+|        1e-5 |       |      |    |     |    |
+|        1e-4 |       |      |    |     |    |
+|        1e-3 |       |      |    |     |    |
+|        0.01 |       |      |    |     |    |
+|        0.05 |       |      |    |     |    |
+|         0.1 |       |      |    |     |    |
+|         0.2 |       |      |    |     |    |
+|         0.5 |       |      |    |     |    |
+|           1 |       |      |    |     |    |
+
+对于 CAL 二分类：
+
+> 主要看 **OR、95% CI、P、AUC、ΔAUC、Nagelkerke R²、calibration**。
+
+---
+
+# 26. 更重要的是比较“有PRS”和“无PRS”
+
+不要只报告：
+
+```text
+PRS P=0.003
+```
+
+应该比较：
+
+### Model 1
+
+```text
+CAL ~ AGE + SEX + PC1-PC10
+```
+
+### Model 2
+
+```text
+CAL ~ AGE + SEX + PC1-PC10 + PRS
+```
+
+然后比较：
+
+```text
+AUC
+R²
+Likelihood ratio test
+AIC
+BIC
+Calibration
+Decision curve
+```
+
+例如：
+
+```text
+Clinical model:
+AUC = 0.71
+
+Clinical + KD-PRS:
+AUC = 0.78
+```
+
+那么 PRS 才真正体现临床价值。
+
+---
+
+# 27. 如果你的目标是“CAL风险预测”，推荐最终模型
+
+结合你现在的多组学项目，我建议：
+
+```text
+Model 0
+Clinical
+    ↓
+CAL
+
+Model 1
+Clinical + KD-PRS
+    ↓
+CAL
+
+Model 2
+Clinical + Proteins
+    ↓
+CAL
+
+Model 3
+Clinical + KD-PRS + Proteins
+    ↓
+CAL
+
+Model 4
+Clinical + KD-PRS + Proteins + pQTL
+    ↓
+CAL
+```
+
+这样就能证明：
+
+> **遗传风险 + 蛋白组 + 临床指标**是否能够提高 CAL 风险预测能力。
+
+---
+
+# 28. 你尤其可以进一步做“PRS → PROZ → CAL”
+
+既然你刚才提到了 **PROZ**，如果 PROZ 在你的 pQTL 中比较突出，可以进一步做：
+
+```text
+KD-GWAS
+   ↓
+KD-PRS
+   ↓
+PROZ
+   ↓
+CAL
+```
+
+分别检验：
+
+### Step 1
+
+```R
+PROZ ~ KD_PRS + age + sex + PCs
+```
+
+### Step 2
+
+```R
+CAL ~ KD_PRS + age + sex + PCs
+```
+
+### Step 3
+
+```R
+CAL ~ KD_PRS + PROZ + age + sex + PCs
+```
+
+如果：
+
+```text
+KD-PRS → PROZ
+KD-PRS → CAL
+```
+
+同时加入 PROZ 后 KD-PRS 效应减弱，那么可以进一步做 mediation analysis。
+
+但这属于**机制探索**，不能仅凭关联就宣称因果。
+
+---
+
+# 29. 最终建议的目录和结果
+
+最后你应该得到：
+
+```text
+01_harmonization/
+    KD_GWAS_PRS.harmonized.txt
+
+02_qc/
+    target.qc.pgen
+    target.qc.pvar
+    target.qc.psam
+
+03_clump/
+    KD.clumps
+
+04_prs/
+    KD_PRS.best
+    KD_PRS.summary
+    KD_PRS.sscore
+
+05_cal/
+    CAL.pheno
+    covariates.txt
+
+06_result/
+    PRS_CAL_association.txt
+    PRS_threshold_comparison.txt
+    PRS_AUC.pdf
+    PRS_CAL_boxplot.pdf
+```
+
+---
+
+## 30. 我给你的参数建议
+
+针对你目前这个 KD 项目，我会优先使用：
+
+```text
+LD window       = 250 kb
+LD r²            = 0.1
+P thresholds    = 5e-8 ~ 1
+LD reference    = EAS reference
+Covariates      = age + sex + PC1-PC10
+```
+
+`250 kb + r²=0.1` 是一个比较常见的 PRS clumping 起点；PLINK2 的 clumping 本身支持调整距离和 r² 阈值。([COG Genomics][3])
+
+**但你的 n≈200 比较小，所以不要把“PRSice自动选出的最佳 P threshold”直接作为最终证据。** 最好用 5-fold CV 或独立验证队列。
+
+### 最关键的流程
+
+```text
+KD GWAS
+   │
+   ├── genome build统一
+   ├── SNP/allele QC
+   ├── A/T、C/G处理
+   ├── effect allele统一
+   │
+   ↓
+Harmonized GWAS
+   │
+   ↓
+EAS LD clumping
+   │
+   ├── r² < 0.1
+   └── 250 kb
+   │
+   ↓
+PRSice-2
+   │
+   ├── 5e-8
+   ├── 1e-6
+   ├── 1e-5
+   ├── 1e-4
+   ├── 1e-3
+   ├── 0.01
+   ├── 0.05
+   ├── 0.1
+   ├── 0.2
+   ├── 0.5
+   └── 1
+   │
+   ↓
+KD-PRS
+   │
+   ├── CAL vs non-CAL
+   ├── 4-level CAL
+   └── max Z-score
+   │
+   ↓
+Clinical + PRS
+   │
+   ↓
+AUC / OR / R² / calibration
+   │
+   ↓
+Proteomics / pQTL
+   │
+   ↓
+KD-PRS → PROZ/protein → CAL
+```
+
+**如果你把你的 KD GWAS 文件的 `header + 前5行` 发给我，我可以下一步直接按你实际的列名（例如 `CHR POS SNP EA NEA OR SE P EAF N`）把上面这套流程改成一份可以直接运行的 `run_KD_PRS.sh`，包括 allele harmonization、palindromic SNP过滤、PLINK2 clumping、PRSice-2 和最后的 CAL logistic/ordinal regression。**
+
+[1]: https://choishingwan.github.io/PRSice/archive/PRSice_MANUAL_v1.25.pdf?utm_source=chatgpt.com "5  Detail on command line options"
+[2]: https://www.cog-genomics.org/plink/2.0/tutorials/qwas2?utm_source=chatgpt.com "GWAS Post-Hoc - PLINK 2.0"
+[3]: https://www.cog-genomics.org/plink/2.0/postproc?utm_source=chatgpt.com "Report postprocessing - PLINK 2.0"
+
+
+
