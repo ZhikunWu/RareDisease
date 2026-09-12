@@ -934,3 +934,414 @@ VWF 在血浆中的半衰期很大程度上取决于其内吞清除效率，GWAS
 
 
 
+
+---
+
+# 列出关联分析文章中所有与川崎病及其CAL相关的基因
+
+可以。这里我建议把“关联分析文章中所有与川崎病（KD）及冠状动脉损伤（CAL）相关的基因”理解为：**既包括GWAS发现的KD易感基因/位点，也包括候选基因、CAL/CAA关联研究、基因-基因互作和较新的WES研究**。
+
+需要先强调：**不同文章的“associated gene”标准不一样**，有些是GWAS genome-wide significant，有些只是候选基因研究达到名义显著。因此不能把下面所有基因都当成“已经被GWAS确证的KD致病基因”。GWAS中最稳定的一批主要包括 **FCGR2A、ITPKC、CASP3、BLK/FAM167A、CD40、HLA相关位点**等。([Nature][1])
+
+## 1. 最值得纳入你WGS/KD-CAL分析的核心基因
+
+| 基因           | 主要关联                     | 证据/备注                           |
+| ------------ | ------------------------ | ------------------------------- |
+| **FCGR2A**   | KD易感、CAL                 | 多人群GWAS重复验证                     |
+| **ITPKC**    | KD易感、CAL、IVIG resistance | Ca²⁺/NFAT/T-cell signaling      |
+| **CASP3**    | KD易感、CAL、IVIG resistance | apoptosis/inflammation          |
+| **BLK**      | KD易感                     | B-cell signaling                |
+| **FAM167A**  | KD易感                     | 与BLK同一区域                        |
+| **CD40**     | KD易感、CAL                 | CD40-CD40L immune signaling     |
+| **HLA-DQB2** | KD易感                     | HLA class II                    |
+| **HLA-DOB**  | KD易感                     | HLA class II                    |
+| **HLA-E**    | CAL                      | HLA/immune regulation           |
+| **HLA-B**    | CAL                      | HLA/immune regulation           |
+| **KCNN2**    | severe CAL/CAA           | CAL GWAS重点基因                    |
+| **NEBL**     | CAA                      | GWAS发现候选基因                      |
+| **TUBA3C**   | CAA                      | GWAS发现候选基因                      |
+| **TGFBR2**   | CAL                      | TGF-β pathway                   |
+| **SMAD3**    | CAL/Z-score              | TGF-β pathway                   |
+| **TGFB2**    | CAL/Z-score              | TGF-β pathway                   |
+| **MMP3**     | CAL                      | extracellular matrix remodeling |
+| **MMP13**    | CAL                      | extracellular matrix remodeling |
+| **ITPR3**    | CAL                      | Ca²⁺ signaling                  |
+| **PELI1**    | KD/CAL                   | T-cell/NF-κB signaling          |
+| **HMGB1**    | CAL                      | inflammation                    |
+| **MICB**     | CAL                      | innate immune response          |
+
+这些基因在综述和CAL遗传研究中反复出现；例如CAL遗传背景综述明确列出了 **HLA-E、HLA-B、CD40、FCGR2A、HMGB1、MICB、PELI1、ITPKC、CASP3、MMP3/MMP13、IL10、ITPR3** 等。([Frontiers][2])
+
+---
+
+# 2. KD GWAS发现的基因/位点
+
+早期GWAS已经发现一批KD susceptibility loci。例如欧洲GWAS发现了 **NAALADL2、ZFHX3**，台湾GWAS涉及 **COPB2、ERAP1、IGHV**，韩国研究发现 **DAB1、PELI1** 等。([PubMed Central (PMC)][3])
+
+因此建议你的WGS候选基因表至少包括：
+
+### KD susceptibility
+
+```text
+FCGR2A
+ITPKC
+CASP3
+BLK
+FAM167A
+CD40
+HLA-DQB2
+HLA-DOB
+HLA-DPB1
+HLA-DQA1
+HLA-DRB1
+NAALADL2
+ZFHX3
+COPB2
+ERAP1
+IGHV
+DAB1
+PELI1
+NMNAT2
+HCP5
+MIA
+RAB4B
+```
+
+其中 **MIA/RAB4B** 位于相关GWAS信号附近，不建议像FCGR2A或ITPKC一样直接称为“确定的功能基因”。台湾和韩国GWAS的相关结果可以从GWAS综述及验证研究中看到。([PubMed Central (PMC)][4])
+
+---
+
+# 3. CAL/冠状动脉瘤重点基因
+
+如果你的主要目标是：
+
+> **KD → CAL**
+
+那么这一组比单纯KD susceptibility gene更重要。
+
+### 第一梯队
+
+```text
+ITPKC
+CASP3
+FCGR2A
+CD40
+KCNN2
+TGFBR2
+TGFB2
+SMAD3
+MMP3
+MMP13
+ITPR3
+HLA-E
+HLA-B
+HMGB1
+MICB
+PELI1
+```
+
+其中 **KCNN2** 非常值得你重点关注。
+
+韩国CAL GWAS研究中，**KCNN2 rs17136627** 与巨大冠状动脉瘤显著相关，联合分析 OR≈12.6，P≈1.96×10⁻⁸，是比较典型的CAL-specific GWAS signal。([Nature][5])
+
+---
+
+# 4. CAL候选基因研究发现的其他基因
+
+早期候选基因研究还发现了大量与CAL相关的基因，包括：
+
+```text
+TIMP4
+AGTR1
+KDR / VEGFR2
+CD14
+VEGFA
+TNF
+TGFBR2
+CCL5
+CTLA4
+MMP3
+MMP12
+FGB
+ITPR3
+CCR5
+CCL3L1
+PRRC2A
+ABHD16A
+```
+
+这些并不全部属于“强GWAS证据”，但如果你的目的是构建一个**KD-CAL候选基因集合**，建议保留。早期遗传多态性综述汇总了这些CAL相关基因。([PubMed Central (PMC)][6])
+
+---
+
+# 5. 免疫/炎症相关候选基因
+
+另外一篇专门做KD susceptibility/CAL基因-基因关联的研究，在159个免疫相关基因中筛选出很多关联信号。其CAL multivariate analysis明确发现：
+
+```text
+CD209
+NOD2
+CLEC2D
+CXCL10
+CCL24
+CD14
+IL4
+CD80
+MS4A2
+LTC4S
+ADAM33
+EHF
+```
+
+例如：
+
+* **CD14 rs2569190**：CAL OR≈5.72
+* **CCL24 rs2302004**：CAL OR≈3.64
+* **MS4A2 rs2583476**：CAL OR≈3.81
+* **CXCL10 rs867562**：CAL OR≈3.41
+
+这些结果来自候选基因association study，而不是大规模GWAS，所以证据等级应单独标记。([PubMed Central (PMC)][7])
+
+---
+
+# 6. KD susceptibility候选基因研究中的其他基因
+
+同一研究的KD susceptibility analysis还发现：
+
+```text
+SPP1
+CLEC4C
+COLEC11
+C5
+CD209
+HLA-DQA1
+TBX21
+TAP1
+LY75
+IL13
+HLA-DPB1
+IL5RA
+ADAM33
+ELF5
+PIK3CD
+PDE2A
+CYFIP2
+PEX6
+SELP
+ADRB2
+PIM1
+PDGFRA
+```
+
+其中值得特别注意的是：
+
+> **PDE2A + CYFIP2**
+
+联合基因型与KD susceptibility显著相关；
+
+而：
+
+> **LOC100133214 + IL2RA**
+
+联合基因型与CAL风险显著相关。([PubMed Central (PMC)][7])
+
+---
+
+# 7. TGF-β/血管重塑通路
+
+这一组我建议你在KD-CAL多组学分析里单独建立一个gene set：
+
+```text
+TGFB1
+TGFB2
+TGFBR1
+TGFBR2
+SMAD2
+SMAD3
+SMAD4
+SMAD7
+```
+
+其中文献对：
+
+> **TGFB2 / TGFBR2 / SMAD3**
+
+与CAL Z-score/冠状动脉损伤的关联尤其值得关注。([PubMed Central (PMC)][8])
+
+---
+
+# 8. 2024 WES研究新增/验证的基因
+
+较新的WES研究中，报道：
+
+```text
+HLA-DRB1
+IL6ST
+IL17RC
+VEGFB
+```
+
+其中：
+
+* **HLA-DRB1 rs17882084**
+* **IL6ST rs781455079**
+
+与KD susceptibility有关；
+
+* **IL17RC rs143781415**
+
+与CAL/non-CAL差异有关。
+
+但该研究样本只有55例KD，因此建议作为**exploratory candidate genes**，不要和FCGR2A/ITPKC/CASP3等经典GWAS基因放在同一个证据等级。([Frontiers][9])
+
+---
+
+# 9. 如果给你做WGS分析，我建议最终建立这个“KD-CAL gene panel”
+
+如果你的目的是后面做：
+
+> **WGS → candidate variants → protein/pQTL → CAL**
+
+我建议不要把上述基因简单混成一个列表，而是分成三个证据层级。
+
+### Tier 1：强证据 / GWAS优先
+
+```text
+FCGR2A
+ITPKC
+CASP3
+BLK
+FAM167A
+CD40
+HLA-DQB2
+HLA-DOB
+KCNN2
+```
+
+### Tier 2：CAL/CAA重点
+
+```text
+NEBL
+TUBA3C
+TGFBR2
+TGFB2
+SMAD3
+MMP3
+MMP13
+ITPR3
+HLA-E
+HLA-B
+HMGB1
+MICB
+PELI1
+```
+
+### Tier 3：候选/关联研究
+
+```text
+CD209
+NOD2
+CLEC2D
+CXCL10
+CCL24
+CD14
+IL4
+CD80
+MS4A2
+LTC4S
+ADAM33
+EHF
+SPP1
+CLEC4C
+COLEC11
+C5
+TBX21
+TAP1
+LY75
+IL13
+IL5RA
+PIK3CD
+PDE2A
+CYFIP2
+PEX6
+SELP
+ADRB2
+PIM1
+PDGFRA
+LOC100133214
+IL2RA
+TIMP4
+AGTR1
+KDR
+VEGFA
+TNF
+CCL5
+CTLA4
+MMP12
+FGB
+CCR5
+CCL3L1
+PRRC2A
+ABHD16A
+HLA-DRB1
+IL6ST
+IL17RC
+VEGFB
+```
+
+---
+
+## 10. 对你现在的WGS + DIA项目，我建议进一步扩展
+
+**最有价值的其实不是单纯做这个gene list。**
+
+你现在有 **WGS + DIA plasma proteome + acute/recovery + CAL phenotype**，可以把这些已报道KD/CAL基因作为一个**prior gene set**，然后做：
+
+```text
+             WGS
+              │
+      ┌───────┴────────┐
+      ↓                ↓
+Known KD/CAL genes   Genome-wide
+      │                │
+      ↓                ↓
+rare variants       common variants
+      │                │
+      └───────┬────────┘
+              ↓
+           pQTL
+              ↓
+       plasma proteins
+              ↓
+    Acute → Recovery
+              ↓
+       CAL phenotype
+              ↓
+      ML / PRS / MR
+```
+
+特别值得优先检查：
+
+**FCGR2A、ITPKC、CASP3、BLK、CD40、KCNN2、TGFBR2、SMAD3、MMP3、ITPR3、PELI1、HLA相关基因**
+
+是否存在：
+
+> **WGS variant → cis/trans-pQTL → protein abundance → CAL**
+
+这样的连续证据链。
+
+这会比单纯统计“哪些基因在KD患者中有差异”更适合你现在的课题。
+
+如果你说的“关联分析文章”是指**你前面让我整理的那批具体KD/CAL GWAS/association论文**，我还可以进一步给你整理成一张**完整的“基因-SNP-染色体-P值-OR-关联表型-人群-文献”表**，这样可以直接作为你WGS分析的候选基因数据库。
+
+[1]: https://www.nature.com/articles/s41431-021-00838-5?utm_source=chatgpt.com "Identification of novel locus associated with coronary artery aneurysms and validation of loci for susceptibility to Kawasaki disease | European Journal of Human Genetics"
+[2]: https://www.frontiersin.org/journals/pediatrics/articles/10.3389/fped.2020.00493/full?utm_source=chatgpt.com "Frontiers | Insights Into Coronary Artery Lesions in Kawasaki Disease"
+[3]: https://pmc.ncbi.nlm.nih.gov/articles/PMC3606754/?utm_source=chatgpt.com "Understanding the Pathogenesis of Kawasaki Disease by Network and Pathway Analysis - PMC"
+[4]: https://pmc.ncbi.nlm.nih.gov/articles/PMC6331318/?utm_source=chatgpt.com "New Insight to the Pathogenetic Mechanism of Kawasaki Disease (KD): the Relationship between Clinical Diversity and Genetic Heterogeneity - PMC"
+[5]: https://www.nature.com/articles/jhg201343?utm_source=chatgpt.com "Identification of KCNN2 as a susceptibility locus for coronary artery aneurysms in Kawasaki disease using genome-wide association analysis | Journal of Human Genetics"
+[6]: https://pmc.ncbi.nlm.nih.gov/articles/PMC4010074/?utm_source=chatgpt.com "Genetic polymorphisms in Kawasaki disease - PMC"
+[7]: https://pmc.ncbi.nlm.nih.gov/articles/PMC4664466/?utm_source=chatgpt.com "Gene-Gene Associations with the Susceptibility of Kawasaki Disease and Coronary Artery Lesions - PMC"
+[8]: https://pmc.ncbi.nlm.nih.gov/articles/PMC7477115/?utm_source=chatgpt.com "Insights Into Coronary Artery Lesions in Kawasaki Disease - PMC"
+[9]: https://www.frontiersin.org/journals/pediatrics/articles/10.3389/fped.2024.1400123/full?utm_source=chatgpt.com "Frontiers | Whole-exome sequencing reveals Kawasaki disease susceptibility genes and their association with coronary artery lesion"
+
+
