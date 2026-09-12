@@ -3335,3 +3335,1049 @@ KD-aneurysm
 [4]: https://www.cdc.gov/kawasaki/about/index.html?utm_source=chatgpt.com "About Kawasaki Disease | Kawasaki Disease | CDC"
 
 
+---
+
+# 检测到川崎病血浆蛋白的pQTL，还可以进行哪些系统深入的研究，和已经得到其他研究进行联动
+
+可以，而且**如果你已经在川崎病血浆DIA蛋白组中发现了可靠的 pQTL，这实际上是整个项目从“蛋白组学 biomarker”升级到“遗传—蛋白—疾病机制—临床预测”研究的关键节点。**
+
+尤其你现在同时有 **WGS + 急性期/恢复期DIA蛋白组 + CAL分组 + 临床指标**，可以把 pQTL 做成一条非常完整的证据链：
+
+> **遗传变异 → pQTL → 蛋白表达 → KD/CAL → 临床表型 → 机制/药物靶点**
+
+近期KD多组学综述也明确提出，KD研究正在从单一组学向 genomics、proteomics、metabolomics、immunomics 等整合，并特别强调炎症、FcγR、内皮/ECM重塑等轴线。([PubMed][1])
+
+下面我按照**“你已经发现pQTL以后，最值得继续做什么”**来设计。
+
+---
+
+# 一、第一优先级：pQTL × KD/CAL GWAS——寻找“共享遗传信号”
+
+这是我认为你**最应该首先做**的。
+
+假设你发现：
+
+> SNP rsXXXX → Protein X
+
+下一步不要停在“这个SNP是Protein X的pQTL”。
+
+应该问：
+
+> **这个SNP是不是同时影响KD或者CAL？**
+
+形成：
+
+```text
+             SNP
+            /   \
+           ↓     ↓
+      Protein X   KD/CAL
+```
+
+如果成立，就比普通差异蛋白有意义得多。
+
+---
+
+## 1. 与KD GWAS联动
+
+可以收集已有KD GWAS summary statistics，与：
+
+> SNP → Protein
+
+做：
+
+### Colocalization
+
+重点看：
+
+* PP.H4：两者共享因果变异
+* PP.H3：两个性状都有association，但可能是不同causal variants
+
+例如：
+
+| SNP    |  pQTL | KD GWAS | Protein  | PP.H4 |
+| ------ | ----: | ------: | -------- | ----: |
+| rsXXXX | 1e-12 |    2e-7 | SERPINE1 |  0.96 |
+| rsYYYY |  3e-9 |    5e-6 | BST1     |  0.12 |
+
+那么：
+
+**rsXXXX → SERPINE1 → KD**
+
+就比单纯：
+
+**SERPINE1在KD升高**
+
+强很多。
+
+---
+
+# 二、第二优先级：pQTL × CAL GWAS——这个甚至比KD更重要
+
+因为你的研究重点不是单纯“什么蛋白与KD有关”，而是：
+
+> **为什么有些KD患儿会发生CAL，而另一些不会？**
+
+所以建议专门建立：
+
+### KD-CAL genetic architecture
+
+即：
+
+```text
+KD patients
+│
+├── nCAL
+│
+├── dilation
+│
+├── aneurysm
+│
+└── giant aneurysm
+```
+
+然后把你的pQTL与：
+
+> CAL GWAS / CAA GWAS
+
+整合。
+
+这方面已经有非常好的外部遗传学基础。例如2024年的KD药物基因组学研究，用WGS分析CAA/L，并发现12个基因组风险位点，建立的遗传风险评分AUC达到0.86。([Nature][2])
+
+另外，TIFAB、KCNN2、ITPKC等都已有KD/CAL遗传关联证据。([Nature][3])
+
+因此你可以建立：
+
+```text
+CAL-GWAS SNP
+      ↓
+    pQTL
+      ↓
+  Protein
+      ↓
+    CAL
+```
+
+这会是一个非常漂亮的**遗传—蛋白—CAL机制链**。
+
+---
+
+# 三、第三优先级：pQTL → 蛋白 → CAL，做 Mendelian Randomization
+
+如果：
+
+> SNP → Protein
+
+而且这个蛋白与你的CAL显著相关，那么下一步就是：
+
+## Two-sample MR
+
+模型：
+
+```text
+pQTL SNP
+     ↓
+Protein
+     ↓
+CAL
+```
+
+检验：
+
+> **Protein X是否可能是CAL的因果因素？**
+
+而不是简单说：
+
+> Protein X与CAL相关。
+
+---
+
+## 推荐分析
+
+至少做：
+
+### ① IVW
+
+主要结果。
+
+### ② MR-Egger
+
+检查水平多效性。
+
+### ③ Weighted median
+
+提高稳健性。
+
+### ④ MR-PRESSO
+
+检测异常工具变量。
+
+### ⑤ Steiger directionality
+
+判断：
+
+> SNP → Protein → CAL
+
+还是：
+
+> SNP → CAL → Protein
+
+---
+
+# 四、第四优先级：Colocalization + MR一起做
+
+我非常建议你不要只做MR。
+
+最佳模式：
+
+```text
+               ┌── pQTL ──→ Protein
+SNP ───────────┤
+               └── GWAS ──→ CAL
+                    ↓
+                 Coloc
+                    ↓
+              Shared causal SNP
+                    ↓
+                   MR
+                    ↓
+            causal protein
+```
+
+也就是说：
+
+### Coloc回答
+
+> 两个GWAS信号是不是来自同一个遗传变异？
+
+### MR回答
+
+> Protein是否可能因果影响CAL？
+
+两个证据结合，可信度明显提高。
+
+现在的大规模蛋白遗传学研究也越来越采用 **pQTL + colocalization + MR** 来从“association”走向“causal protein”。例如2026年Nature Communications的大规模研究就是将circulating proteome genetics与疾病状态结合来寻找潜在causal proteins。([Nature][4])
+
+---
+
+# 五、第五优先级：把你自己的WGS也真正利用起来
+
+你现在最大的优势其实不是只有DIA，而是：
+
+> **同一批KD患者同时拥有WGS + 蛋白组。**
+
+因此可以做：
+
+## Individual-level pQTL
+
+模型：
+
+```text
+Protein ~ SNP + age + sex + PC1-PC10 + batch
+```
+
+然后进一步：
+
+```text
+Protein ~ SNP + CAL + age + sex + PCs
+```
+
+甚至：
+
+```text
+CAL ~ SNP + Protein + age + sex + PCs
+```
+
+这样可以尝试：
+
+### Mediation analysis
+
+```text
+SNP
+ ↓
+Protein
+ ↓
+CAL
+```
+
+问：
+
+> SNP对CAL的影响，有多少比例可能通过Protein介导？
+
+---
+
+# 六、第六优先级：做“遗传调控 × 急性/恢复期”
+
+这个是我认为**你目前的数据非常有特色的一点**。
+
+因为你的蛋白不是只有一个时间点，而是：
+
+> Acute
+> Recovery
+
+所以不要只做：
+
+```text
+SNP → Protein
+```
+
+而应该研究：
+
+```text
+SNP
+ ↓
+Protein acute
+ ↓
+Protein recovery
+ ↓
+ΔProtein
+```
+
+定义：
+
+$$
+\Delta Protein =
+Protein_{recovery}-Protein_{acute}
+$$
+
+或者标准化：
+
+$$
+Recovery\ Index =
+Z_{recovery}-Z_{acute}
+$$
+
+然后问：
+
+> **某个遗传变异是否影响蛋白恢复能力？**
+
+---
+
+# 七、可以进一步做“response-pQTL”
+
+这个方向非常有意思。
+
+例如：
+
+### SNP A
+
+携带风险等位基因：
+
+```text
+Acute Protein = 高
+Recovery Protein = 仍然高
+```
+
+而保护等位基因：
+
+```text
+Acute Protein = 高
+Recovery Protein = 正常
+```
+
+那么真正有意义的可能不是：
+
+> Protein abundance
+
+而是：
+
+> **Protein recovery dynamics**
+
+即：
+
+### genotype × time interaction
+
+模型：
+
+```text
+Protein ~ Genotype
+        + Time
+        + Genotype × Time
+        + Age
+        + Sex
+        + Batch
+        + (1|Patient)
+```
+
+如果：
+
+> Genotype × Time
+
+显著，那么可以称为一种：
+
+**genetically regulated longitudinal proteomic response**
+
+这个方向比普通pQTL有新意。
+
+---
+
+# 八、第七优先级：pQTL × IVIG response
+
+KD里面这是非常值得做的。
+
+因为已有研究表明KD患者的遗传背景与IVIG后的冠脉反应存在关联。2024年的pharmacogenomics研究就是直接研究了CAA/L和IVIG治疗背景下的遗传风险。([Nature][2])
+
+所以你可以建立：
+
+```text
+SNP
+ ↓
+Protein
+ ↓
+IVIG response
+```
+
+例如结局：
+
+* IVIG resistance
+* fever persistence
+* second IVIG
+* steroid/biologic escalation
+* CAL development
+* persistent CAL
+
+最终形成：
+
+### Pharmacoproteomic model
+
+```text
+Genotype
+   +
+Protein
+   +
+Clinical
+   ↓
+IVIG response prediction
+```
+
+这与你原来的“**早期干预决策**”方向非常吻合。
+
+---
+
+# 九、第八优先级：pQTL × 临床生化指标
+
+你已经有：
+
+* CRP
+* ESR
+* WBC
+* neutrophils
+* lymphocytes
+* platelets
+* albumin
+* ALT/AST
+* bilirubin
+* NT-proBNP
+* troponin
+* ECG
+* echo
+* Z-score
+
+那么可以研究：
+
+```text
+SNP
+ ↓
+Protein
+ ↓
+Clinical phenotype
+```
+
+例如：
+
+> pQTL → SERPINE1 → NT-proBNP
+
+或者：
+
+> pQTL → complement protein → CRP
+
+或者：
+
+> pQTL → PROZ → platelet/coagulation phenotype
+
+最终做一个：
+
+### Protein–clinical network
+
+非常适合画成：
+
+```text
+Genetic variants
+       │
+       ↓
+     pQTL
+       │
+       ↓
+ Proteins
+   │    │    │
+   ↓    ↓    ↓
+CRP   NT-proBNP  Platelet
+   \    │    /
+      ↓
+     CAL
+```
+
+---
+
+# 十、第九优先级：pQTL × 已发表KD蛋白组
+
+这一步特别重要，因为你已经有大量其他研究结果。
+
+例如目前KD-CAL蛋白组研究已经报道：
+
+* SERPINE1
+* BST1
+* HRG
+* SERPINA1
+* GNAI2
+* C3
+* C6
+* CFHR3
+* CFHR4
+* S100A8
+* S100A9
+* S100A12
+* VTN
+* SERPIND1
+* F11
+* F13B
+* FGG
+
+其中SERPINE1和BST1已经分别有DIA/4D-DIA及ELISA验证研究。([PubMed][5])
+
+你可以建立一个：
+
+# KD Protein Evidence Database
+
+每个蛋白统计：
+
+| Evidence                  | 是否存在 |
+| ------------------------- | ---- |
+| 你的DIA DE                  | ✓    |
+| CAL association           | ✓    |
+| Acute/Recovery difference | ✓    |
+| pQTL                      | ✓    |
+| KD GWAS                   | ✓    |
+| CAL GWAS                  | ✓    |
+| Coloc                     | ✓    |
+| MR                        | ✓    |
+| WGCNA hub                 | ✓    |
+| Clinical correlation      | ✓    |
+| External literature       | ✓    |
+| ELISA validation          | ?    |
+| Drug target               | ?    |
+
+然后给蛋白分级。
+
+---
+
+# 十一、最终可以定义“Tier 1 causal candidate”
+
+例如：
+
+### Protein X
+
+同时满足：
+
+```text
+① DIA差异
+        ↓
+② CAL association
+        ↓
+③ Acute→Recovery abnormal trajectory
+        ↓
+④ cis-pQTL
+        ↓
+⑤ CAL-GWAS colocalization
+        ↓
+⑥ MR支持
+        ↓
+⑦ WGCNA hub
+        ↓
+⑧ 与Z-score/NT-proBNP等相关
+        ↓
+⑨ 外部KD研究支持
+```
+
+那么这个蛋白就不是普通的：
+
+> “differentially expressed protein”
+
+而可以定义为：
+
+> **genetically supported CAL-associated causal candidate protein**
+
+这会明显提高文章层次。
+
+---
+
+# 十二、第十优先级：做 trans-pQTL → protein network
+
+如果你的WGS pQTL里面发现很多trans-pQTL，不要简单丢掉。
+
+例如：
+
+```text
+SNP
+ ↓
+Protein A
+ ↓
+Protein B
+ ↓
+Protein C
+```
+
+或者：
+
+```text
+SNP
+ ↓
+Protein A
+ ↓
+PPI network
+ ├── Protein B
+ ├── Protein C
+ ├── Protein D
+```
+
+然后做：
+
+* PPI
+* WGCNA
+* GO
+* KEGG
+* Reactome
+* STRING
+* network propagation
+
+近期研究已经开始强调**PPI对trans-pQTL效应的组织作用**。因此你可以把trans-pQTL从“噪声”转化成机制线索。
+
+---
+
+# 十三、第十一优先级：你之前提到的“蛋白Ratio-pQTL”可以正式升级
+
+这是你这个项目里一个很有潜力的创新点。
+
+比如：
+
+### 炎症 / 抗凝
+
+$$
+Ratio_1 = \log_2(SERPINA3)-\log_2(SERPINC1)
+$$
+
+### 凝血 / 抗凝
+
+$$
+Ratio_2 = \log_2(F11)-\log_2(PROZ)
+$$
+
+### Complement balance
+
+$$
+Ratio_3 =
+\log_2(C3)-\log_2(CFHR3)
+$$
+
+### Endothelial injury / protection
+
+根据你的实际蛋白结果构建。
+
+然后做：
+
+```text
+SNP
+ ↓
+Protein A / Protein B
+ ↓
+CAL
+```
+
+这比简单研究Protein A或Protein B更接近：
+
+> **pathway balance**
+
+尤其适合KD这种炎症—凝血—补体—血管内皮互相作用的疾病。
+
+KD蛋白组研究已经观察到complement/coagulation等通路，而最新KD多组学综述也强调炎症与内皮/ECM重塑的整合。([PubMed][5])
+
+---
+
+# 十四、第十二优先级：做PheWAS——看这个pQTL/蛋白到底是不是KD特异
+
+这是非常值得做的。
+
+假设你发现：
+
+> rsXXXX → Protein X
+
+然后查询这个variant/protein与：
+
+* cardiovascular disease
+* autoimmune disease
+* infection
+* vasculitis
+* thrombosis
+* inflammatory disease
+* blood cell traits
+* liver function
+* kidney function
+
+的关系。
+
+得到：
+
+```text
+Protein X
+│
+├── KD
+├── CAL
+├── thrombosis
+├── CRP
+├── platelet
+├── autoimmune disease
+└── infection
+```
+
+这样可以判断：
+
+> Protein X是KD-specific biomarker
+
+还是：
+
+> 一个广义炎症/血管损伤蛋白。
+
+这对文章讨论部分非常重要。
+
+---
+
+# 十五、第十三优先级：与eQTL整合
+
+你可以建立：
+
+```text
+          SNP
+         /   \
+        ↓     ↓
+      eQTL   pQTL
+       ↓       ↓
+      mRNA   Protein
+         \   /
+          ↓
+         CAL
+```
+
+然后做：
+
+### eQTL–pQTL–CAL三方colocalization
+
+特别是：
+
+* GTEx
+* blood
+* liver
+* vascular tissue
+* endothelial-related tissues
+
+如果：
+
+> SNP → gene expression → protein → CAL
+
+形成完整链条，机制证据会进一步增强。
+
+---
+
+# 十六、第十四优先级：做“KD蛋白→药物靶点”
+
+这个方向很适合你的“**早期干预决策**”。
+
+例如：
+
+```text
+pQTL
+ ↓
+Protein
+ ↓
+CAL
+ ↓
+Drug target
+```
+
+然后查询：
+
+* DrugBank
+* Open Targets
+* ChEMBL
+* DGIdb
+* STRING
+* ClinicalTrials.gov
+
+最终得到：
+
+| Protein   | Genetic support | CAL evidence | Drug evidence |
+| --------- | --------------- | ------------ | ------------- |
+| Protein A | ★★★★★           | ★★★★★        | ★★★★          |
+| Protein B | ★★★★            | ★★★★★        | ★★★           |
+| Protein C | ★★★★★           | ★★★          | ★★★★★         |
+
+最后可以提出：
+
+> **Genetically supported therapeutic targets for KD-CAL**
+
+这比简单的“潜在biomarker”更有文章价值。
+
+---
+
+# 十七、我尤其推荐你做一个“KD-CAL多组学证据整合评分”
+
+这是我认为你这个项目**最适合形成最终主线**的方法。
+
+给每个蛋白建立：
+
+$$
+EvidenceScore =
+DIA + CAL + Longitudinal + pQTL +
+GWAS + Coloc + MR + WGCNA +
+Clinical + Literature
+$$
+
+例如：
+
+| Protein  | DIA | CAL | Longitudinal | pQTL | CAL-GWAS | Coloc | MR | Clinical | Literature |
+| -------- | --: | --: | -----------: | ---: | -------: | ----: | -: | -------: | ---------: |
+| SERPINE1 |   ✓ |   ✓ |            ✓ |    ✓ |        ✓ |     ✓ |  ✓ |        ✓ |          ✓ |
+| BST1     |   ✓ |   ✓ |            ✓ |    ✓ |        ? |     ? |  ? |        ✓ |          ✓ |
+| HRG      |   ✓ |   ✓ |            ? |    ✓ |        ? |     ? |  ? |        ✓ |          ✓ |
+| PROZ     |   ✓ |   ✓ |            ✓ |    ✓ |        ✓ |     ✓ |  ✓ |        ✓ |          ? |
+
+最终筛选出：
+
+### Tier 1
+
+**Genetically supported CAL proteins**
+
+### Tier 2
+
+**Proteomic CAL biomarkers**
+
+### Tier 3
+
+**Inflammation-associated proteins**
+
+### Tier 4
+
+**Exploratory candidates**
+
+---
+
+# 十八、最后可以形成一篇非常完整的文章结构
+
+我会建议你最终把整个研究设计成：
+
+```text
+                    WGS
+                     │
+             ┌───────┴────────┐
+             ↓                ↓
+          pQTL             GWAS/CAL
+             │                │
+             └───────┬────────┘
+                     ↓
+              Colocalization
+                     ↓
+              Causal proteins
+                     │
+                     ↓
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+      DIA         Clinical      WGCNA
+        │            │            │
+        └────────────┼────────────┘
+                     ↓
+             Protein network
+                     ↓
+             CAL mechanism
+                     ↓
+        ┌────────────┴───────────┐
+        ↓                        ↓
+  Risk prediction          Drug target
+        ↓                        ↓
+   ML model                Intervention
+        │
+        ↓
+ Acute → Recovery
+ trajectory
+```
+
+---
+
+# 十九、结合你目前的数据，我建议优先做这8项
+
+如果按照**投入产出比 + 创新性 + 你现有数据可完成度**排序：
+
+### ★★★★★ 1. pQTL × CAL GWAS Coloc
+
+**最优先**
+
+### ★★★★★ 2. pQTL → Protein → CAL MR
+
+**最优先**
+
+### ★★★★★ 3. Acute/Recovery longitudinal pQTL
+
+研究：
+
+> SNP × Time → Protein
+
+这个很有特色。
+
+### ★★★★★ 4. pQTL × CAL × 临床指标
+
+建立：
+
+> genotype → protein → Z-score/NT-proBNP/CRP → CAL
+
+### ★★★★☆ 5. 与已发表KD-CAL蛋白组交叉验证
+
+重点看：
+
+> SERPINE1、BST1、HRG、SERPINA1、GNAI2、C3/C6、CFHR3/4、S100A8/A9/A12、VTN、PROZ、SERPIND1等。
+
+### ★★★★☆ 6. Protein ratio-pQTL
+
+尤其做：
+
+> complement balance
+> coagulation/anticoagulation balance
+> inflammation/endothelial balance
+
+### ★★★★☆ 7. PheWAS + Drug target
+
+寻找：
+
+> KD-CAL-specific protein
+
+以及：
+
+> potentially druggable causal protein
+
+### ★★★★☆ 8. 多模态预测
+
+最终：
+
+> **Clinical model → Protein model → pQTL/PRS model → Clinical+Protein+Genetic model**
+
+比较AUC、calibration、NRI/IDI、decision curve。
+
+---
+
+## 最关键的一点
+
+你现在**千万不要把pQTL研究做成“找到了多少个pQTL”**。
+
+对于你这个KD项目，更有价值的科学问题应该是：
+
+> **哪些遗传变异通过调控血浆蛋白水平，进一步影响川崎病冠状动脉损伤？这些遗传调控的蛋白是否具有稳定的急性期—恢复期动态特征，并能否作为CAL风险预测及早期干预的分子靶点？**
+
+最终最好能够拿出类似这样的**“四层证据”**：
+
+**遗传证据**
+
+> WGS → pQTL → Coloc
+
+↓
+
+**蛋白证据**
+
+> DIA → differential protein → acute/recovery trajectory
+
+↓
+
+**疾病证据**
+
+> CAL → Z-score → clinical phenotype → GWAS/MR
+
+↓
+
+**临床转化**
+
+> Protein + Clinical + PRS → CAL prediction → intervention decision
+
+这会比单纯的 **“KD患者发现若干差异蛋白 + pQTL”** 高一个明显的研究层级。
+
+而且你现在已有WGS和急性/恢复期DIA，这条路线基本都是围绕你现有数据展开，不需要把课题完全推翻重做。
+
+[1]: https://pubmed.ncbi.nlm.nih.gov/41736230/?utm_source=chatgpt.com "Multiomics approaches in Kawasaki disease: insights into pathogenesis and emerging directions for diagnosis and treatment - PubMed"
+[2]: https://www.nature.com/articles/s41525-024-00419-7?utm_source=chatgpt.com "Pharmacogenomics of coronary artery response to intravenous gamma globulin in kawasaki disease | npj Genomic Medicine"
+[3]: https://www.nature.com/articles/ng.2007.59?utm_source=chatgpt.com "ITPKC functional polymorphism associated with Kawasaki disease susceptibility and formation of coronary artery aneurysms | Nature Genetics"
+[4]: https://www.nature.com/articles/s41467-025-67238-x?utm_source=chatgpt.com "Genetic profiling of the circulating proteome in common diseases suggests causal proteins and improves risk prediction | Nature Communications"
+[5]: https://pubmed.ncbi.nlm.nih.gov/41877833/?utm_source=chatgpt.com "Identification of Serum BST1 as a Biomarker to Predict Coronary Artery Lesions in Children with Kawasaki Disease Based on 4D-DIA Quantitative Proteomics."
+
+---
+
+# 蛋白检测方法和通量
+
+如果你问的是**“大样本血浆验证阶段，一次实验通常能测多少个蛋白”**，不同平台差别非常大。现在主流平台大致可以这样理解：
+
+| 方法/平台                |                        一次可检测蛋白数量 | 更适合你的场景         |
+| -------------------- | -------------------------------: | --------------- |
+| **ELISA**            |                   1个/孔；通常1–10个目标 | 最终少数biomarker验证 |
+| **PRM**              |                         ~5–100+个 | DIA候选蛋白的MS正交验证  |
+| **MRM/SRM**          |                        ~20–200+个 | 较大规模靶向蛋白验证      |
+| **Olink Focus**      |                             ≤21个 | 最终小panel        |
+| **Olink Flex**       |                          5–30个/次 | 自定义候选蛋白panel    |
+| **Olink Target 96**  |                            92个/次 | 免疫/炎症等固定panel   |
+| **Olink Explore HT** |                      **~5,400个** | 大规模血浆蛋白组        |
+| **SomaScan 11K**     | **~11,000个protein measurements** | 超大规模蛋白组队列       |
+| **DIA-MS**           |           通常数千个，具体取决于血浆预处理/仪器/方法 | discovery       |
+
+Olink目前的Explore HT官方规格是**5,400+ proteins，2 µL plasma**；其Flex可以自定义5–30个，Target 96一次测92个。([Olink®][1])
+
+SomaScan 11K目前是**约11,000个protein measurements，对应超过10,000种unique human proteins**，使用血浆/血清也比较成熟。([SomaLogic][2])
+
+### 对你这个KD项目，我建议这样选
+
+如果你现在已经从 **4,532个DIA蛋白**里面筛出了候选：
+
+**① 10–30个候选蛋白**
+
+→ **Olink Flex / PRM**
+
+**② 30–100个候选蛋白**
+
+→ **Olink Target 96 / MRM**
+
+**③ 想在1000–10000例KD/对照血浆中重新做较全面的蛋白组**
+
+→ **Olink Explore HT（~5,400）或 SomaScan 11K**
+
+**④ 最终只剩3–8个蛋白**
+
+→ **ELISA**，这是我最推荐的临床验证方式。
+
+---
+
+### 特别需要注意一个问题
+
+你现在的**4,532个DIA蛋白**和Olink的**5,400个蛋白**不能简单理解成：
+
+> 4,532 + Olink 5,400 = 覆盖更多蛋白
+
+因为两种技术的**protein/analyte定义、抗体/适配体靶点、肽段层面和蛋白层面并不完全一致**。
+
+所以如果你的目标是：
+
+> **从目前DIA发现的候选蛋白中，在大样本血浆中验证**
+
+我反而不建议为了“测得更多”直接上5,400/11,000 panel。
+
+更合理的是：
+
+**4,532 DIA → 筛选20–50个候选 → Olink/PRM验证 → 最终3–8个 → ELISA大队列验证。**
+
+这对你现在的 **KD-CAL biomarker + 机器学习预测模型**会更加经济，而且证据链也更漂亮。
+
+[1]: https://olink.com/products/olink-explore-ht?utm_source=chatgpt.com "Olink Explore HT — Olink®"
+[2]: https://somalogic.com/menu-size/?utm_source=chatgpt.com "Menu Size - Our Science - Platform - SomaLogic"
+
+
