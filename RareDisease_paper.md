@@ -1,3 +1,1239 @@
+# 如何搭建“WES + LLM/RAG + knowledge graph + variant evidence”的多模态罕见病诊断系统
+
+如果你的目标是搭建一个真正用于**NDD/罕见病队列诊断**的系统，我不建议做成“把 WES 结果扔给 GPT，让它猜病”。更合理的架构是：
+
+> **WES/WGS 提供硬证据 → HPO/临床文本提供表型证据 → Knowledge Graph 提供结构化生物医学知识 → RAG 提供可追溯文献证据 → LLM 负责整合、解释和交互 → 最终由规则/证据系统约束诊断结论。**
+
+这与目前比较先进的 DeepRare 思路很接近：其架构把自由文本、HPO 和遗传检测结果作为异构输入，再由 LLM agent 调用专门工具和外部知识源，产生带证据链的 Top-K 诊断。([Nature][1])
+
+---
+
+# 一、我建议你搭建成这套总体架构
+
+```text
+                         NDD / Rare Disease Patient
+                                    │
+                ┌───────────────────┼───────────────────┐
+                │                   │                   │
+                ▼                   ▼                   ▼
+         Clinical records        WES/WGS            Pedigree
+         Free-text/HPO           VCF/gVCF             PED
+                │                   │                   │
+                ▼                   ▼                   │
+          LLM Phenotype       Variant Annotation        │
+             Agent                   │                   │
+                │             ┌─────┴─────┐             │
+                ▼             ▼           ▼             ▼
+              HPO         Frequency    Functional    Inheritance
+             terms        ClinVar      prediction      model
+                │             │           │             │
+                └─────────────┼───────────┼─────────────┘
+                              ▼
+                    ┌─────────────────────┐
+                    │ Variant/Gene Engine  │
+                    │ Exomiser + custom    │
+                    └──────────┬──────────┘
+                               │
+                    Top 50–500 genes/variants
+                               │
+                ┌──────────────┼──────────────┐
+                ▼              ▼              ▼
+        Knowledge Graph       RAG          LLM Agents
+        Gene-HPO-Disease      PubMed       phenotype
+        Gene-Gene             guidelines   genotype
+        Variant-Disease       ClinVar      literature
+        Drug-Phenotype        OMIM         evidence
+                │              │              │
+                └──────────────┼──────────────┘
+                               ▼
+                     Evidence Integration
+                               │
+                               ▼
+                    Candidate Disease/Gene
+                               │
+                               ▼
+                       Variant Evidence
+                               │
+                               ▼
+                    ACMG/AMP-style review
+                               │
+                               ▼
+                 ┌─────────────────────────┐
+                 │ Final diagnostic report │
+                 │                         │
+                 │ Disease                 │
+                 │ Gene                    │
+                 │ Variant                 │
+                 │ Inheritance             │
+                 │ Evidence                │
+                 │ Confidence              │
+                 │ Literature              │
+                 └─────────────────────────┘
+```
+
+这里最关键的一点是：
+
+**LLM 不应该成为 variant pathogenicity 的最终裁判。**
+
+它应该是**evidence integration / reasoning layer**。
+
+---
+
+# 二、第一层：WES 数据处理
+
+你的输入最好不是直接用原始 BAM，而是：
+
+```text
+FASTQ
+ ↓
+BWA-MEM2
+ ↓
+BAM
+ ↓
+GATK
+ ↓
+SNV/Indel VCF
+ ↓
+VEP / ANNOVAR
+ ↓
+annotated VCF
+```
+
+如果是 trio：
+
+```text
+Father
+Mother
+Child
+   ↓
+joint calling
+   ↓
+trio VCF
+   ↓
+inheritance analysis
+```
+
+然后保留：
+
+```text
+CHROM
+POS
+REF
+ALT
+GENE
+TRANSCRIPT
+HGVS.c
+HGVS.p
+Consequence
+AF
+gnomAD
+ClinVar
+CADD
+REVEL
+AlphaMissense
+SpliceAI
+```
+
+以及：
+
+```text
+GT
+AD
+DP
+GQ
+```
+
+---
+
+# 三、第二层：不要让 LLM 直接分析几十万个变异
+
+这是整个系统设计里非常重要的一点。
+
+假设一个 WES：
+
+```text
+100,000–300,000 variants
+```
+
+不要：
+
+```text
+VCF
+ ↓
+GPT
+ ↓
+Diagnosis
+```
+
+这样既浪费 token，又容易 hallucination。
+
+应该：
+
+```text
+WES
+ ↓
+hard filtering
+ ↓
+inheritance filtering
+ ↓
+pathogenicity annotation
+ ↓
+Exomiser
+ ↓
+Top 100 genes
+ ↓
+Top 500 variants
+ ↓
+LLM
+```
+
+---
+
+# 四、第三层：Exomiser应该成为你的“第一代诊断引擎”
+
+这一点非常重要。
+
+Exomiser 本身就是：
+
+> VCF + HPO → variant/gene prioritization
+
+它综合：
+
+* variant frequency
+* pathogenicity
+* inheritance
+* phenotype similarity
+* disease-gene association
+* model organism phenotype
+
+等信息。([GitHub][2])
+
+例如：
+
+```text
+Patient HPO
+   │
+   ├── HP:0001263
+   ├── HP:0001252
+   ├── HP:0000729
+   └── HP:0002311
+          │
+          ▼
+       Exomiser
+          │
+          ▼
+Gene A       score 0.91
+Gene B       score 0.87
+Gene C       score 0.82
+...
+```
+
+而且最近针对 UDN 386 个已诊断病例的分析显示，优化 Exomiser 参数后，WES 中已知诊断变异进入 Top 10 的比例可以从 **67.3% 提高到 88.2%**。([PubMed Central (PMC)][3])
+
+所以：
+
+> **你的 LLM 系统应该和 Exomiser 比，而不是取代 Exomiser。**
+
+---
+
+# 五、第四层：Knowledge Graph 是整个系统的“知识骨架”
+
+我建议建立一个 Rare Disease Knowledge Graph：
+
+```text
+                    Disease
+                  /    |    \
+                 /     |     \
+              Gene    HPO    Variant
+               |       |       |
+               |       |       |
+             Protein  Phenotype
+               |
+             Pathway
+               |
+             Drug
+```
+
+至少建立这些关系：
+
+```text
+Gene ──causes──> Disease
+
+Disease ──has_phenotype──> HPO
+
+Gene ──associated_with──> HPO
+
+Variant ──located_in──> Gene
+
+Variant ──associated_with──> Disease
+
+Variant ──has_clinical_significance──> Pathogenic
+
+Gene ──interacts_with──> Gene
+
+Gene ──encodes──> Protein
+
+Protein ──participates_in──> Pathway
+
+Disease ──treated_by──> Drug
+```
+
+---
+
+# 六、Knowledge Graph的数据源怎么选？
+
+第一版不要自己从零构建。
+
+建议整合：
+
+### 核心
+
+* HPO
+* MONDO
+* Orphanet
+* OMIM
+* ClinVar
+* ClinGen
+* Gene Ontology
+* Reactome
+* STRING
+* gnomAD
+
+### 遗传诊断
+
+* DECIPHER
+* PanelApp
+* GenCC
+* MIM
+* Model organism phenotype
+
+Exomiser 本身已经整合了相当一部分这种 phenotype/gene/disease/model-organism 信息。([PubMed][4])
+
+---
+
+# 七、数据库可以放进 Neo4j
+
+如果你准备真正做一个项目，我推荐：
+
+```text
+Neo4j
+```
+
+而不是一开始就自己搞复杂的 RDF/SPARQL。
+
+例如：
+
+```text
+(:Gene {id:"SHANK3"})
+       │
+       ├──[:CAUSES]──>
+       │
+       (:Disease {id:"MONDO:0010726"})
+       │
+       ├──[:HAS_PHENOTYPE]──>
+       │
+       (:HPO {id:"HP:0001263"})
+```
+
+Variant：
+
+```text
+(:Variant {hgvs:"NM_033517.1:c.3679C>T"})
+       │
+       ├──[:IN_GENE]──>
+       (:Gene {id:"SHANK3"})
+       │
+       └──[:CLINVAR]──>
+       (:Evidence {classification:"Pathogenic"})
+```
+
+---
+
+# 八、第五层：RAG负责“文献证据”
+
+Knowledge Graph 和 RAG 不应该混为一谈。
+
+### Knowledge Graph
+
+回答：
+
+> **结构化关系是什么？**
+
+例如：
+
+```text
+SHANK3 → associated with → autism
+```
+
+### RAG
+
+回答：
+
+> **为什么？哪篇文章？病例是什么？证据是什么？**
+
+例如：
+
+```text
+SHANK3 variant
+     ↓
+PubMed
+     ↓
+case report
+     ↓
+patient phenotype
+     ↓
+functional experiment
+```
+
+---
+
+# 九、RAG数据库怎么构建？
+
+我建议：
+
+```text
+PubMed
+ClinVar
+ClinGen
+OMIM
+Orphanet
+GeneReviews
+case reports
+guidelines
+```
+
+构建：
+
+```text
+PDF/XML/HTML
+      ↓
+document parsing
+      ↓
+chunking
+      ↓
+embedding
+      ↓
+vector DB
+```
+
+Vector DB 可以用：
+
+```text
+Qdrant
+Milvus
+Weaviate
+FAISS
+```
+
+如果是你自己做科研原型：
+
+> **Qdrant + PostgreSQL + Neo4j**
+
+就已经很好。
+
+---
+
+# 十、不要让RAG只做普通“语义搜索”
+
+这是你系统可以做出创新的地方。
+
+普通 RAG：
+
+```text
+query:
+SHANK3 autism
+
+       ↓
+
+retrieve 10 papers
+```
+
+更好的做法：
+
+```text
+Variant:
+NM_033517:c.3679C>T
+
+Gene:
+SHANK3
+
+Phenotype:
+autism
+hypotonia
+speech delay
+
+Inheritance:
+de novo
+
+       ↓
+
+structured query
+       +
+semantic query
+       ↓
+RAG
+```
+
+最终：
+
+```text
+Paper 1
+Paper 2
+ClinVar
+ClinGen
+GeneReviews
+Case report
+```
+
+进行**证据融合**。
+
+---
+
+# 十一、第六层：LLM不要只有一个 Agent
+
+如果你想做高水平研究，我建议：
+
+```text
+                Supervisor LLM
+                      │
+       ┌──────────────┼──────────────┐
+       ↓              ↓              ↓
+Phenotype Agent  Variant Agent  Literature Agent
+       │              │              │
+       ↓              ↓              ↓
+      HPO         ACMG evidence     RAG
+       │              │              │
+       └──────────────┼──────────────┘
+                      ↓
+                  Gene Agent
+                      │
+                      ↓
+                Disease Agent
+                      │
+                      ↓
+              Evidence Synthesizer
+```
+
+这个思路和目前 DeepRare 的多层 agent 架构非常接近。DeepRare 将中央 LLM host、专门 agent server 和外部医学知识源分开，并处理自由文本、HPO 和 VCF 等输入。([Nature][1])
+
+---
+
+# 十二、Phenotype Agent做什么？
+
+例如病历：
+
+> 患儿2岁，语言发育迟缓，肌张力低下，不能独立行走，反复癫痫。
+
+LLM：
+
+```text
+Clinical text
+      ↓
+Phenotype extraction
+      ↓
+HPO normalization
+```
+
+输出：
+
+```text
+HP:0001263
+Developmental delay
+
+HP:0001252
+Hypotonia
+
+HP:0001250
+Seizures
+
+HP:0000750
+Delayed speech
+```
+
+然后再判断：
+
+```text
+Present
+Absent
+Unknown
+```
+
+这一点很重要。
+
+因为：
+
+```text
+没有描述
+```
+
+不等于：
+
+```text
+没有这个表型
+```
+
+---
+
+# 十三、Variant Agent
+
+Variant Agent 不应该自己“猜”。
+
+它调用：
+
+```text
+ClinVar
+ClinGen
+gnomAD
+VEP
+CADD
+REVEL
+AlphaMissense
+SpliceAI
+LOFTEE
+```
+
+然后生成：
+
+```text
+Variant Evidence Object
+```
+
+例如：
+
+```json
+{
+  "variant": "NM_033517.1:c.3679C>T",
+  "gene": "SHANK3",
+  "consequence": "missense",
+  "gnomAD_AF": 0.00001,
+  "clinvar": "Pathogenic",
+  "clinvar_stars": 3,
+  "REVEL": 0.91,
+  "alphamissense": 0.97,
+  "inheritance": "de_novo",
+  "phenotype_match": 0.87
+}
+```
+
+LLM只负责解释这些结构化证据。
+
+---
+
+# 十四、ACMG不要让LLM自由发挥
+
+最好设计成：
+
+```text
+Variant
+   ↓
+Evidence extraction
+   ↓
+ACMG rules engine
+   ↓
+PVS1
+PS1
+PS2
+PS3
+PM2
+PM5
+PP3
+PP4
+...
+   ↓
+Classification
+```
+
+LLM：
+
+```text
+解释为什么满足PM2
+解释为什么满足PS2
+寻找文献支持
+生成报告
+```
+
+而不是：
+
+```text
+GPT：
+我认为这个变异是Pathogenic
+```
+
+例如 Exomiser 目前已经能利用 ClinVar 星级、phenotype matching、phased VCF 等信息进行部分 ACMG assignment。([Exomiser][5])
+
+---
+
+# 十五、最终应该形成一个 Evidence Graph
+
+这是整个系统最漂亮的部分。
+
+例如：
+
+```text
+                    Patient
+                       │
+             ┌─────────┴─────────┐
+             │                   │
+         Phenotype            Variant
+             │                   │
+          HPO terms          SHANK3:p.X
+             │                   │
+             └────────┬──────────┘
+                      │
+                    Gene
+                   SHANK3
+                      │
+            ┌─────────┼─────────┐
+            │         │         │
+         Disease    Protein   Literature
+            │         │         │
+          ASD       SHANK3     PMIDxxxx
+            │                   │
+            └─────────┬─────────┘
+                      │
+                   Evidence
+                      │
+                      ▼
+              Diagnostic hypothesis
+```
+
+这样最终每个结论都能回答：
+
+> **为什么认为这个基因/变异是候选？**
+
+---
+
+# 十六、最终输出不要只给一个诊断
+
+建议：
+
+```text
+Top 10 diseases
+Top 20 genes
+Top 50 variants
+```
+
+例如：
+
+| Rank | Gene    | Variant | Disease         | HPO score | Variant score | Evidence                | Confidence |
+| ---: | ------- | ------- | --------------- | --------: | ------------: | ----------------------- | ---------- |
+|    1 | SHANK3  | c.XXX   | Phelan-McDermid |      0.93 |          0.98 | ClinGen + ClinVar + HPO | High       |
+|    2 | SYNGAP1 | c.XXX   | SYNGAP1-related |      0.88 |          0.91 | ClinVar + literature    | High       |
+|    3 | DDX3X   | c.XXX   | DDX3X-related   |      0.81 |          0.86 | literature              | Medium     |
+
+然后：
+
+```text
+Diagnostic conclusion
+        ↓
+Evidence
+        ↓
+Literature
+        ↓
+Uncertainty
+        ↓
+Recommended next test
+```
+
+---
+
+# 十七、如果是 NDD 队列，我建议进一步加入“未解决病例再分析”
+
+这会让你的项目价值明显提高。
+
+```text
+                     NDD cohort
+                         │
+                         ▼
+                       WES
+                         │
+                         ▼
+                  Initial analysis
+                         │
+              ┌──────────┴──────────┐
+              ↓                     ↓
+           Solved                 Unsolved
+              │                     │
+              │                     ▼
+              │              LLM/RAG/KG
+              │                     │
+              │              re-ranking
+              │                     │
+              │          ┌──────────┼──────────┐
+              │          ↓          ↓          ↓
+              │       novel gene  novel      phenotype
+              │                   variant    expansion
+              │          │
+              └──────────┴──────────┘
+                         ↓
+                   Reanalysis
+                         ↓
+                 Diagnosis improvement
+```
+
+尤其可以利用：
+
+* 新发表文献
+* 新 ClinVar
+* 新 HPO
+* 新 gene-disease association
+* 新 ClinGen evidence
+
+实现：
+
+> **LLM-assisted longitudinal reanalysis**
+
+这个方向比一次性诊断模型更有科研价值。
+
+---
+
+# 十八、我建议你的第一版技术栈
+
+如果是你自己带队做科研，我会这样配：
+
+### 基础生信
+
+```text
+BWA-MEM2
+GATK
+VEP
+bcftools
+samtools
+```
+
+### Variant prioritization
+
+```text
+Exomiser
+Genomiser
+```
+
+Exomiser 可以直接接收 VCF + HPO，并输出排序后的 variants/genes。([GitHub][2])
+
+### Knowledge Graph
+
+```text
+Neo4j
+```
+
+### RAG
+
+```text
+Qdrant
++
+BGE-M3 / 同类生物医学embedding
+```
+
+### LLM
+
+研究阶段可以：
+
+```text
+DeepSeek
+Qwen
+Llama
+```
+
+然后用 API/闭源模型做 benchmark：
+
+```text
+GPT
+Claude
+Gemini
+```
+
+### Agent
+
+```text
+LangGraph
+```
+
+或者自己用：
+
+```text
+Python
+FastAPI
+```
+
+搭建。
+
+---
+
+# 十九、推荐的系统目录结构
+
+可以直接按照这个项目结构开始：
+
+```text
+RareDiseaseAI/
+│
+├── data/
+│   ├── patients/
+│   ├── phenotype/
+│   ├── pedigree/
+│   └── vcf/
+│
+├── annotation/
+│   ├── VEP/
+│   ├── ClinVar/
+│   ├── gnomAD/
+│   ├── CADD/
+│   ├── REVEL/
+│   └── SpliceAI/
+│
+├── exomiser/
+│
+├── knowledge_graph/
+│   ├── HPO/
+│   ├── MONDO/
+│   ├── OMIM/
+│   ├── Orphanet/
+│   ├── ClinGen/
+│   └── Neo4j/
+│
+├── rag/
+│   ├── PubMed/
+│   ├── Guidelines/
+│   ├── CaseReports/
+│   ├── embeddings/
+│   └── Qdrant/
+│
+├── agents/
+│   ├── phenotype_agent.py
+│   ├── variant_agent.py
+│   ├── gene_agent.py
+│   ├── disease_agent.py
+│   ├── literature_agent.py
+│   └── supervisor.py
+│
+├── evidence/
+│   ├── ACMG/
+│   ├── evidence_graph/
+│   └── scoring/
+│
+├── evaluation/
+│   ├── solved_cases/
+│   ├── benchmark/
+│   └── metrics/
+│
+└── report/
+    └── diagnostic_report.py
+```
+
+---
+
+# 二十、最关键的是设计 Benchmark
+
+如果你要发表高水平文章，这一步比搭系统本身还重要。
+
+你最好建立：
+
+> **已确诊 NDD rare disease cohort**
+
+例如：
+
+```text
+500–2000 cases
+```
+
+其中：
+
+```text
+80% training/development
+20% independent test
+```
+
+但测试集必须保持真正独立。
+
+每个病例：
+
+```text
+Clinical text
+HPO
+WES
+Pedigree
+Confirmed diagnosis
+Causal gene
+Causal variant
+ACMG classification
+```
+
+然后比较：
+
+### Baseline 1
+
+```text
+Phenotype → LLM
+```
+
+### Baseline 2
+
+```text
+HPO → Exomiser
+```
+
+### Baseline 3
+
+```text
+HPO + WES → Exomiser
+```
+
+### Baseline 4
+
+```text
+HPO + WES → LLM
+```
+
+### Baseline 5
+
+```text
+HPO + WES + KG + RAG → LLM
+```
+
+### Baseline 6
+
+```text
+HPO + WES + KG + RAG
+        ↓
+   Multi-agent LLM
+```
+
+---
+
+# 二十一、评价指标
+
+至少做：
+
+```text
+Disease Top-1
+Disease Top-3
+Disease Top-5
+Disease Top-10
+
+Gene Top-1
+Gene Top-5
+Gene Top-10
+Gene Top-20
+
+Variant Top-1
+Variant Top-10
+Variant Top-50
+```
+
+另外做：
+
+```text
+diagnostic yield
+sensitivity
+specificity
+MRR
+Recall@K
+AUROC
+AUPRC
+```
+
+尤其是：
+
+> **Known diagnostic variant rank**
+
+非常重要。
+
+最近的 Exomiser 优化研究就是用“已知诊断变异进入 Top-10 的比例”作为核心评价指标之一。([PubMed Central (PMC)][3])
+
+---
+
+# 二十二、你这个项目真正有创新空间的地方
+
+如果让我帮你把它定位成一个科研项目，我不会把题目写成：
+
+> “基于大语言模型的罕见病诊断”
+
+太普通。
+
+我会设计成：
+
+> **基于临床表型—基因组—知识图谱—检索增强大语言模型的神经发育障碍罕见病智能诊断与遗传变异优先级系统**
+
+英文可以是：
+
+> **A Multimodal Knowledge-Grounded Large Language Model Framework for Phenotype- and Genome-Informed Diagnosis of Rare Neurodevelopmental Disorders**
+
+核心创新点可以有四个：
+
+**① Multimodal**
+
+```text
+Clinical text
++
+HPO
++
+WES
++
+Pedigree
+```
+
+**② Knowledge-grounded**
+
+```text
+HPO
++
+Gene
++
+Disease
++
+Variant
++
+Pathway
+```
+
+**③ Evidence-grounded RAG**
+
+```text
+ClinVar
+ClinGen
+PubMed
+GeneReviews
+Case reports
+```
+
+**④ Agentic reasoning**
+
+```text
+Phenotype Agent
++
+Variant Agent
++
+Gene Agent
++
+Literature Agent
++
+Supervisor
+```
+
+而不是单纯：
+
+```text
+GPT → diagnosis
+```
+
+---
+
+## 二十三、如果现在开始，我建议分三期做
+
+### Phase I：3个月
+
+先不要训练模型。
+
+做：
+
+```text
+WES
+ ↓
+VEP
+ ↓
+Exomiser
+ ↓
+HPO
+ ↓
+Neo4j
+ ↓
+RAG
+ ↓
+LLM
+```
+
+先把**可解释诊断原型**跑起来。
+
+---
+
+### Phase II：3–6个月
+
+加入：
+
+```text
+multi-agent
++
+ACMG evidence engine
++
+literature RAG
++
+pedigree
++
+reanalysis
+```
+
+建立：
+
+```text
+500–1000 solved NDD cases
+```
+
+做 benchmark。
+
+---
+
+### Phase III：6–12个月
+
+再考虑：
+
+```text
+fine-tuning
+LoRA
+RL
+multimodal model
+novel gene discovery
+novel variant discovery
+```
+
+最终形成：
+
+```text
+             NDD Patient
+                  │
+       ┌──────────┼──────────┐
+       ↓          ↓          ↓
+   Clinical      WES       Pedigree
+       ↓          ↓          ↓
+      HPO     Variant      MOI
+       │      Evidence       │
+       └─────────┬────────────┘
+                 ↓
+       ┌──────────────────┐
+       │ Knowledge Graph  │
+       └────────┬─────────┘
+                ↓
+          Exomiser/KG
+                ↓
+         Candidate genes
+                ↓
+       ┌────────┴────────┐
+       ↓                 ↓
+      RAG            Multi-Agent
+       │                 │
+       └────────┬────────┘
+                ↓
+        Evidence Fusion
+                ↓
+       ACMG/AMP Evidence
+                ↓
+        Ranked diagnosis
+                ↓
+       Explainable Report
+```
+
+**这套路线尤其适合你前面考虑的 NDD 罕见病队列项目。**它的优势是：即使 LLM 本身并不比 Exomiser 强，也可以把研究问题变成“**LLM 是否能在已有可靠基因组优先级系统之上，通过 RAG + knowledge graph + evidence reasoning 提高复杂/未解决病例的诊断率和可解释性**”。这比单纯 benchmark GPT-4 的科学问题强很多。DeepRare 的最新结果也支持这种“异构数据 + 工具调用 + 可追溯证据”的架构方向。([Nature][1])
+
+如果你准备**实际开始搭建**，我建议第一步就从 **“WES + HPO + Exomiser + Neo4j + Qdrant + LLM”最小可运行版本（MVP）**开始，而不是先训练大模型。
+
+[1]: https://www.nature.com/articles/s41586-025-10097-9?utm_source=chatgpt.com "An agentic system for rare disease diagnosis with traceable reasoning | Nature"
+[2]: https://github.com/exomiser/Exomiser?utm_source=chatgpt.com "GitHub - exomiser/Exomiser: A Tool to Annotate and Prioritize Exome Variants · GitHub"
+[3]: https://pmc.ncbi.nlm.nih.gov/articles/PMC12539062/?utm_source=chatgpt.com "An optimized variant prioritization process for rare disease diagnostics: recommendations for Exomiser and Genomiser - PMC"
+[4]: https://pubmed.ncbi.nlm.nih.gov/35391505/?utm_source=chatgpt.com "Phenotype-driven approaches to enhance variant prioritization and diagnosis of rare disease - PubMed"
+[5]: https://exomiser.readthedocs.io/en/latest/acmg_assignment.html?utm_source=chatgpt.com "ACMG Assignment — exomiser 15.1.1 documentation"
+
+
+
+---
+
 # 近三年大语言模型在罕见病中的应用的高水平文章
 
 有，而且 **2024–2026 年已经出现一批比较成体系的工作**。如果你关注的是你前面提到的 **NDD/罕见病队列、WES/WGS、表型、基因优先级、临床诊断**，我建议重点看下面这些，而不是泛泛的“ChatGPT 医疗应用”。
