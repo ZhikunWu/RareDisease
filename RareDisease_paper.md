@@ -1,3 +1,778 @@
+# 近三年大语言模型在罕见病中的应用的高水平文章
+
+有，而且 **2024–2026 年已经出现一批比较成体系的工作**。如果你关注的是你前面提到的 **NDD/罕见病队列、WES/WGS、表型、基因优先级、临床诊断**，我建议重点看下面这些，而不是泛泛的“ChatGPT 医疗应用”。
+
+我按**文章水平 + 与罕见病遗传诊断的相关性**给你筛了一遍。
+
+## 一、最值得重点看的 10 篇
+
+| 年份       | 期刊                                     | 文章                                                                                                                                                         | LLM应用                            | 推荐    |
+| -------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----- |
+| **2026** | **Nature**                             | **An agentic system for rare disease diagnosis with large language models**                                                                                | 多智能体 + LLM + HPO + 遗传检测结果 + 工具调用 | ⭐⭐⭐⭐⭐ |
+| **2026** | **npj Digital Medicine**               | **Interpretable fine-tuned large language models facilitate making genetic test decisions for rare diseases**                                              | LLM决定 Panel/WES/WGS              | ⭐⭐⭐⭐⭐ |
+| **2026** | **European Journal of Human Genetics** | **Systematic benchmarking demonstrates large language models have not reached the diagnostic accuracy of traditional rare-disease decision support tools** | 5213例罕见病，LLM vs Exomiser         | ⭐⭐⭐⭐⭐ |
+| **2025** | **Nature Medicine**                    | **A generalist medical language model for disease diagnosis assistance**                                                                                   | MedFound-176B，罕见病诊断              | ⭐⭐⭐⭐⭐ |
+| **2025** | **npj Digital Medicine**               | **Enhancing diagnostic capability with multi-agents conversational large language models**                                                                 | 多智能体罕见病诊断                        | ⭐⭐⭐⭐⭐ |
+| **2025** | **npj Digital Medicine**               | **Few shot learning for phenotype-driven diagnosis of patients with rare genetic diseases**                                                                | SHEPHERD，表型→基因/疾病                | ⭐⭐⭐⭐⭐ |
+| **2025** | **Genome Medicine**                    | **Improving automated deep phenotyping through large language models using retrieval-augmented generation**                                                | RAG-HPO，临床文本→HPO                 | ⭐⭐⭐⭐⭐ |
+| **2024** | **American Journal of Human Genetics** | **Assessing the utility of large language models for phenotype-driven gene prioritization in the diagnosis of rare genetic disease**                       | GPT-4/Llama→基因优先级                | ⭐⭐⭐⭐⭐ |
+| **2024** | **American Journal of Human Genetics** | **Evaluating large language models on medical, lay-language, and self-reported descriptions of genetic conditions**                                        | 63种遗传病诊断                         | ⭐⭐⭐⭐  |
+| **2025** | **npj Digital Medicine**               | **A phenotype-based AI pipeline outperforms human experts in differentially diagnosing rare diseases using EHRs**                                          | EHR→表型→罕见病诊断                     | ⭐⭐⭐⭐  |
+
+下面分别说。
+
+---
+
+# 1. Nature：DeepRare —— 目前非常值得关注
+
+**An agentic system for rare disease diagnosis with large language models**
+
+这是我认为你目前做**罕见病队列 + AI诊断**最应该重点看的文章之一。
+
+[Nature 原文：An agentic system for rare disease diagnosis with large language models](https://www.nature.com/articles/s41586-025-10097-9?utm_source=chatgpt.com)
+
+DeepRare 的核心不是简单：
+
+```text
+患者表型
+ ↓
+GPT
+ ↓
+疾病
+```
+
+而是：
+
+```text
+Clinical text
+     │
+HPO
+     │
+Genetic testing
+     │
+     ▼
+┌───────────────────┐
+│   DeepRare        │
+│  multi-agent LLM  │
+├───────────────────┤
+│ phenotype agent   │
+│ genetics agent    │
+│ disease agent     │
+│ literature/tool   │
+│ reasoning agent   │
+└─────────┬─────────┘
+          ↓
+   differential diagnosis
+          ↓
+   evidence-supported
+      diagnosis
+```
+
+它能够处理：
+
+* 自由文本临床描述
+* HPO
+* 遗传检测结果
+* 多种专业工具
+* 外部知识源
+* 多智能体推理
+
+并且输出**带证据支持的候选诊断**。([Nature][1])
+
+### 对你最有价值的地方
+
+你现在如果做：
+
+> **NDD罕见病队列 + WGS/WES + HPO + AI诊断**
+
+DeepRare实际上给出了一个很好的研究框架：
+
+**LLM不直接替代 variant caller，而是作为“临床表型—基因组—知识库”的推理层。**
+
+---
+
+# 2. npj Digital Medicine 2026：RareDAI
+
+**Interpretable fine-tuned large language models facilitate making genetic test decisions for rare diseases**
+
+这篇和你的方向也非常接近。
+
+[npj Digital Medicine 原文：RareDAI](https://www.nature.com/articles/s41746-026-02733-z?utm_source=chatgpt.com)
+
+它研究的不是“这个患者是什么病”，而是一个非常实际的问题：
+
+> **这个患者应该做什么遗传检测？**
+
+例如：
+
+```text
+clinical information
+       ↓
+   LLM / RareDAI
+       ↓
+ ┌─────┼─────┐
+ │     │     │
+Panel  WES   WGS
+```
+
+模型输入包括：
+
+* 非结构化临床记录
+* structured Phecodes
+* 临床指南
+
+目标是模拟医生依据 ACMG 等指南进行遗传检测决策。([doi.org][2])
+
+### 对你的启发非常大
+
+你的 NDD 队列完全可以进一步做：
+
+```text
+NDD phenotype
+      +
+family history
+      +
+HPO
+      +
+clinical features
+      ↓
+      LLM
+      ↓
+Recommended testing strategy
+      │
+      ├── WES
+      ├── WGS
+      ├── CNV
+      ├── mtDNA
+      ├── repeat expansion
+      └── long-read sequencing
+```
+
+这个方向甚至比单纯“GPT诊断罕见病”更有研究价值。
+
+---
+
+# 3. 2026 EJHG：5213例罕见病 LLM benchmark
+
+这篇我特别建议你看。
+
+**Systematic benchmarking demonstrates large language models have not reached the diagnostic accuracy of traditional rare-disease decision support tools**
+
+[EJHG 原文](https://www.nature.com/articles/s41431-026-02054-5?utm_source=chatgpt.com)
+
+这是一个非常重要的**反面证据**。
+
+研究用了：
+
+> **5213 个罕见遗传病病例**
+
+比较：
+
+* o1-preview
+* GPT-4o
+* Gemini
+* o1-mini
+* Meditron
+* Meditron3
+* Medfound
+
+和：
+
+* **Exomiser**
+
+结果非常值得注意：
+
+| 方法       |     Top-1 |     Top-3 |    Top-10 |
+| -------- | --------: | --------: | --------: |
+| 最佳LLM    |     23.6% |     31.2% | **36.8%** |
+| Exomiser | **35.5%** | **46.3%** | **58.5%** |
+
+也就是说：
+
+> **纯 phenotype → LLM diagnosis，目前仍明显不如专门的 rare-disease decision-support 工具。** ([Nature][3])
+
+这个结论对你的研究设计非常重要。
+
+### 它告诉你不要做：
+
+```text
+HPO → GPT → diagnosis
+```
+
+然后声称：
+
+> LLM优于Exomiser。
+
+目前很难成立。
+
+更有价值的是：
+
+```text
+HPO
+ +
+WGS/WES
+ +
+variant evidence
+ +
+literature
+ +
+HPO ontology
+ +
+LLM
+ ↓
+integrated diagnosis
+```
+
+---
+
+# 4. Nature Medicine 2025：MedFound
+
+**A generalist medical language model for disease diagnosis assistance**
+
+这是顶级期刊里非常值得看的 LLM 医疗诊断工作。
+
+[Nature Medicine 原文](https://www.nature.com/articles/s41591-024-03416-6?utm_source=chatgpt.com)
+
+MedFound：
+
+> **176 billion parameters**
+
+训练数据包括：
+
+* 医学文本
+* 真实世界临床记录
+
+然后用：
+
+* self-bootstrapping
+* chain-of-thought
+* preference alignment
+
+训练诊断能力。
+
+重要的是，它专门评估了：
+
+> **long-tailed distribution / rare diseases**
+
+并覆盖多个医学专科。([Nature][4])
+
+它不是一个专门的 rare-disease LLM，但对你研究**“为什么需要医疗专用LLM”**很重要。
+
+---
+
+# 5. npj Digital Medicine 2025：多智能体诊断
+
+**Enhancing diagnostic capability with multi-agents conversational large language models**
+
+[npj Digital Medicine 原文](https://doi.org/10.1038/s41746-025-01550-0?utm_source=chatgpt.com)
+
+这是一个很有意思的方向。
+
+用了：
+
+> **302个罕见病病例**
+
+比较：
+
+```text
+GPT-3.5
+GPT-4
+      vs
+Multi-Agent Conversation (MAC)
+```
+
+MAC模拟：
+
+```text
+Doctor 1
+   ↓
+Doctor 2
+   ↓
+Doctor 3
+   ↓
+Supervisor
+   ↓
+Final diagnosis
+```
+
+最终发现多智能体框架在诊断和推荐进一步检查方面优于单个模型。([doi.org][5])
+
+### 这对 NDD 特别适合
+
+你甚至可以设计：
+
+```text
+              NDD patient
+                   │
+        ┌──────────┼──────────┐
+        ↓          ↓          ↓
+   Phenotype     Genetics    Neurology
+     Agent        Agent       Agent
+        │          │          │
+        └──────────┼──────────┘
+                   ↓
+             Evidence Agent
+                   ↓
+            Supervisor LLM
+                   ↓
+        ┌──────────┼──────────┐
+        ↓          ↓          ↓
+    disease      gene       variant
+    ranking     ranking     ranking
+```
+
+这比单纯“GPT-4诊断NDD”有明显的方法学创新空间。
+
+---
+
+# 6. SHEPHERD：非常值得看，但它不是传统LLM
+
+**Few shot learning for phenotype-driven diagnosis of patients with rare genetic diseases**
+
+[npj Digital Medicine 原文](https://doi.org/10.1038/s41746-025-01749-1?utm_source=chatgpt.com)
+
+SHEPHERD 是 **knowledge-grounded deep learning**，不是传统意义上的 ChatGPT/LLM。
+
+但如果你研究：
+
+> **NDD罕见病诊断 + phenotype + genotype**
+
+这篇非常重要。
+
+它使用：
+
+* phenotype
+* candidate genes
+* rare disease knowledge graph
+
+实现：
+
+```text
+patient phenotype
+      ↓
+causal gene discovery
+      ↓
+patients-like-me
+      ↓
+novel disease presentation
+```
+
+并在：
+
+* UDN：465
+* MyGene2：146
+* DDD：1431
+
+等真实队列上验证。([doi.org][6])
+
+### 为什么我建议你看？
+
+因为它代表了另一条路线：
+
+**不是让 LLM “凭知识猜答案”，而是让 AI 建立在 rare-disease knowledge graph 上。**
+
+这可能比纯 LLM 更适合真正的临床遗传诊断。
+
+---
+
+# 7. Genome Medicine：RAG-HPO
+
+**Improving automated deep phenotyping through large language models using retrieval-augmented generation**
+
+[Genome Medicine 原文](https://link.springer.com/article/10.1186/s13073-025-01521-w?utm_source=chatgpt.com)
+
+这篇对于你做**临床文本 → HPO**特别重要。
+
+作者开发：
+
+> **RAG-HPO**
+
+核心：
+
+```text
+Clinical note
+      ↓
+LLM
+      +
+Vector database
+      ↓
+retrieve phenotype concepts
+      ↓
+HPO ID
+```
+
+知识库包含：
+
+> **54,000+ phenotype phrases → HPO IDs**
+
+利用 RAG 减少 LLM hallucination。([Springer][7])
+
+### 这个方向和你的NDD队列高度匹配
+
+例如你有：
+
+```text
+病历：
+“患儿2岁仍不能独立行走，
+语言发育明显落后，
+存在肌张力低下……”
+```
+
+自动变成：
+
+```text
+HP:0001252
+HP:0001263
+HP:0001290
+...
+```
+
+然后进入：
+
+```text
+HPO
+ ↓
+Exomiser
+ ↓
+LLM
+ ↓
+SHEPHERD
+ ↓
+Gene ranking
+```
+
+---
+
+# 8. AJHG 2024：LLM做基因优先级
+
+这篇是**你一定应该下载下来仔细看的**。
+
+**Assessing the utility of large language models for phenotype-driven gene prioritization in the diagnosis of rare genetic disease**
+
+[AJHG/Cell Press 原文](https://www.sciencedirect.com/science/article/pii/S0002929724002969?utm_source=chatgpt.com)
+
+作者比较：
+
+* GPT-4
+* GPT-3.5
+* Llama2-70B
+* Llama2-13B
+* Llama2-7B
+
+在 rare genetic disease phenotype → gene prioritization 上的表现。
+
+GPT-4：
+
+> Top-10：13.9%
+
+> Top-50：17.0%
+
+但仍然低于传统工具。([科学直接][8])
+
+还有一个非常重要的发现：
+
+> **LLM存在明显的“热门基因偏倚”。**
+
+例如：
+
+```text
+BRCA1
+TP53
+PTEN
+```
+
+这种文献量极大的基因更容易被 LLM 选中，而真正罕见的疾病基因反而容易漏掉。([PubMed Central (PMC)][9])
+
+这对于 rare disease 非常关键。
+
+---
+
+# 9. AJHG 2024：医学语言 vs 普通语言
+
+**Evaluating large language models on medical, lay-language, and self-reported descriptions of genetic conditions**
+
+[PubMed：Flaharty et al.](https://pubmed.ncbi.nlm.nih.gov/39146935/?utm_source=chatgpt.com)
+
+研究了：
+
+> **63种遗传疾病**
+
+比较：
+
+* medical language
+* lay language
+* self-reported descriptions
+
+以及：
+
+* GPT-3.5
+* GPT-4
+* Claude
+* Gemini/Bard
+* Llama2
+* MedLlama2
+
+等。
+
+它特别适合研究：
+
+> **患者自己描述的症状 → LLM → 遗传病候选诊断**
+
+这对未来的患者端 rare disease AI 很有意义。([PubMed][10])
+
+---
+
+# 10. npj Digital Medicine：EHR → 罕见病
+
+**A phenotype-based AI pipeline outperforms human experts in differentially diagnosing rare diseases using EHRs**
+
+[npj Digital Medicine 原文](https://www.nature.com/articles/s41746-025-01452-1?utm_source=chatgpt.com)
+
+这个不是纯 LLM，而是一个很值得你关注的 **AI pipeline**。
+
+数据：
+
+> **2271 cases / 431 rare diseases**
+
+并且有：
+
+> **75 cases / 50 specialist physicians**
+
+进行 human-computer comparison。
+
+PhenoBrain：
+
+```text
+EHR
+ ↓
+phenotype extraction
+ ↓
+phenotype representation
+ ↓
+disease ranking
+```
+
+最终在部分任务上超过 ChatGPT/GPT-4 和专家医生。([Nature][11])
+
+---
+
+# 还有一个方向：Genetic Transformer / GeneT
+
+如果你特别关心：
+
+> **WES/WGS → candidate variant**
+
+那么这篇值得关注：
+
+**Genetic Transformer: An Innovative Large Language Model Driven Approach for Rapid and Accurate Identification of Causative Variants in Rare Genetic Diseases**
+
+目前检索到的是 **medRxiv**，所以我不会把它和上面的 Nature/AJHG 正式论文放在同一个证据等级。([MedRxiv][12])
+
+它直接把目标从：
+
+```text
+phenotype → disease
+```
+
+推进到了：
+
+```text
+WES/WGS
+  ↓
+variants
+  ↓
+LLM
+  ↓
+candidate causal variants
+```
+
+这实际上更接近你做 NDD 队列的需求。
+
+---
+
+# 二、把这些文章放在一起，会看到一个非常清楚的发展路线
+
+近三年其实经历了：
+
+### 第一阶段：ChatGPT 做诊断
+
+```text
+Clinical description
+        ↓
+      GPT-4
+        ↓
+     Disease
+```
+
+代表：
+
+**Flaharty 2024**
+
+---
+
+### 第二阶段：LLM 做 phenotype → gene
+
+```text
+HPO
+ ↓
+LLM
+ ↓
+Gene ranking
+```
+
+代表：
+
+**Kim et al., AJHG 2024**
+
+但问题是：
+
+> **Exomiser 等传统方法仍然更强。**
+
+([科学直接][8])
+
+---
+
+### 第三阶段：LLM + RAG + knowledge graph
+
+```text
+Clinical text
+      ↓
+    LLM
+      +
+Knowledge graph
+      +
+RAG
+      ↓
+HPO / disease / gene
+```
+
+代表：
+
+**RAG-HPO**
+
+**SHEPHERD**
+
+---
+
+### 第四阶段：Multi-agent LLM
+
+```text
+Phenotype Agent
+       +
+Genomics Agent
+       +
+Disease Agent
+       +
+Literature Agent
+       ↓
+Supervisor
+       ↓
+Diagnosis
+```
+
+代表：
+
+**MAC**
+
+**DeepRare**
+
+---
+
+### 第五阶段：真正的 genomic decision support
+
+未来更值得做的是：
+
+```text
+             Clinical phenotype
+                    │
+             ┌──────┴──────┐
+             ↓             ↓
+           HPO          Clinical text
+             │             │
+             └──────┬──────┘
+                    ↓
+               LLM/RAG
+                    │
+          ┌─────────┼─────────┐
+          ↓         ↓         ↓
+       Disease     Gene     Variant
+       ranking    ranking    ranking
+          │         │         │
+          └─────────┼─────────┘
+                    ↓
+              WES/WGS evidence
+                    ↓
+             ClinVar/OMIM/
+             HPO/gnomAD/
+             literature
+                    ↓
+             Final diagnosis
+```
+
+**我认为这个方向比“拿GPT-4诊断罕见病”有明显更高的研究价值。**
+
+---
+
+# 三、如果你是为了你前面提到的“NDD罕见病队列”项目
+
+我会特别推荐你把文献分成下面 **4条技术路线**：
+
+| 方向                                 | 代表工作                 | 适合你的程度 |
+| ---------------------------------- | -------------------- | -----: |
+| 临床文本 → HPO                         | RAG-HPO              |  ⭐⭐⭐⭐⭐ |
+| HPO → Disease/Gene                 | Kim / SHEPHERD       |  ⭐⭐⭐⭐⭐ |
+| Multi-agent rare disease diagnosis | MAC / DeepRare       |  ⭐⭐⭐⭐⭐ |
+| WES/WGS → Variant/Gene             | GeneT / Exomiser+LLM |  ⭐⭐⭐⭐⭐ |
+
+而且你前面正在考虑的 **NDD罕见病队列诊断**，其实非常适合进一步设计成一个：
+
+> **“HPO + WGS + pedigree + LLM/RAG + knowledge graph + variant evidence”的多模态罕见病诊断系统**
+
+而不是简单做一个 ChatGPT benchmark。
+
+---
+
+## 四、如果让我选“最值得精读”的 6 篇
+
+如果你不想一次看十几篇，我建议按照这个顺序：
+
+**① DeepRare — Nature 2026**
+→ 看最新的 **agentic rare-disease diagnosis**
+
+**② 5213 cases LLM benchmark — EJHG 2026**
+→ 看 LLM 与 Exomiser 的真实差距
+
+**③ RareDAI — npj Digital Medicine 2026**
+→ 看 **LLM + genetic testing decision**
+
+**④ MedFound — Nature Medicine 2025**
+→ 看医疗大模型本身怎么训练
+
+**⑤ SHEPHERD — npj Digital Medicine 2025**
+→ 看 **knowledge graph + rare disease diagnosis**
+
+**⑥ Kim et al. — AJHG 2024**
+→ 看 **LLM phenotype → gene prioritization** 的系统 benchmark
+
+这六篇基本可以把 **2024–2026 年 LLM + 罕见病诊断**的技术演进串起来。([Nature][1])
+
+如果你的目的其实是为**“粤港澳认知与情感神经生物学/NDD罕见病队列”申请项目**做文献依据，那么下一步最有价值的是把这些文章进一步整理成 **2023–2026 年 20–30 篇高水平论文表格**，专门增加 **队列规模、NDD/罕见病类型、WES/WGS、HPO、LLM类型、是否RAG、是否multi-agent、是否真实临床队列、诊断Top-1/Top-10、是否发现新基因、代码/模型是否开放** 这些字段。
+
+[1]: https://www.nature.com/articles/s41586-025-10097-9?utm_source=chatgpt.com "An agentic system for rare disease diagnosis with ..."
+[2]: https://doi.org/10.1038/s41746-026-02733-z?utm_source=chatgpt.com "Interpretable fine-tuned large language models facilitate making genetic test decisions for rare diseases | npj Digital Medicine"
+[3]: https://www.nature.com/articles/s41431-026-02054-5?utm_source=chatgpt.com "Systematic benchmarking demonstrates large language ..."
+[4]: https://www.nature.com/articles/s41591-024-03416-6?utm_source=chatgpt.com "A generalist medical language model for disease diagnosis assistance | Nature Medicine"
+[5]: https://doi.org/10.1038/s41746-025-01550-0?utm_source=chatgpt.com "Enhancing diagnostic capability with multi-agents conversational large language models | npj Digital Medicine"
+[6]: https://doi.org/10.1038%2Fs41746-025-01749-1?utm_source=chatgpt.com "Few shot learning for phenotype-driven diagnosis of patients with rare genetic diseases | npj Digital Medicine"
+[7]: https://link.springer.com/article/10.1186/s13073-025-01521-w?utm_source=chatgpt.com "Improving automated deep phenotyping through large language models using retrieval-augmented generation | Genome Medicine | Springer Nature Link"
+[8]: https://www.sciencedirect.com/science/article/pii/S0002929724002969?utm_source=chatgpt.com "Assessing the utility of large language models for phenotype-driven gene prioritization in the diagnosis of rare genetic disease - ScienceDirect"
+[9]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11480789/?utm_source=chatgpt.com "Assessing the utility of large language models for phenotype-driven gene prioritization in the diagnosis of rare genetic disease - PMC"
+[10]: https://pubmed.ncbi.nlm.nih.gov/39146935/?utm_source=chatgpt.com "Evaluating large language models on medical, lay-language, and self-reported descriptions of genetic conditions - PubMed"
+[11]: https://www.nature.com/articles/s41746-025-01452-1?utm_source=chatgpt.com "A phenotype-based AI pipeline outperforms human experts in differentially diagnosing rare diseases using EHRs | npj Digital Medicine"
+[12]: https://www.medrxiv.org/content/10.1101/2024.07.18.24310666v1.full?utm_source=chatgpt.com "Genetic Transformer: An Innovative Large Language Model Driven Approach for Rapid and Accurate Identification of Causative Variants in Rare Genetic Diseases | medRxiv"
+
+
+---
 
 # 罕见病重要文章
 
