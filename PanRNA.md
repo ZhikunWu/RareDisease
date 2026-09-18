@@ -1794,4 +1794,527 @@ expression matrix
 
 这样最终得到的 GTF 才真正适合作为你后面做 **population-level isoform expression、isoform usage、alternative splicing、eQTL/isoQTL** 的统一参考。
 
+---
+
+# 近三年发表的关于泛转录本的高水平文章有哪些
+
+如果你这里说的“**泛转录本**”是指 **pan-transcriptome / pan-transcriptomics（泛转录组）**，而且结合你现在正在做的 **100个样本 IsoQuant + 长读长 RNA-seq + 建立非冗余 population reference GTF**，近三年（**2023–2026**）确实有几篇非常值得重点看。
+
+我按“**与你当前研究最相关程度**”整理如下。
+
+---
+
+## 一、与你现在100个样本 IsoQuant 项目最直接相关
+
+### 1. 人群多样性 + 长读长 + pan-transcriptome —— 强烈推荐
+
+**Clavell-Revelles et al.
+“Long-read transcriptomics of a diverse human cohort reveals ancestry bias in gene annotation”
+Nature Communications, 2025**
+
+这是目前和你现在的研究设计**最接近的一篇**。
+
+研究使用：
+
+* 43个具有遗传多样性的人群样本
+* 8个人群
+* ONT long-read RNA-seq
+* 超过 **800 million full-length reads**
+* FLAIR
+* IsoQuant
+* ESPRESSO
+* LyRic
+
+构建跨人群 transcript annotation。研究发现非欧洲人群存在大量当前参考注释没有充分覆盖的 transcript，并指出个人基因组 assembly 可以进一步提高 transcript discovery。作者明确提出需要进一步建立 **human pantranscriptome**。([Nature][1])
+
+[Nature Communications 原文](https://www.nature.com/articles/s41467-025-66096-x?utm_source=chatgpt.com)
+
+**对你的项目最值得借鉴的地方：**
+
+```text
+多个人群/个体
+      ↓
+long-read RNA-seq
+      ↓
+IsoQuant / FLAIR / ESPRESSO
+      ↓
+transcript discovery
+      ↓
+cross-sample annotation
+      ↓
+population-level transcript annotation
+      ↓
+pan-transcriptome
+```
+
+这和你现在：
+
+```text
+100 samples
+   ↓
+IsoQuant
+   ↓
+transcript_models.gtf
+   ↓
+collapse
+   ↓
+population reference GTF
+```
+
+几乎是同一个技术路线。
+
+---
+
+## 二、最值得你学习“如何建立 Pan-transcriptome”的文章
+
+### 2. Barley pan-transcriptome —— Nature Genetics 2025
+
+**Guo et al.
+“A barley pan-transcriptome reveals layers of genotype-dependent transcriptional complexity”
+Nature Genetics, 2025, 57:441–450**
+
+这是我认为**最值得你仔细研究方法部分的一篇**。([Nature][2])
+
+研究：
+
+* 20个不同 barley genotype
+* 多组织
+* short-read RNA-seq
+* PacBio Iso-Seq
+* genotype-specific reference transcript datasets
+* 最终建立 **pan-RTD**
+
+他们没有简单把所有 transcript GTF `cat` 在一起，而是：
+
+```text
+20 genomes
+   ↓
+20 genotype-specific transcript datasets
+   ↓
+integration
+   ↓
+pan-RTD
+   ↓
+core / shell / cloud transcript
+```
+
+这是一个非常重要的概念。
+
+他们把 transcript 分成类似：
+
+```text
+Core transcripts
+Shell transcripts
+Cloud transcripts
+```
+
+因此不仅仅是：
+
+> “所有样本检测到的 transcript 集合”
+
+而是进一步研究：
+
+> **哪些 transcript 在所有基因型中存在，哪些是群体/基因型特异的。**
+
+[Nature Genetics 原文](https://www.nature.com/articles/s41588-024-02069-y?utm_source=chatgpt.com)
+
+### 对你的100个样本特别有启发
+
+你完全可以借鉴成：
+
+```text
+100 samples
+      ↓
+non-redundant transcriptome
+      ↓
+                   ┌── Core
+                   │
+                   ├── Common
+                   │
+                   ├── Population-enriched
+                   │
+                   └── Sample-specific
+```
+
+例如定义：
+
+| 类别        | 100样本中出现比例 |
+| --------- | ---------: |
+| Core      |       ≥90% |
+| Common    |     20–90% |
+| Rare      |      2–20% |
+| Singleton |         1% |
+
+当然具体阈值应该根据你的样本量、组织类型和测序深度决定。
+
+---
+
+# 三、另一个非常重要的 Nature Genetics：大规模群体 Pan-transcriptome
+
+### 3. Yeast pan-transcriptome
+
+**Caudal et al.
+“Pan-transcriptome reveals a large accessory genome contribution to gene expression variation in yeast”
+Nature Genetics, 2024**
+
+这是非常漂亮的**大群体 pan-transcriptome**研究。
+
+他们分析约：
+
+> **1,000个 yeast natural isolates**
+
+建立：
+
+* 4,977 core genes
+* 1,468 accessory genes
+
+然后进一步研究：
+
+```text
+pan-transcriptome
+       ↓
+core / accessory genome
+       ↓
+gene expression
+       ↓
+population structure
+       ↓
+GWAS
+       ↓
+genetic determinants of expression
+```
+
+研究发现 accessory genome 对表达差异贡献很大，而且 accessory genes 与较大的遗传效应相关。([Nature][3])
+
+[Nature Genetics 原文](https://www.nature.com/articles/s41588-024-01769-9?utm_source=chatgpt.com)
+
+### 对你最大的启发
+
+你以后如果100个样本有 WGS，那么你的项目可以从：
+
+```text
+Population transcriptome
+```
+
+进一步升级成：
+
+```text
+Population pan-transcriptome
+             ↓
+transcript presence/absence
+             ↓
+isoform usage
+             ↓
+expression variation
+             ↓
+eQTL / isoQTL
+             ↓
+SV / SNV / indel
+             ↓
+genotype → transcript → phenotype
+```
+
+这比单纯建立一个 GTF 有明显更大的研究空间。
+
+---
+
+# 四、2023 Nature：Pan-grass transcriptome
+
+### 4. Guillotin et al.
+
+**“A pan-grass transcriptome reveals patterns of cellular divergence in crops”
+Nature, 2023, 617:785–791**
+
+这是近三年 pan-transcriptome 领域非常值得看的 Nature 文章。([Nature][4])
+
+研究：
+
+* maize
+* sorghum
+* Setaria
+* single-cell / single-nucleus RNA-seq
+* comparative transcriptomics
+
+重点不是“建立一个 GTF”本身，而是：
+
+```text
+multiple species
+      ↓
+pan-transcriptome
+      ↓
+cell types
+      ↓
+orthologous transcript/gene programs
+      ↓
+cellular divergence
+```
+
+对你以后如果考虑：
+
+> 不同组织/不同疾病状态/不同人群的 transcriptome diversity
+
+这个思路非常有参考价值。
+
+[Nature 原文](https://www.nature.com/articles/s41586-023-06053-0?utm_source=chatgpt.com)
+
+---
+
+# 五、2025 Nature：Oat pan-genome + pan-transcriptome
+
+### 5. Avni et al.
+
+**“A pangenome and pantranscriptome of hexaploid oat”
+Nature, 2025/2026**
+
+这篇也非常值得关注。
+
+研究同时构建：
+
+```text
+pangenome
++
+pantranscriptome
+```
+
+并把基因组多样性与 transcript diversity 联系起来。该论文发表于 **Nature 649, 131–139（2026 issue）**。([Nature][5])
+
+[Nature 原文](https://www.nature.com/articles/s41586-025-09676-7?utm_source=chatgpt.com)
+
+这篇对你以后做：
+
+> **Pan-genome → Pan-transcriptome → functional variation**
+
+非常有参考意义。
+
+---
+
+# 六、虽然不是“pan-transcriptome”，但你的项目一定应该看
+
+### 6. LRGASP：长读长 transcriptome benchmark
+
+**“Systematic assessment of long-read RNA-seq methods for transcript identification and quantification”
+Nature Methods, 2024**
+
+这是 **LRGASP** 项目，非常重要。([Nature][6])
+
+它系统比较了：
+
+* transcript identification
+* transcript quantification
+* de novo transcript discovery
+* PacBio
+* ONT
+* cDNA
+* direct RNA
+* 多种分析工具
+
+数据超过：
+
+> **427 million long-read sequences**
+
+涉及 human、mouse、manatee。([Nature][6])
+
+[Nature Methods 原文](https://www.nature.com/articles/s41592-024-02298-3?utm_source=chatgpt.com)
+
+对于你正在比较：
+
+```text
+IsoQuant
+TAMA
+gffcompare
+FLAIR
+SQANTI3
+```
+
+这篇非常重要。
+
+---
+
+# 七、SQANTI3：建立高质量 Pan-transcriptome 时尤其重要
+
+### 7. Pardo-Palacios et al.
+
+**“SQANTI3: curation of long-read transcriptomes for accurate identification of known and novel isoforms”
+Nature Methods, 2024**
+
+SQANTI3 主要解决：
+
+> 长读长发现出来的 novel transcript 到底是不是真实 transcript？
+
+它可以评估：
+
+* splice junction
+* transcript ends
+* FSM
+* ISM
+* NIC
+* NNC
+* antisense
+* intronic
+* intergenic
+* RT switching
+* internal priming
+* junction quality
+
+([Nature][7])
+
+[Nature Methods 原文](https://www.nature.com/articles/s41592-024-02229-2?utm_source=chatgpt.com)
+
+因此你的流程最好不是：
+
+```text
+100 GTF
+ ↓
+merge
+ ↓
+GTF
+```
+
+而是：
+
+```text
+100 IsoQuant
+      ↓
+cross-sample collapse
+      ↓
+SQANTI3
+      ↓
+novel transcript QC
+      ↓
+high-confidence pan-transcriptome
+```
+
+---
+
+# 八、2025 Nature Methods：长读长 transcript quantification benchmark
+
+### 8. ONT long-read RNA-seq benchmark
+
+**“A systematic benchmark of Nanopore long-read RNA sequencing for transcript-level analysis in human cell lines”
+Nature Methods, 2025**
+
+研究比较了：
+
+* short-read cDNA
+* ONT direct RNA
+* ONT direct cDNA
+* PCR cDNA
+* PacBio Iso-Seq
+
+并使用多个 human cell lines 和 spike-in 对 transcript-level quantification 进行评价。([Nature][8])
+
+[Nature Methods 原文](https://www.nature.com/articles/s41592-025-02623-4?utm_source=chatgpt.com)
+
+这个对你后面：
+
+```text
+population_reference.gtf
+          ↓
+重新IsoQuant
+          ↓
+transcript TPM/count
+```
+
+特别重要。
+
+---
+
+# 九、如果你最终想做“人类 Pan-transcriptome”，我建议重点看这几篇
+
+按照与你当前项目的**相关性**，我会这样分：
+
+| 优先级   | 文章                                                                                               |   年份 | 期刊                    | 主要价值                                       |
+| ----- | ------------------------------------------------------------------------------------------------ | ---: | --------------------- | ------------------------------------------ |
+| ★★★★★ | **Long-read transcriptomics of a diverse human cohort reveals ancestry bias in gene annotation** | 2025 | Nature Communications | **人群 + long-read + transcript annotation** |
+| ★★★★★ | **A barley pan-transcriptome reveals layers of genotype-dependent transcriptional complexity**   | 2025 | Nature Genetics       | **Pan-transcriptome构建方法**                  |
+| ★★★★★ | **Pan-transcriptome reveals a large accessory genome contribution...**                           | 2024 | Nature Genetics       | **大群体 + pan-transcriptome + genetics**     |
+| ★★★★★ | **Systematic assessment of long-read RNA-seq methods...**                                        | 2024 | Nature Methods        | **IsoQuant等工具benchmark**                   |
+| ★★★★☆ | **SQANTI3**                                                                                      | 2024 | Nature Methods        | **Novel isoform QC**                       |
+| ★★★★☆ | **A pangenome and pantranscriptome of hexaploid oat**                                            | 2026 | Nature                | **Pan-genome + pan-transcriptome**         |
+| ★★★★☆ | **A pan-grass transcriptome reveals patterns of cellular divergence in crops**                   | 2023 | Nature                | **跨物种/细胞类型pan-transcriptome**              |
+| ★★★★☆ | **A systematic benchmark of Nanopore long-read RNA sequencing...**                               | 2025 | Nature Methods        | **transcript-level quantification**        |
+
+---
+
+# 十、对你目前100个 IsoQuant 样本，我尤其建议借鉴两篇
+
+其实你现在正在做的事情已经非常接近这两个方向的结合：
+
+### 文章A
+
+**Clavell-Revelles 2025**
+
+解决：
+
+> **不同人群 → long-read transcript discovery → population annotation**
+
+### 文章B
+
+**Guo 2025**
+
+解决：
+
+> **多个 genotype → genotype-specific transcriptome → pan-transcriptome → core/shell/cloud**
+
+因此你的项目完全可以设计成：
+
+```text
+                 100 individuals
+                       │
+                       ▼
+                Long-read RNA-seq
+                       │
+                       ▼
+                    IsoQuant
+                       │
+            ┌──────────┴──────────┐
+            │                     │
+       known isoforms        novel isoforms
+            │                     │
+            │             cross-sample collapse
+            │                     │
+            │                     ▼
+            │              non-redundant
+            │              novel transcriptome
+            │                     │
+            └──────────┬──────────┘
+                       ▼
+              Population Transcriptome
+                       │
+             ┌─────────┼─────────┐
+             ▼         ▼         ▼
+           Core      Common     Rare
+        transcript  transcript transcript
+             │
+             ▼
+        Pan-transcriptome
+             │
+     ┌───────┼─────────┐
+     ▼       ▼         ▼
+  Isoform   AS       APA/TSS
+  usage
+     │
+     ▼
+  WGS / SV
+     │
+     ▼
+ isoQTL / sQTL / apaQTL
+```
+
+这实际上已经不仅仅是“合并100个GTF”，而是可以形成一个比较完整的 **population long-read pan-transcriptome** 研究框架。
+
+特别值得注意的是，2025年的人群研究明确指出，即使只分析43个来自不同遗传背景的人群样本，也能发现大量当前参考注释没有充分覆盖的 transcript；作者因此提出扩大不同人群、组织、细胞类型和发育阶段的数据来构建更完整的人类 pantranscriptome。([Nature][1])
+
+**如果你的100个样本是人类样本，并且有 WGS，我建议下一步不要只做“100 GTF → 一个 GTF”。** 可以进一步按照这些文章的思路，把它设计成 **“人群长读长泛转录组 + transcript PAV + isoform diversity + WGS/SV关联”**。这和你现在的 IsoQuant 数据非常匹配。
+
+[1]: https://www.nature.com/articles/s41467-025-66096-x?utm_source=chatgpt.com "Long-read transcriptomics of a diverse human cohort reveals ancestry bias in gene annotation | Nature Communications"
+[2]: https://www.nature.com/articles/s41588-024-02069-y?utm_source=chatgpt.com "A barley pan-transcriptome reveals layers of genotype-dependent transcriptional complexity | Nature Genetics"
+[3]: https://www.nature.com/articles/s41588-024-01769-9?utm_source=chatgpt.com "Pan-transcriptome reveals a large accessory genome contribution to gene expression variation in yeast | Nature Genetics"
+[4]: https://www.nature.com/articles/s41586-023-06053-0?utm_source=chatgpt.com "A pan-grass transcriptome reveals patterns of cellular divergence in crops | Nature"
+[5]: https://www.nature.com/articles/s41586-025-09676-7?utm_source=chatgpt.com "A pangenome and pantranscriptome of hexaploid oat | Nature"
+[6]: https://www.nature.com/articles/s41592-024-02298-3?utm_source=chatgpt.com "Systematic assessment of long-read RNA-seq methods for transcript identification and quantification | Nature Methods"
+[7]: https://www.nature.com/articles/s41592-024-02229-2?utm_source=chatgpt.com "SQANTI3: curation of long-read transcriptomes for accurate identification of known and novel isoforms | Nature Methods"
+[8]: https://www.nature.com/articles/s41592-025-02623-4?utm_source=chatgpt.com "A systematic benchmark of Nanopore long-read RNA sequencing for transcript-level analysis in human cell lines | Nature Methods"
+
+
 
