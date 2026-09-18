@@ -1485,3 +1485,313 @@ SQANTI PASS
 
 **如果你把一个样本的 `transcript_models.gtf` 前20行 + 你的原始 reference GTF 前20行贴出来，并告诉我 IsoQuant 版本（例如 v3.8/v3.9），我可以直接按照你的实际 GTF 格式给你写一套可批量运行的 Bash 流程，从 `100个GTF → 合并 → 去冗余 → gffcompare → SQANTI3 → high-confidence novel isoform → new_reference.gtf → 重新定量100样本`，包括每一步具体命令。**
 
+
+# isoquant结果的extended_annotation.gtf和transcript_models.gtf有什么区别
+
+在 **IsoQuant** 中，这两个 GTF 都和转录本结构有关，但用途不同。对于你现在 **100 个样本合并、建立 population-level reference GTF** 的任务，这个区别尤其重要。
+
+### 1. `transcript_models.gtf`：IsoQuant 最终建立的转录本模型
+
+这是你最应该关注的文件。
+
+它描述的是 IsoQuant 根据 reads 识别/定量得到的**非冗余 transcript model**，通常包含：
+
+* 已知参考转录本
+* IsoQuant 识别到的 novel transcript
+* exon 结构
+* transcript/gene ID
+* 一些 IsoQuant 注释属性
+
+典型结构类似：
+
+```text
+chr1  IsoQuant  transcript  1000  5000  .  +  .  gene_id "GENE1"; transcript_id "GENE1-001";
+chr1  IsoQuant  exon       1000  1500  .  +  .  gene_id "GENE1"; transcript_id "GENE1-001"; exon_number "1";
+chr1  IsoQuant  exon       2000  3000  .  +  .  gene_id "GENE1"; transcript_id "GENE1-001"; exon_number "2";
+chr1  IsoQuant  exon       4000  5000  .  +  .  gene_id "GENE1"; transcript_id "GENE1-001"; exon_number "3";
+```
+
+所以可以把它理解为：
+
+> **“IsoQuant 最终认为这个样本中有哪些 transcript model。”**
+
+---
+
+### 2. `extended_annotation.gtf`：在原始 annotation 基础上扩展出来的注释
+
+`extended_annotation.gtf` 更偏向于**注释扩展/兼容性注释**。
+
+它通常是在原始 reference GTF 的基础上，加入 IsoQuant 识别出来的新 transcript/gene model，使得后续分析能够把：
+
+```text
+Reference transcript
+        +
+IsoQuant novel transcript
+```
+
+放在一个 annotation 中。
+
+也就是说，它更接近：
+
+> **“原来的参考注释 + IsoQuant发现的额外转录本模型。”**
+
+因此它通常比单纯的 `transcript_models.gtf` 更适合用于需要“扩展后的完整 annotation”的场景。
+
+---
+
+## 两者最核心的区别
+
+可以简单记成：
+
+| 文件                        | 核心含义                                 | 主要用途                         |
+| ------------------------- | ------------------------------------ | ---------------------------- |
+| `transcript_models.gtf`   | IsoQuant 建立的 transcript models       | 看 IsoQuant 识别了哪些转录本          |
+| `extended_annotation.gtf` | reference annotation + IsoQuant 扩展模型 | 建立扩展后的 transcript annotation |
+| reference.gtf             | 原始参考注释                               | 基础注释                         |
+
+关系可以理解成：
+
+```text
+                 Reference GTF
+                      │
+                      │
+                 IsoQuant
+                      │
+          ┌───────────┴───────────┐
+          │                       │
+ transcript_models.gtf    extended_annotation.gtf
+          │                       │
+          │                 Reference annotation
+          │                       +
+          │                 novel models
+          │
+      transcript models
+```
+
+---
+
+# 对你现在100个样本的情况，应该用哪个？
+
+这个问题非常关键。
+
+如果你的目标是：
+
+> **100个样本的 IsoQuant 结果 → 合并 → 和 reference GTF 整合 → 建立 population-level 新参考 GTF**
+
+我建议**不要直接把100个 `extended_annotation.gtf` 简单 `cat` 在一起**。
+
+也不建议直接把100个 `transcript_models.gtf` 全部 `cat` 后就当成新 reference。
+
+更合理的是：
+
+```text
+100 samples
+   │
+   ├── sample1 transcript_models.gtf
+   ├── sample2 transcript_models.gtf
+   ├── ...
+   └── sample100 transcript_models.gtf
+             │
+             ↓
+       提取 novel transcripts
+             │
+             ↓
+     跨样本 transcript collapse
+             │
+             ↓
+      population novel GTF
+             │
+             ↓
+Reference GTF ─────────┐
+                       │
+                       ↓
+            population_reference.gtf
+```
+
+### 为什么？
+
+因为100个样本里面很可能出现这种情况：
+
+```text
+Sample1:
+chr1:1000-2000-3000
+
+Sample2:
+chr1:1000-2000-3000
+
+Sample3:
+chr1:1000-2000-3050
+
+Sample4:
+chr1:1000-2000-3000
+```
+
+如果直接合并：
+
+```text
+transcript_A
+transcript_B
+transcript_C
+transcript_D
+```
+
+实际上可能只是：
+
+```text
+一个共同的 isoform
+        +
+一个不同3'端的 isoform
+```
+
+所以需要先进行 **cross-sample transcript model collapsing / clustering**。
+
+---
+
+# 还有一个非常重要的情况
+
+如果你这100个样本当初都是：
+
+```bash
+isoquant.py \
+    --reference_gtf reference.gtf \
+    ...
+```
+
+也就是说**全部使用完全相同的 reference GTF**，那么事情会简单很多。
+
+这时候：
+
+### 已知 transcript
+
+一般不需要重新 collapse。
+
+例如：
+
+```text
+reference.gtf
+
+ENST000001
+ENST000002
+ENST000003
+```
+
+100个样本中这些已知 transcript 的 ID/结构本来就是统一的。
+
+真正需要跨样本整合的是：
+
+```text
+Sample1 novel transcript
+Sample2 novel transcript
+Sample3 novel transcript
+...
+Sample100 novel transcript
+```
+
+所以最推荐的策略是：
+
+```text
+Reference GTF
+     │
+     ├── 保留全部 reference transcripts
+     │
+     │
+100 × IsoQuant
+transcript_models.gtf
+     │
+     ↓
+提取 novel transcripts
+     │
+     ↓
+跨样本 collapse
+     │
+     ↓
+population novel transcripts
+     │
+     ↓
+Reference + population novel
+     │
+     ↓
+population_reference.gtf
+```
+
+---
+
+# `extended_annotation.gtf` 在这里有什么作用？
+
+它可以作为一个很有价值的**辅助结果**。
+
+例如你可以检查：
+
+```bash
+grep -v '^#' sample1.extended_annotation.gtf | head
+```
+
+以及：
+
+```bash
+grep -v '^#' sample1.transcript_models.gtf | head
+```
+
+然后比较它们的：
+
+```text
+gene_id
+transcript_id
+source
+attributes
+```
+
+尤其是 novel transcript 的 ID 和 annotation 信息。
+
+---
+
+## 我更建议你现在先不要急着合并
+
+因为 **IsoQuant 不同版本、不同参数以及是否使用 reference GTF 时，这两个文件中的 attributes 和 transcript 来源可能有所不同**。
+
+你现在最有价值的是把下面两个文件各贴 **20行左右**：
+
+```bash
+head -20 sample1.transcript_models.gtf
+```
+
+和
+
+```bash
+head -20 sample1.extended_annotation.gtf
+```
+
+最好再给我：
+
+```bash
+grep -v '^#' sample1.transcript_models.gtf | head -5
+grep -v '^#' sample1.extended_annotation.gtf | head -5
+```
+
+**我可以根据你实际的 IsoQuant GTF 格式，直接给你设计一套 100 个样本的完整流程：**
+
+```text
+100 × transcript_models.gtf
+          ↓
+识别 known / novel
+          ↓
+100样本 novel transcript collapse
+          ↓
+统计每个isoform的
+supporting reads + sample数
+          ↓
+高可信 novel isoform筛选
+          ↓
+Reference GTF + novel GTF
+          ↓
+population_reference.gtf
+          ↓
+重新对100个样本统一定量
+          ↓
+100 × transcript × sample
+expression matrix
+```
+
+这样最终得到的 GTF 才真正适合作为你后面做 **population-level isoform expression、isoform usage、alternative splicing、eQTL/isoQTL** 的统一参考。
+
+
