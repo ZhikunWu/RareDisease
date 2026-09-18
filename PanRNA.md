@@ -621,3 +621,867 @@ transcript_models.gtf   read_info
 [3]: https://ablab.github.io/IsoQuant/cmd.html?utm_source=chatgpt.com "Command line options - IsoQuant"
 
 
+---
+
+# 首先如何合并所有样本的isoform，然后按单个样本检测每个isoform的表达量或者tpm
+
+可以。对于 **100 个样本已经分别经过 IsoQuant 分析**的情况，你要做的实际上是建立一个：
+
+> **Population-level non-redundant transcriptome annotation（群体水平非冗余转录组注释）**
+
+即把：
+
+**100 个样本 IsoQuant 发现的 transcript models + 原始参考 GTF**
+
+整合成一个新的、统一的 `population_reference.gtf`。
+
+这里有一个关键点：**不要直接 `cat` 100 个 GTF，也不要直接用 gffcompare 的输出当最终 GTF**。更稳妥的流程是“样本内结果汇总 → transcript model 去冗余 → 与 reference GTF 比对/分类 → 建立统一 transcript ID → 过滤低可信 novel transcript → 生成新的 GTF”。
+
+---
+
+# 一、推荐的总体流程
+
+假设：
+
+```text
+100个样本
+    │
+    ├── S01/transcript_models.gtf
+    ├── S02/transcript_models.gtf
+    ├── ...
+    └── S100/transcript_models.gtf
+              │
+              ↓
+      合并所有 IsoQuant GTF
+              │
+              ↓
+       transcript model 去冗余
+              │
+              ↓
+       population transcriptome
+              │
+              ↓
+      与 reference GTF 比较
+              │
+       ┌──────┴──────┐
+       ↓             ↓
+    known          novel
+       │             │
+       │       ┌─────┴─────┐
+       │       ↓           ↓
+       │    high-conf    low-conf
+       │       novel
+       │
+       └───────┬───────────┘
+               ↓
+     population_reference.gtf
+```
+
+最终：
+
+```text
+reference.gtf
+       +
+100 samples IsoQuant
+       ↓
+population_reference.gtf
+```
+
+---
+
+# 二、首先要明确：你想建立哪一种“新参考 GTF”
+
+实际上有两种。
+
+## 类型 A：Reference + Novel
+
+这是我最推荐的。
+
+```text
+new_reference.gtf
+│
+├── 原始 reference transcripts
+│
+└── high-confidence novel transcripts
+```
+
+例如：
+
+```text
+GENE1
+ ├── ENST000001
+ ├── ENST000002
+ ├── NOVEL000001
+ └── NOVEL000002
+```
+
+这种适合：
+
+* 后续100个样本重新定量
+* transcript expression
+* isoform usage
+* isoQTL
+* sQTL
+* APA
+* population transcriptome
+
+---
+
+## 类型 B：只保留100个样本实际观察到的 transcript
+
+即：
+
+```text
+population_observed.gtf
+```
+
+例如 reference 中有：
+
+```text
+GENE1
+ ├── iso1
+ ├── iso2
+ ├── iso3
+ ├── iso4
+ └── iso5
+```
+
+但100个人只观察到：
+
+```text
+iso1
+iso2
+iso4
+novel1
+novel2
+```
+
+那么最终只保留：
+
+```text
+iso1
+iso2
+iso4
+novel1
+novel2
+```
+
+这个更适合研究：
+
+> **population transcriptome diversity**
+
+---
+
+# 三、第一步：收集100个 IsoQuant GTF
+
+假设目录：
+
+```bash
+project/
+├── S01/
+│   └── S01.transcript_models.gtf
+├── S02/
+│   └── S02.transcript_models.gtf
+...
+└── S100/
+    └── S100.transcript_models.gtf
+```
+
+先建立列表：
+
+```bash
+find project/ \
+    -name "*.transcript_models.gtf" \
+    > isoquant_gtf.list
+```
+
+检查：
+
+```bash
+wc -l isoquant_gtf.list
+```
+
+应该：
+
+```text
+100
+```
+
+---
+
+# 四、第二步：先合并100个 GTF
+
+可以先简单合并：
+
+```bash
+cat $(cat isoquant_gtf.list) > all_isoquant.gtf
+```
+
+但是：
+
+> **这个文件只是临时文件，不是最终 GTF。**
+
+因为不同样本可能产生相同结构但不同 transcript ID。
+
+例如：
+
+```text
+S01:
+PB.1.1
+
+S02:
+PB.23.4
+
+S03:
+PB.8.2
+```
+
+实际上三者可能是：
+
+```text
+chr1:1000-2000
+exon1:1000-1100
+exon2:1500-1600
+exon3:1900-2000
+```
+
+即完全相同的 transcript model。
+
+所以必须进行 **collapse / deduplication**。
+
+---
+
+# 五、第三步：非常推荐使用 TAMA 做跨样本 transcript collapse
+
+如果你的目标是建立真正的 **population transcriptome GTF**，TAMA 是非常合适的工具之一。
+
+基本思想：
+
+```text
+100 IsoQuant GTF
+       ↓
+TAMA collapse
+       ↓
+non-redundant transcript models
+```
+
+尤其适合：
+
+* PacBio Iso-Seq
+* ONT long RNA
+* 多样本
+* transcript model collapse
+* alternative TSS
+* alternative polyA
+* transcript end variation
+
+---
+
+# 六、不过这里有一个非常重要的问题
+
+**不要把 reference GTF 和 100 个 IsoQuant GTF 一上来直接 collapse。**
+
+建议分开：
+
+```text
+                    ┌── reference.gtf
+                    │
+100 IsoQuant GTF ───┤
+                    ↓
+              novel transcript
+              identification
+```
+
+也就是：
+
+### 第一步
+
+100个样本内部：
+
+```text
+100 IsoQuant GTF
+      ↓
+collapse
+      ↓
+population IsoQuant GTF
+```
+
+### 第二步
+
+```text
+population IsoQuant GTF
+          +
+reference GTF
+          ↓
+classification
+```
+
+### 第三步
+
+```text
+known + high-confidence novel
+          ↓
+new reference GTF
+```
+
+这样结构更清楚。
+
+---
+
+# 七、第四步：用 gffcompare 和 reference GTF 比较
+
+这是非常重要的一步。
+
+例如：
+
+```bash
+gffcompare \
+    -r reference.gtf \
+    -o population \
+    population_collapsed.gtf
+```
+
+会产生：
+
+```text
+population.annotated.gtf
+population.tracking
+population.stats
+population.tmap
+```
+
+其中：
+
+```text
+population.tmap
+```
+
+特别重要。
+
+它可以告诉你：
+
+```text
+query transcript
+       ↓
+reference transcript
+       ↓
+class code
+```
+
+---
+
+# 八、重点关注 gffcompare 的 class code
+
+例如：
+
+```text
+=
+```
+
+表示：
+
+> 与 reference transcript 完全匹配
+
+---
+
+```text
+c
+```
+
+表示：
+
+> query transcript 包含于 reference transcript / 与已知 transcript 有包含关系
+
+---
+
+```text
+j
+```
+
+表示：
+
+> 与 reference 有 splice junction match，但结构不是完全一致
+
+---
+
+```text
+i
+```
+
+表示：
+
+> intronic transcript
+
+---
+
+```text
+u
+```
+
+表示：
+
+> intergenic transcript
+
+---
+
+```text
+x
+```
+
+表示：
+
+> antisense transcript
+
+---
+
+所以你可以建立：
+
+```text
+Known
+ ├── =
+ ├── c
+ └── j
+
+Novel
+ ├── j
+ ├── i
+ ├── u
+ └── x
+```
+
+但这里不要机械地把所有 `j/i/u/x` 都当作高可信 novel isoform。
+
+---
+
+# 九、对于100样本，我建议这样定义 High-confidence Novel Isoform
+
+这是整个流程的核心。
+
+例如：
+
+```text
+Novel transcript
+      │
+      ├── ≥3 supporting reads
+      │
+      ├── ≥2 independent samples
+      │
+      ├── canonical splice junction
+      │
+      ├── not identical to reference
+      │
+      ├── not obvious fragment
+      │
+      └── SQANTI3 PASS
+              │
+              ↓
+       High-confidence
+       novel isoform
+```
+
+如果你的数据深度比较高，可以进一步要求：
+
+```text
+≥5 supporting reads
+```
+
+和：
+
+```text
+≥3 individuals
+```
+
+---
+
+# 十、为什么一定要加入“样本数”这个条件？
+
+因为你有100个人。
+
+这是非常大的优势。
+
+比如：
+
+### Novel A
+
+```text
+100 individuals
+85 individuals detected
+```
+
+可信度很高。
+
+---
+
+### Novel B
+
+```text
+100 individuals
+15 individuals detected
+```
+
+也可能是真实的低频 isoform。
+
+---
+
+### Novel C
+
+```text
+100 individuals
+1 individual
+1 read
+```
+
+很可能是：
+
+* sequencing artifact
+* mapping artifact
+* incomplete transcript
+* random splice
+* RT artifact
+
+所以100个样本实际上可以把 novel transcript 分成：
+
+```text
+Common
+≥50%
+
+Intermediate
+10–50%
+
+Rare
+1–10%
+
+Private
+1%
+```
+
+这对于后面的 population transcriptome 分析非常有价值。
+
+---
+
+# 十一、第五步：SQANTI3 建议放在这里
+
+我非常建议：
+
+```text
+100 IsoQuant
+      ↓
+collapse
+      ↓
+population transcriptome
+      ↓
+gffcompare
+      ↓
+SQANTI3
+```
+
+SQANTI3 对 novel isoform 做：
+
+* FSM
+* ISM
+* NIC
+* NNC
+* antisense
+* intergenic
+* RT switching
+* splice junction QC
+* junction support
+* ORF
+* transcript structural classification
+
+然后：
+
+```text
+SQANTI3
+    ↓
+filter
+    ↓
+high-confidence novel transcripts
+```
+
+这一步对于建立“新参考 GTF”非常重要。
+
+---
+
+# 十二、第六步：建立统一 transcript ID
+
+这个一定要做。
+
+不要最终 GTF 里出现：
+
+```text
+S01.PB.1.1
+S02.PB.1.1
+S03.PB.2.3
+```
+
+应该统一成：
+
+```text
+ENST...
+```
+
+或者：
+
+```text
+NOVEL000001
+NOVEL000002
+NOVEL000003
+```
+
+例如：
+
+```text
+GENE0001
+ ├── ENST000001
+ ├── ENST000002
+ ├── NOVEL000001
+ └── NOVEL000002
+```
+
+同时建议建立一个 annotation table：
+
+```text
+transcript_id
+gene_id
+source
+class
+reference_transcript
+n_samples
+supporting_reads
+chromosome
+start
+end
+strand
+```
+
+例如：
+
+| transcript | type  | reference | samples | reads |
+| ---------- | ----- | --------- | ------: | ----: |
+| ENST001    | known | ENST001   |     100 | 15000 |
+| NOVEL001   | NIC   | ENST002   |      63 |   420 |
+| NOVEL002   | NNC   | NA        |      21 |    87 |
+| NOVEL003   | NNC   | NA        |       3 |    12 |
+
+这张表后面非常有用。
+
+---
+
+# 十三、第七步：最终构建新的 GTF
+
+最终：
+
+```text
+new_reference.gtf
+```
+
+包含：
+
+```text
+reference known transcripts
+        +
+high-confidence novel transcripts
+```
+
+例如：
+
+```text
+chr1 source transcript 1000 5000 . + . gene_id "GENE1"; transcript_id "ENST001";
+
+chr1 source exon      1000 1500 . + . gene_id "GENE1"; transcript_id "ENST001";
+chr1 source exon      2000 2500 . + . gene_id "GENE1"; transcript_id "ENST001";
+
+chr1 IsoQuant transcript 1000 6000 . + . gene_id "GENE1"; transcript_id "NOVEL000001";
+
+chr1 IsoQuant exon      1000 1500 . + . gene_id "GENE1"; transcript_id "NOVEL000001";
+chr1 IsoQuant exon      1800 2200 . + . gene_id "GENE1"; transcript_id "NOVEL000001";
+chr1 IsoQuant exon      3000 6000 . + . gene_id "GENE1"; transcript_id "NOVEL000001";
+```
+
+---
+
+# 十四、然后一定要做 GTF QC
+
+至少检查：
+
+### transcript 数量
+
+```bash
+grep -w transcript new_reference.gtf | wc -l
+```
+
+### gene 数量
+
+```bash
+grep -w transcript new_reference.gtf \
+| sed 's/.*gene_id "\([^"]*\)".*/\1/' \
+| sort -u | wc -l
+```
+
+### exon 数量
+
+```bash
+grep -w exon new_reference.gtf | wc -l
+```
+
+---
+
+# 十五、最重要的验证：重新定量100个样本
+
+建立：
+
+```text
+new_reference.gtf
+```
+
+之后，不要马上拿它做最终群体分析。
+
+应该：
+
+```text
+                 new_reference.gtf
+                       │
+          ┌────────────┼─────────────┐
+          ↓            ↓             ↓
+         S01          S02          S100
+          │            │             │
+          └────────────┼─────────────┘
+                       ↓
+                   IsoQuant
+                       ↓
+          transcript count / TPM
+```
+
+重新跑100个样本。
+
+这样最终得到：
+
+```text
+transcript_count_matrix
+transcript_TPM_matrix
+```
+
+此时：
+
+> **100个样本的每个 transcript 都对应同一个统一 transcript ID。**
+
+这才是真正可以进入群体分析的数据。
+
+---
+
+# 十六、我建议你最终做两个版本的 GTF
+
+非常重要。
+
+### GTF 1：`population_reference.full.gtf`
+
+```text
+reference
++
+all reasonably supported novel isoforms
+```
+
+用于探索。
+
+---
+
+### GTF 2：`population_reference.highconf.gtf`
+
+```text
+reference
++
+high-confidence novel isoforms
+```
+
+用于正式统计分析。
+
+例如：
+
+```text
+high-confidence:
+≥3 reads
+≥2 samples
+canonical splice
+SQANTI PASS
+```
+
+---
+
+# 十七、对于你的100个样本，我更推荐下面这个实际流程
+
+```text
+                 100 samples
+                      │
+                      ↓
+            IsoQuant transcript_models
+                      │
+                      ↓
+              sample GTF aggregation
+                      │
+                      ↓
+             TAMA / transcript collapse
+                      │
+                      ↓
+        population_nonredundant.gtf
+                      │
+                      ↓
+              gffcompare -r
+                      │
+          ┌───────────┴────────────┐
+          ↓                        ↓
+       Known                     Novel
+          │                        │
+       = / c / j             j / i / u / x
+                                   │
+                                   ↓
+                              SQANTI3
+                                   │
+                       ┌───────────┴───────────┐
+                       ↓                       ↓
+                  high-confidence          low-confidence
+                       │
+                       ↓
+                population novel
+                       │
+                       ↓
+        reference GTF + novel GTF
+                       │
+                       ↓
+          population_reference.gtf
+                       │
+                       ↓
+              100 samples IsoQuant
+                 re-quantification
+                       │
+             ┌─────────┴─────────┐
+             ↓                   ↓
+        Count matrix          TPM matrix
+             │                   │
+             └─────────┬─────────┘
+                       ↓
+             population analysis
+```
+
+---
+
+## 十八、但有一个关键技术选择需要先确定
+
+你现在说的“100个样本 IsoQuant 结果”，**如果这100个样本使用的是同一个 reference GTF**，那么我建议流程可以明显简化：
+
+> **已知 transcript 不需要重新 collapse，只需要针对 novel transcript 做跨样本合并；然后将 novel transcript 与 reference GTF 合并。**
+
+这种方式通常比把 **reference + 100个GTF全部重新 collapse** 更安全，因为不会无意间改变原始 reference transcript 的 ID 和结构。
+
+而如果你的100个样本是：
+
+> **没有 reference GTF 的 de novo IsoQuant transcript discovery**
+
+那么就应该走完整的：
+
+**100 GTF → collapse → reference comparison → SQANTI3 → filtering → new GTF**
+
+路线。
+
+**如果你把一个样本的 `transcript_models.gtf` 前20行 + 你的原始 reference GTF 前20行贴出来，并告诉我 IsoQuant 版本（例如 v3.8/v3.9），我可以直接按照你的实际 GTF 格式给你写一套可批量运行的 Bash 流程，从 `100个GTF → 合并 → 去冗余 → gffcompare → SQANTI3 → high-confidence novel isoform → new_reference.gtf → 重新定量100样本`，包括每一步具体命令。**
+
