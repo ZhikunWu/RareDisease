@@ -1,3 +1,895 @@
+# 近四年在四大医学期刊的子刊上发表的关于罕见病的论文有哪些（尽可能多列出）
+
+可以。这里我把“**四大医学期刊的子刊**”按通常科研语境理解为四大医学出版体系：
+
+* **NEJM Group**：NEJM Evidence、NEJM AI 等
+* **The Lancet 系列**：Lancet Neurology、Lancet Child & Adolescent Health、Lancet Haematology、Lancet Gastroenterology & Hepatology、Lancet Respiratory Medicine、Lancet Diabetes & Endocrinology 等
+* **JAMA Network**：JAMA Neurology、JAMA Pediatrics、JAMA Psychiatry、JAMA Dermatology、JAMA Network Open 等
+* **BMJ Group**：Journal of Medical Genetics、BMJ Neurology Open、BMJ Paediatrics Open 等
+
+时间范围按 **2022–2026年9月**。由于“罕见病”可以包括单基因病、NDD、罕见神经病、遗传性眼病、罕见血液病、罕见代谢病、罕见肺病以及基因治疗等，所以我下面重点放在**与你的 WES/WGS、NDD、long-read、SV、AI诊断和罕见病队列最相关**的文章，同时补充一些重要疾病治疗论文。
+
+---
+
+# 一、首先推荐：与你的 NDD/WES/WGS/Long-read 最相关
+
+这一部分是我认为你最应该重点阅读的。
+
+| 年份       | 期刊                              | 论文                                                                                                                                         | 疾病/方向        | 数据/方法                     |
+| -------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------------- |
+| **2025** | **JAMA Pediatrics**             | **Clinical Long-Read Sequencing Test for Genetic Disease Diagnosis**                                                                       | 罕见遗传病        | 235例儿童 HiFi long-read     |
+| **2024** | **JAMA Neurology**              | **Genome Sequencing After Exome Sequencing in Pediatric Epilepsy**                                                                         | 儿童癫痫/NDD     | 125例，ES后GS                |
+| **2023** | **JAMA Neurology**              | **Exome Sequencing and the Identification of New Genes and Shared Mechanisms in Polymicrogyria**                                           | PMG/NDD      | 275个家系                    |
+| **2022** | **JAMA Neurology**              | **Molecular Diagnostic Yield of Exome Sequencing and Chromosomal Microarray in Cerebral Palsy**                                            | CP/NDD       | ES/CMA meta-analysis      |
+| **2024** | **JAMA Pediatrics**             | **Rare De Novo and Inherited Genes in Familial and Nonfamilial Pediatric ADHD**                                                            | ADHD/NDD     | WES + rare variants       |
+| **2023** | **JAMA Pediatrics**             | **Molecular Diagnostic Yield of Exome Sequencing and Chromosomal Microarray in Short Stature**                                             | 遗传性矮小        | ES/CMA meta-analysis      |
+| **2023** | **Lancet Neurology**            | **Evaluation of the feasibility, diagnostic yield, and clinical utility of rapid genome sequencing in infantile epilepsy (Gene-STEPS)**    | 婴儿癫痫/NDD     | rapid WGS，多中心             |
+| **2022** | **Lancet Neurology**            | **Whole genome sequencing for the diagnosis of neurological repeat expansion disorders in the UK**                                         | 重复扩增疾病       | WGS                       |
+| **2023** | **Journal of Medical Genetics** | **Diagnostic genome sequencing improves diagnostic yield: a prospective single-centre study in 1000 patients with inherited eye diseases** | 遗传性眼病        | **1000例WGS + RNA-seq**    |
+| **2025** | **Journal of Medical Genetics** | **Clinical utility of genome sequencing in autism: illustrative examples from a genomic research study**                                   | ASD/NDD      | 202个WGS家庭                 |
+| **2024** | **Journal of Medical Genetics** | **WDR45 variants as a major cause for a clinically variable intellectual disability syndrome from early infancy in females**               | ID/NDD       | WGS + XCI                 |
+| **2024** | **Journal of Medical Genetics** | **Non-coding CGG repeat expansion in LOC642361/NUTM2B-AS1...**                                                                             | OPDM         | repeat expansion/WGS/LRS  |
+| **2024** | **Journal of Medical Genetics** | **Novel variants and genotype-phenotype correlation in a multicentre cohort of GNE myopathy in China**                                     | GNE myopathy | 113例 + WGS + Nanopore LRS |
+
+其中 JAMA Pediatrics 2025 的 long-read 文章尤其值得你看：研究比较了 **235例儿童临床HiFi长读长测序**和513例年龄、表型匹配的标准检测病例；87个LRS诊断中，16个（18.3%）受益于长读长整合能力，包括SV、repeat expansion、甲基化和phasing等。([JAMA Network][1])
+
+JAMA Neurology 2024 的 ES→GS 研究则非常贴合你目前的“**WES未诊断病例进一步WGS**”思路：125名ES未诊断儿童癫痫患者中，GS找到9个诊断/可能诊断结果，其中7个必须依靠GS才能发现。([JAMA Network][2])
+
+---
+
+# 二、The Lancet Neurology：罕见神经遗传病非常值得系统看
+
+## 1. 2022：WGS检测神经系统repeat expansion
+
+### **Whole genome sequencing for the diagnosis of neurological repeat expansion disorders in the UK**
+
+**The Lancet Neurology, 2022;21:234–245**
+
+这是非常重要的一篇。
+
+研究对象是英国疑似神经遗传病患者，利用WGS检测：
+
+* C9orf72
+* FMR1
+* FXN
+* HTT
+* DMPK
+* ATXN1/2/3/7
+* TBP
+* CACNA1A
+* 等重复扩增位点。
+
+文章指出，传统重复扩增检测往往是**locus-specific**，而WGS有机会在更广泛的遗传病诊断中统一检测。([EM Consulte][3])
+
+这对你以后做：
+
+```text
+WGS
+ ↓
+SNV/Indel
+SV
+Repeat expansion
+CNV
+ ↓
+rare disease diagnosis
+```
+
+很重要。
+
+---
+
+## 2. 2023：Gene-STEPS
+
+### **Evaluation of the feasibility, diagnostic yield, and clinical utility of rapid genome sequencing in infantile epilepsy (Gene-STEPS)**
+
+**The Lancet Neurology, 2023;22:812–825**
+
+国际多中心研究，针对：
+
+> neonatal/infantile-onset epilepsy
+
+开展rapid genome sequencing。
+
+这实际上就是：
+
+```text
+婴幼儿癫痫
+     ↓
+rapid WGS
+     ↓
+genetic diagnosis
+     ↓
+clinical utility
+```
+
+而且是澳大利亚、加拿大、英国、美国多中心合作。([科学直通车][4])
+
+---
+
+## 3. 2025：C9orf72 repeat expansion
+
+### **Amyotrophic lateral sclerosis caused by hexanucleotide repeat expansions in C9orf72: from genetics to therapeutics**
+
+**The Lancet Neurology, 2025;24:261–274**
+
+重点是：
+
+* repeat expansion
+* penetrance
+* RNA toxicity
+* dipeptide repeat proteins
+* TDP-43
+* genetic diagnosis
+* therapeutics
+
+([科学直通车][5])
+
+---
+
+## 4. 2025：SMA
+
+### **Safety and efficacy of apitegromab in nonambulatory type 2 or type 3 spinal muscular atrophy (SAPPHIRE)**
+
+**The Lancet Neurology, 2025;24:727–739**
+
+SMA是典型的遗传性罕见神经疾病，文章为多中心III期试验。([科学直通车][6])
+
+---
+
+# 三、The Lancet Child & Adolescent Health
+
+这一刊对你的 **NDD/儿童罕见病** 项目非常重要。
+
+## 1. 2024：遗传性发育性癫痫性脑病
+
+### **The expanding field of genetic developmental and epileptic encephalopathies: current understanding and future perspectives**
+
+**The Lancet Child & Adolescent Health, 2024;8:821–834**
+
+重点：
+
+* > 800个DEEs相关基因
+* gBRAT-1
+* GNAO1
+* GRIN family
+* HCN family
+* gene therapy
+
+这篇非常适合你做NDD课题的**疾病谱背景综述**。([科学直通车][7])
+
+---
+
+## 2. 2024：儿童癌症遗传易感
+
+### **Comparison of clinical selection-based genetic testing with phenotype-agnostic extensive germline sequencing to diagnose genetic predisposition in children with cancer**
+
+**The Lancet Child & Adolescent Health, 2024;8:751–761**
+
+研究比较：
+
+```text
+clinical phenotype-driven testing
+        VS
+phenotype-agnostic extensive germline sequencing
+```
+
+这是一个很值得你借鉴的研究设计，因为它实际上对应：
+
+> **“表型驱动WES” vs “广泛无偏WGS/WES”**
+
+([科学直通车][8])
+
+---
+
+## 3. 2024：儿童罕见病支持
+
+### **Holistic support for children with rare disease**
+
+**The Lancet Child & Adolescent Health, 2024**
+
+属于儿童罕见病综合管理方向。([OpenAlex][9])
+
+---
+
+# 四、The Lancet Gastroenterology & Hepatology
+
+这里有一个与你的**罕见病精准诊断**特别相关的研究。
+
+## 1. 2023：单基因IBD
+
+### **Genomic diagnosis and care co-ordination for monogenic inflammatory bowel disease in children and adults**
+
+**The Lancet Gastroenterology & Hepatology, 2023;8:271–286**
+
+这是共识指南。
+
+重点是：
+
+> monogenic IBD
+
+已知超过100种单基因疾病可以表现为IBD。
+
+涉及：
+
+* WGS/WES
+* immunodeficiency
+* early-onset IBD
+* genotype–phenotype
+* genomic diagnosis
+
+([科学直通车][10])
+
+对你的NDD项目来说，它提供了一个非常重要的范式：
+
+```text
+临床表型
+   ↓
+怀疑monogenic disease
+   ↓
+genomic testing
+   ↓
+分子诊断
+   ↓
+改变治疗策略
+```
+
+---
+
+## 2. 2024：PFIC
+
+### **Maralixibat in progressive familial intrahepatic cholestasis (MARCH-PFIC)**
+
+**The Lancet Gastroenterology & Hepatology, 2024;9:620–631**
+
+PFIC属于遗传性罕见胆汁淤积病。([科学直通车][11])
+
+---
+
+# 五、The Lancet Respiratory Medicine
+
+## 1. 2024：淋巴管平滑肌瘤病
+
+### **Nintedanib for patients with lymphangioleiomyomatosis**
+
+**The Lancet Respiratory Medicine, 2024;12:967–974**
+
+文章明确把 lymphangioleiomyomatosis 描述为：
+
+> ultra-rare disease
+
+属于罕见肺病治疗研究。([科学直通车][12])
+
+---
+
+## 2. 2024：囊性纤维化
+
+### **Compassionate use trials and equitable access to variant-specific treatment for cystic fibrosis**
+
+**The Lancet Respiratory Medicine, 2024;12:842–844**
+
+强调：
+
+> variant-specific treatment
+
+也就是不同CFTR变异与个体化治疗之间的关系。([PubMed][13])
+
+---
+
+# 六、The Lancet Haematology
+
+这一系列里面罕见遗传病非常多。
+
+## 1. 2024：血友病B基因治疗
+
+### **Etranacogene dezaparvovec gene therapy for haemophilia B (HOPE-B)**
+
+**The Lancet Haematology, 2024;11:e265–e275**
+
+24个月随访，单臂III期研究。
+
+([科学直通车][14])
+
+---
+
+## 2. 2022：丙酮酸激酶缺乏症
+
+### **Mitapivat in adult patients with pyruvate kinase deficiency receiving regular transfusions (ACTIVATE-T)**
+
+**The Lancet Haematology, 2022**
+
+丙酮酸激酶缺乏症是经典罕见遗传性溶血性贫血。该研究出现在2022年Lancet Haematology 9(10)期。([科学直通车][15])
+
+---
+
+## 3. 2024：CRISPR/Cas9 gene therapy
+
+### **The dawn of the CRISPR/Cas9 gene therapy era**
+
+**The Lancet Haematology, 2024**
+
+重点讨论：
+
+* gene editing
+* CRISPR
+* inherited hematologic diseases
+
+([PubMed][16])
+
+---
+
+# 七、The Lancet Diabetes & Endocrinology
+
+## 1. 2023：Rare diseases editorial
+
+### **Rare diseases: individually rare, collectively common**
+
+**The Lancet Diabetes & Endocrinology, 2023;11:139**
+
+直接讨论罕见病。([PubMed][17])
+
+---
+
+## 2. 2025：遗传性肥胖
+
+### **Setmelanotide in patients aged 2–5 years with rare MC4R pathway-associated obesity (VENTURE)**
+
+**The Lancet Diabetes & Endocrinology, 2025;13:29–37**
+
+涉及：
+
+* POMC deficiency
+* PCSK1 deficiency
+* LEPR deficiency
+* Bardet-Biedl syndrome
+* MC4R pathway
+
+([科学直通车][18])
+
+---
+
+# 八、JAMA Neurology：与你的NDD队列非常匹配
+
+这部分建议重点读。
+
+## 1. 2023：Polymicrogyria + WES
+
+### **Exome Sequencing and the Identification of New Genes and Shared Mechanisms in Polymicrogyria**
+
+**JAMA Neurology, 2023;80:980–988**
+
+这是非常漂亮的**罕见神经疾病基因发现研究**。
+
+275个家系：
+
+```text
+275 families
+      ↓
+panel / WES
+      ↓
+known genes
+      +
+novel associations
+      ↓
+Matchmaker Exchange
+```
+
+最终：
+
+> genetic explanation rate = **32.7% (90/275)**
+
+([JAMA Network][19])
+
+这个模式与你未来做：
+
+> NDD队列 → WES/WGS → candidate genes → phenotype → Matchmaker/knowledge graph
+
+非常接近。
+
+---
+
+## 2. 2024：ES→GS
+
+### **Genome Sequencing After Exome Sequencing in Pediatric Epilepsy**
+
+125名患者：
+
+```text
+ES negative
+     ↓
+GS
+     ↓
+9 diagnostic / likely diagnostic
+     ↓
+7 required GS
+```
+
+([JAMA Network][2])
+
+---
+
+## 3. 2022：脑瘫
+
+### **Molecular Diagnostic Yield of Exome Sequencing and Chromosomal Microarray in Cerebral Palsy**
+
+**JAMA Neurology, 2022;79:1287–1295**
+
+系统综述和meta-analysis，重点讨论CP中的：
+
+* WES
+* CMA
+* genetic diagnosis
+
+([JAMA Network][20])
+
+---
+
+# 九、JAMA Pediatrics
+
+## 1. 2025：Clinical Long-read sequencing
+
+### **Clinical Long-Read Sequencing Test for Genetic Disease Diagnosis**
+
+这是我建议你**重点精读**的一篇。
+
+235名LRS患者：
+
+```text
+HiFi long-read sequencing
+        ↓
+SNV
+SV
+CNV
+repeat expansion
+methylation
+phasing
+        ↓
+genetic diagnosis
+```
+
+而且与513名standard-of-care患者进行了比较。([JAMA Network][1])
+
+对于你现在做：
+
+> **long-read RNA + WGS + NDD**
+
+非常有价值。
+
+---
+
+## 2. 2024：ADHD rare variants
+
+### **Rare De Novo and Inherited Genes in Familial and Nonfamilial Pediatric Attention-Deficit/Hyperactivity Disorder**
+
+使用临床级WES。
+
+77名proband，研究rare damaging inherited/de novo variants。
+
+([JAMA Network][21])
+
+---
+
+## 3. 2023：Cerebral palsy
+
+### **Diagnostic Yield of Exome Sequencing in Cerebral Palsy and Implications for Genetic Testing Guidelines**
+
+系统综述和meta-analysis。
+
+([JAMA Network][22])
+
+---
+
+## 4. 2023：Short stature
+
+### **Molecular Diagnostic Yield of Exome Sequencing and Chromosomal Microarray in Short Stature**
+
+21个研究队列的meta-analysis。
+
+([JAMA Network][23])
+
+---
+
+# 十、JAMA Network Open：你的AI方向尤其值得关注
+
+这本虽然不是传统意义上的“专科子刊”，但属于JAMA Network体系，而且对于你的项目非常重要。
+
+## 2025：LLM + Undiagnosed Diseases Network
+
+### **Large Language Models for Rare Disease Diagnosis at the Undiagnosed Diseases Network**
+
+**JAMA Network Open, 2025;8:e2528538**
+
+这是目前与你提出的：
+
+> **WES + LLM + RAG + Knowledge Graph + Exomiser**
+
+最直接相关的顶级医学期刊文章之一。
+
+研究比较LLM在UDN罕见病诊断中的 differential diagnosis 表现。使用了：
+
+* ChatGPT-4o
+* Llama 3.1 8B Instruct
+* Undiagnosed Diseases Network
+
+([JAMA Network][24])
+
+**这篇我建议你重点精读。**
+
+---
+
+## 2025：Rare disease drug repurposing
+
+### **Strategies to Advance Drug Repurposing for Rare Diseases**
+
+**JAMA Network Open, 2025;8:e258339**
+
+讨论罕见病药物再利用策略。([JAMA Network][25])
+
+---
+
+# 十一、JAMA Dermatology：罕见皮肤遗传病
+
+## 2024：Palmoplantar keratoderma
+
+### **Clinical and Genetic Findings in Patients With Palmoplantar Keratoderma**
+
+**JAMA Dermatology, 2024**
+
+属于遗传性角化病/罕见皮肤遗传病方向。([JAMA Network][26])
+
+---
+
+## 2024：Recessive dystrophic epidermolysis bullosa
+
+### **Revertant Mosaic Skin Punch Grafting in Recessive Dystrophic Epidermolysis Bullosa**
+
+**JAMA Dermatology, 2024**
+
+研究严重的遗传性大疱性表皮松解症。([JAMA Network][27])
+
+---
+
+# 十二、BMJ / Journal of Medical Genetics：这一部分非常适合你的研究
+
+严格来说，**Journal of Medical Genetics 是BMJ Group旗下非常核心的遗传医学期刊**，如果你关注罕见病遗传诊断，这本实际上应该和JAMA Neurology、Lancet Neurology一起重点看。
+
+---
+
+## 1. 2023：1000例遗传性眼病
+
+### **Diagnostic genome sequencing improves diagnostic yield: a prospective single-centre study in 1000 patients with inherited eye diseases**
+
+**Journal of Medical Genetics, 2024;61:186–?**
+
+这是非常值得你关注的一篇。
+
+数据：
+
+```text
+1000 consecutive probands
+        ↓
+whole-genome sequencing
+        +
+RNA-seq subset (74)
+        ↓
+SV calling
++
+RNA/DNA integration
+```
+
+最终：
+
+> definite genetic diagnosis = **57.4%**
+
+([BMJ Medicine][28])
+
+这和你未来的：
+
+> **WGS + RNA-seq + SV + phenotype**
+
+路线非常接近。
+
+---
+
+# 十三、BMJ JMG：NDD/ID相关
+
+## 1. 2024：WDR45
+
+### **WDR45 variants as a major cause for a clinically variable intellectual disability syndrome from early infancy in females**
+
+研究32名女性developmental delay患者，并结合：
+
+* Sanger
+* WGS
+* X-chromosome inactivation
+
+([BMJ Medicine][29])
+
+---
+
+## 2. 2025：Autism + WGS
+
+### **Clinical utility of genome sequencing in autism: illustrative examples from a genomic research study**
+
+研究：
+
+> **202 families**
+
+接受WGS结果后，100个家庭至少发现一个与ASD相关的临床意义结果。
+
+([BMJ Medicine][30])
+
+这个对你的**NDD/ASD队列**特别有参考价值。
+
+---
+
+# 十四、BMJ JMG：罕见病基因发现
+
+## 1. Schaaf-Yang syndrome
+
+### **Advancing in Schaaf-Yang syndrome pathophysiology: from bedside to subcellular analyses of truncated MAGEL2**
+
+2022。
+
+MAGEL2 truncating variants，属于超罕见遗传病。([BMJ Medicine][31])
+
+---
+
+## 2. 新骨骼遗传病
+
+### **Heterozygous pathogenic variants involving CBFB cause a new skeletal disorder resembling cleidocranial dysplasia**
+
+2022。
+
+5个无关家系、8个患者，通过遗传分析确定新的疾病机制。([BMJ Medicine][32])
+
+---
+
+## 3. KBG syndrome
+
+### **Deep phenotyping of the neuroimaging and skeletal features in KBG syndrome**
+
+2023。
+
+53例KBG syndrome患者，结合ANKRD11遗传变异与深度表型。([BMJ Medicine][33])
+
+---
+
+## 4. Alström syndrome
+
+### **Genotype–phenotype associations in Alström syndrome: a systematic review and meta-analysis**
+
+2024。
+
+Alström syndrome属于超罕见单基因病。([BMJ Medicine][34])
+
+---
+
+## 5. OPDM repeat expansion
+
+### **Non-coding CGG repeat expansion in LOC642361/NUTM2B-AS1 is associated with a phenotype of oculopharyngodistal myopathy**
+
+2024。
+
+涉及：
+
+> non-coding repeat expansion + rare neuromuscular disease
+
+([BMJ Medicine][35])
+
+---
+
+## 6. GNE myopathy
+
+### **Novel variants and genotype-phenotype correlation in a multicentre cohort of GNE myopathy in China**
+
+2024。
+
+非常有意思，因为它同时使用：
+
+* 113 patients
+* WGS
+* deep intronic variants
+* Nanopore long-read sequencing
+* 639-bp insertion
+
+([BMJ Medicine][36])
+
+这篇和你的 **long-read + rare disease** 方向非常匹配。
+
+---
+
+## 7. OGM + genetic diagnosis
+
+### **Retrospective study on the utility of optical genome mapping as a follow-up method in genetic diagnostics**
+
+2025。
+
+7个SOC方法发现SV的病例进一步用OGM分析：
+
+> 6/7病例通过OGM解决。
+
+([BMJ Medicine][37])
+
+---
+
+# 十五、一个非常值得你关注的“新趋势”：Long-read正在进入罕见病临床诊断
+
+把上述论文串起来，会出现非常清晰的技术演进：
+
+```text
+                 传统遗传诊断
+                      │
+          ┌───────────┴───────────┐
+          ↓                       ↓
+        CMA                     Panel
+          │                       │
+          └───────────┬───────────┘
+                      ↓
+                     WES
+                      │
+                      ↓
+                     WGS
+                      │
+       ┌──────────────┼──────────────┐
+       ↓              ↓              ↓
+      SNV             SV          CNV
+                      │
+                      ↓
+                Repeat expansion
+                      │
+                      ↓
+             Long-read sequencing
+                      │
+        ┌─────────────┼─────────────┐
+        ↓             ↓             ↓
+      HiFi          ONT          RNA long-read
+        │             │             │
+        └─────────────┼─────────────┘
+                      ↓
+          Genome → Transcriptome
+                      ↓
+               Phenotype / HPO
+                      ↓
+              AI / LLM / KG
+                      ↓
+             Molecular diagnosis
+```
+
+JAMA Pediatrics 2025的临床HiFi LRS研究、Lancet Neurology的WGS repeat-expansion研究、BMJ JMG的1000例WGS+RNA-seq研究和GNE myopathy的Nanopore长读长研究，正好构成了这条技术路线的不同环节。([JAMA Network][1])
+
+---
+
+# 十六、如果专门针对你的“NDD罕见病队列 + AI诊断”项目，我建议重点建立这个文献矩阵
+
+| 层级                                         | 推荐文章                                          | 对你的项目价值 |
+| ------------------------------------------ | --------------------------------------------- | ------- |
+| **超大规模NDD队列**                              | NEJM 2023 DDD/rare pediatric disease          | ⭐⭐⭐⭐⭐   |
+| **WGS诊断**                                  | NEJM 2024 Genome Sequencing for Rare Diseases | ⭐⭐⭐⭐⭐   |
+| **Long-read WGS**                          | JAMA Pediatr 2025 Clinical LRS                | ⭐⭐⭐⭐⭐   |
+| **ES→GS**                                  | JAMA Neurol 2024 Pediatric Epilepsy           | ⭐⭐⭐⭐⭐   |
+| **NDD基因发现**                                | JAMA Neurol 2023 Polymicrogyria               | ⭐⭐⭐⭐⭐   |
+| **rapid WGS**                              | Lancet Neurol 2023 Gene-STEPS                 | ⭐⭐⭐⭐⭐   |
+| **Repeat expansion**                       | Lancet Neurol 2022                            | ⭐⭐⭐⭐⭐   |
+| **WGS+RNA**                                | JMG 2024 1000 inherited eye disease           | ⭐⭐⭐⭐⭐   |
+| **WGS+ASD**                                | JMG 2025 autism                               | ⭐⭐⭐⭐⭐   |
+| **WGS+long-read**                          | JMG 2024 GNE myopathy                         | ⭐⭐⭐⭐⭐   |
+| **LLM+rare disease**                       | JAMA Netw Open 2025 UDN                       | ⭐⭐⭐⭐⭐   |
+| **OGM+SV**                                 | JMG 2025 OGM                                  | ⭐⭐⭐⭐    |
+| **Phenotype-driven vs phenotype-agnostic** | Lancet Child 2024                             | ⭐⭐⭐⭐⭐   |
+| **Genomic diagnosis → treatment**          | Lancet Gastroenterol 2023 monogenic IBD       | ⭐⭐⭐⭐    |
+
+---
+
+# 十七、对你目前课题，我认为最值得组合成一个“文献逻辑链”
+
+你之前提出的：
+
+> **WES + LLM/RAG + Knowledge Graph + Exomiser + HPO + NDD rare disease cohort**
+
+如果结合这些近四年文章，可以形成：
+
+```text
+                   NDD / Rare Disease Cohort
+                            │
+                            ↓
+                    Deep Phenotyping
+                    HPO + EHR + imaging
+                            │
+              ┌─────────────┴──────────────┐
+              ↓                            ↓
+            WES                           WGS
+              │                            │
+              ↓                            ↓
+       SNV / Indel                    SV / CNV
+                                           │
+                                  Repeat expansion
+                                           │
+                                  Long-read WGS
+                                           │
+                         ┌─────────────────┘
+                         ↓
+                  Long-read RNA
+                         │
+                         ↓
+             Aberrant isoform / splicing
+                         │
+                         ↓
+       ┌─────────────────┴─────────────────┐
+       ↓                                   ↓
+   Exomiser                         LLM/RAG/KG
+       │                                   │
+       └─────────────────┬─────────────────┘
+                         ↓
+                  Variant prioritization
+                         ↓
+                  Molecular diagnosis
+                         ↓
+                  Functional validation
+                         ↓
+                  Precision treatment
+```
+
+这比单纯做一个“**WES + AI诊断模型**”要完整得多。
+
+尤其是你现在已经在做 **PacBio long-read RNA、IsoQuant、atroplex、Isopedia、population pan-transcriptome**，所以你的项目实际上可以再向前走一步：
+
+> **不是只解决“哪个基因有变异”，而是解决“这个变异如何改变真实的人类转录本/isoform，从而解释患者表型”。**
+
+这正好把你现在的两个研究方向：
+
+**① NDD/WES/WGS/AI rare disease diagnosis**
+
+和
+
+**② population long-read transcriptome / pan-transcriptome / isoform**
+
+连接起来。
+
+如果以发表论文为目标，这可能比单独做“LLM辅助WES诊断”更有新意。
+
+[1]: https://jamanetwork.com/journals/jamapediatrics/fullarticle/2838675?utm_source=chatgpt.com "Clinical Long-Read Sequencing Test for Genetic Disease Diagnosis | Genetics and Genomics | JAMA Pediatrics | JAMA Network"
+[2]: https://jamanetwork.com/journals/jamaneurology/fullarticle/2824572?utm_source=chatgpt.com "Genome Sequencing After Exome Sequencing in Pediatric Epilepsy | Neurogenetics | JAMA Neurology | JAMA Network"
+[3]: https://www.em-consulte.com/revue/LANEUR/21/3/table-des-matieres?prompt=false&utm_source=chatgpt.com "Lancet Neurology, The - Vol 21 - n° 3 - EM consulte"
+[4]: https://www.sciencedirect.com/science/article/pii/S1474442223002466?utm_source=chatgpt.com "Evaluation of the feasibility, diagnostic yield, and clinical utility of rapid genome sequencing in infantile epilepsy (Gene-STEPS): an international, multicentre, pilot cohort study - ScienceDirect"
+[5]: https://www.sciencedirect.com/science/article/pii/S1474442225000262?utm_source=chatgpt.com "Amyotrophic lateral sclerosis caused by hexanucleotide repeat expansions in C9orf72: from genetics to therapeutics - ScienceDirect"
+[6]: https://www.sciencedirect.com/science/article/pii/S147444222500225X?utm_source=chatgpt.com "Safety and efficacy of apitegromab in nonambulatory type 2 or type 3 spinal muscular atrophy (SAPPHIRE): a phase 3, double-blind, randomised, placebo-controlled trial - ScienceDirect"
+[7]: https://www.sciencedirect.com/science/article/abs/pii/S2352464224001962?utm_source=chatgpt.com "The expanding field of genetic developmental and epileptic encephalopathies: current understanding and future perspectives - ScienceDirect"
+[8]: https://www.sciencedirect.com/science/article/abs/pii/S2352464224001445?utm_source=chatgpt.com "Comparison of clinical selection-based genetic testing with phenotype-agnostic extensive germline sequencing to diagnose genetic predisposition in children with cancer: a prospective diagnostic study - ScienceDirect"
+[9]: https://openalex.org/W4391850140?utm_source=chatgpt.com "Holistic support for children with rare disease"
+[10]: https://www.sciencedirect.com/science/article/abs/pii/S2468125322003375?utm_source=chatgpt.com "Genomic diagnosis and care co-ordination for monogenic inflammatory bowel disease in children and adults: consensus guideline on behalf of the British Society of Gastroenterology and British Society of Paediatric Gastroenterology, Hepatology and Nutrition - ScienceDirect"
+[11]: https://www.sciencedirect.com/science/article/pii/S2468125324000803?utm_source=chatgpt.com "Maralixibat in progressive familial intrahepatic cholestasis (MARCH-PFIC): a multicentre, randomised, double-blind, placebo-controlled, phase 3 trial - ScienceDirect"
+[12]: https://www.sciencedirect.com/science/article/abs/pii/S2213260024002170?utm_source=chatgpt.com "Nintedanib for patients with lymphangioleiomyomatosis: a phase 2, open-label, single-arm study - ScienceDirect"
+[13]: https://pubmed.ncbi.nlm.nih.gov/39151435/?utm_source=chatgpt.com "Compassionate use trials and equitable access to variant-specific treatment for cystic fibrosis."
+[14]: https://www.sciencedirect.com/science/article/abs/pii/S2352302624000061?utm_source=chatgpt.com "Etranacogene dezaparvovec gene therapy for haemophilia B (HOPE-B): 24-month post-hoc efficacy and safety data from a single-arm, multicentre, phase 3 trial - ScienceDirect"
+[15]: https://www.sciencedirect.com/journal/the-lancet-haematology/vol/9/issue/10?utm_source=chatgpt.com "The Lancet Haematology | Vol 9, Issue 10, Pages e707-e796 (October 2022) | ScienceDirect.com by Elsevier"
+[16]: https://pubmed.ncbi.nlm.nih.gov/38135367/?utm_source=chatgpt.com "The dawn of the CRISPR/Cas9 gene therapy era."
+[17]: https://pubmed.ncbi.nlm.nih.gov/36822740/?utm_source=chatgpt.com "Rare diseases: individually rare, collectively common."
+[18]: https://www.sciencedirect.com/science/article/abs/pii/S2213858724002730?utm_source=chatgpt.com "Setmelanotide in patients aged 2–5 years with rare MC4R pathway-associated obesity (VENTURE): a 1 year, open-label, multicenter, phase 3 trial - ScienceDirect"
+[19]: https://jamanetwork.com/journals/jamaneurology/fullarticle/2807207?utm_source=chatgpt.com "Exome Sequencing and the Identification of New Genes and Shared Mechanisms in Polymicrogyria | Genetics and Genomics | JAMA Neurology | JAMA Network"
+[20]: https://jamanetwork.com/journals/jamaneurology/fullarticle/2797273?utm_source=chatgpt.com "Molecular Diagnostic Yield of Exome Sequencing and Chromosomal Microarray in Cerebral Palsy: A Systematic Review and Meta-analysis | Genetics and Genomics | JAMA Neurology | JAMA Network"
+[21]: https://jamanetwork.com/journals/jamapediatrics/fullarticle/2812165?utm_source=chatgpt.com "Rare De Novo and Inherited Genes in Familial and Nonfamilial Pediatric Attention-Deficit/Hyperactivity Disorder | Attention Deficit/Hyperactivity Disorders | JAMA Pediatrics | JAMA Network"
+[22]: https://jamanetwork.com/journals/jamapediatrics/fullarticle/2801964?utm_source=chatgpt.com "Diagnostic Yield of Exome Sequencing in Cerebral Palsy and Implications for Genetic Testing Guidelines: A Systematic Review and Meta-analysis | Genetics and Genomics | JAMA Pediatrics | JAMA Network"
+[23]: https://jamanetwork.com/journals/jamapediatrics/fullarticle/2808913?utm_source=chatgpt.com "Molecular Diagnostic Yield of Exome Sequencing and Chromosomal Microarray in Short Stature: A Systematic Review and Meta-Analysis | Genetics and Genomics | JAMA Pediatrics | JAMA Network"
+[24]: https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2837941?utm_source=chatgpt.com "Large Language Models for Rare Disease Diagnosis at the Undiagnosed Diseases Network | Digital Health | JAMA Network Open | JAMA Network"
+[25]: https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2833522?utm_source=chatgpt.com "Strategies to Advance Drug Repurposing for Rare Diseases | Health Policy | JAMA Network Open | JAMA Network"
+[26]: https://jamanetwork.com/journals/jamadermatology/fullarticle/2826499?utm_source=chatgpt.com "Clinical and Genetic Findings in Patients With Palmoplantar Keratoderma | Genetics and Genomics | JAMA Dermatology | JAMA Network"
+[27]: https://jamanetwork.com/journals/jamadermatology/issue/160/10?utm_source=chatgpt.com "October 1, 2024 Issue of JAMA Dermatology | JAMA Network"
+[28]: https://jmg.bmj.com/content/jmedgenet/61/2/186.full.pdf?with-ds=yes&utm_source=chatgpt.com "Diagnostic genome sequencing improves diagnostic yield: a prospective single-centre study in 1000 patients with inherited eye diseases"
+[29]: https://jmg.bmj.com/content/early/2024/10/28/jmg-2024-110068?utm_source=chatgpt.com "WDR45 variants as a major cause for a clinically variable intellectual disability syndrome from early infancy in females | Journal of Medical Genetics"
+[30]: https://jmg.bmj.com/content/early/2025/04/01/jmg-2024-110463?utm_source=chatgpt.com "Clinical utility of genome sequencing in autism: illustrative examples from a genomic research study | Journal of Medical Genetics"
+[31]: https://jmg.bmj.com/content/early/2022/09/06/jmg-2022-108690?utm_source=chatgpt.com "Advancing in Schaaf-Yang syndrome pathophysiology: from bedside to subcellular analyses of truncated MAGEL2 | Journal of Medical Genetics"
+[32]: https://jmg.bmj.com/content/jmedgenet/early/2022/10/13/jmg-2022-108739.full.pdf?utm_source=chatgpt.com "Heterozygous pathogenic variants involving CBFB cause a new skeletal disorder resembling cleidocranial dysplasia"
+[33]: https://jmg.bmj.com/content/early/2023/08/15/jmg-2023-109141?versioned=true&utm_source=chatgpt.com "Deep phenotyping of the neuroimaging and skeletal features in KBG syndrome: a study of 53 patients and review of the literature | Journal of Medical Genetics"
+[34]: https://jmg.bmj.com/content/61/1/18.abstract?utm_source=chatgpt.com "Genotype–phenotype associations in Alström syndrome: a systematic review and meta-analysis | Journal of Medical Genetics"
+[35]: https://jmg.bmj.com/content/61/4/340?utm_source=chatgpt.com "Non-coding CGG repeat expansion in LOC642361/NUTM2B-AS1 is associated with a phenotype of oculopharyngodistal myopathy | Journal of Medical Genetics"
+[36]: https://jmg.bmj.com/content/61/11/1053?utm_source=chatgpt.com "Novel variants and genotype-phenotype correlation in a multicentre cohort of GNE myopathy in China | Journal of Medical Genetics"
+[37]: https://jmg.bmj.com/content/62/2/89?utm_source=chatgpt.com "Retrospective study on the utility of optical genome mapping as a follow-up method in genetic diagnostics | Journal of Medical Genetics"
+
+
+
+
+---
+
 # 如何搭建“WES + LLM/RAG + knowledge graph + variant evidence”的多模态罕见病诊断系统
 
 如果你的目标是搭建一个真正用于**NDD/罕见病队列诊断**的系统，我不建议做成“把 WES 结果扔给 GPT，让它猜病”。更合理的架构是：
