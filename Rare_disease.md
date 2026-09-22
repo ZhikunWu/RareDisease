@@ -1726,3 +1726,1073 @@ AZFc缺失男性通过试管婴儿技术生育的核心原理是：
 2. **遗传阻断**：PGT技术选择女性胚胎移植，避免Y染色体缺陷垂直传递。  
 ⚠️ 需严格进行遗传咨询与个体化方案设计，才能在解决生育需求的同时保障子代健康。
 
+
+---
+
+# G6PD是否在不同人群中受到选择？关于这个基因的高水平文章有哪些？如何围绕该基因进行创新性的研究？
+
+是的。**G6PD 是研究“人群特异性自然选择 → 遗传变异 → 疾病易感性 → 精准医学”非常经典、但实际上仍然有很多新问题的基因。**而且它与你现在关注的**人群基因组、不同祖源、WGS、罕见/低频变异、功能组学和AI遗传诊断**非常容易结合。
+
+先给一个核心判断：
+
+> **G6PD 确实存在非常强的人群特异性自然选择信号，但不能简单概括成“G6PD 缺乏等位基因在所有人群都受到疟疾正选择”。不同人群的优势等位基因、单倍型、选择强度以及疾病代价可能不同，而且G6PD位于X染色体，使得男性半合子、女性杂合子/纯合子的选择模型非常特殊。**
+
+---
+
+# 1. G6PD为什么是一个非常漂亮的“自然选择”模型？
+
+G6PD编码葡萄糖-6-磷酸脱氢酶，是红细胞抗氧化体系的重要组成部分。
+
+它催化：
+
+```text
+Glucose-6-P
+     ↓
+   G6PD
+     ↓
+   NADPH
+     ↓
+GSH/GSSG还原体系
+     ↓
+抵抗氧化应激
+```
+
+而疟原虫感染红细胞后，对红细胞的氧化还原环境非常敏感。
+
+因此形成了一个经典的进化矛盾：
+
+```text
+G6PD正常
+   ↓
+红细胞抗氧化能力强
+   ↓
+对疟原虫相对有利
+
+G6PD活性降低
+   ↓
+红细胞抗氧化能力下降
+   ↓
+某些情况下不利于疟原虫
+   ↓
+疟疾严重程度下降
+```
+
+但另一方面：
+
+```text
+G6PD deficiency
+       ↓
+氧化应激耐受性下降
+       ↓
+药物/蚕豆/感染等诱发溶血
+       ↓
+疾病风险增加
+```
+
+因此非常类似一个：
+
+> **“保护性适应 + 生理代价”的进化权衡（fitness trade-off）**
+
+2024年《Nature Medicine》的研究实际上把这个故事推进了一步：G6PD缺乏相关的 rs1050828-T（Val98Met）既与疟疾保护有关，也与糖尿病并发症风险增加有关，而且其频率差异可以解释部分非洲祖源人群糖尿病并发症差异。([Nature][1])
+
+这篇文章对你尤其值得关注。
+
+---
+
+# 2. 不同人群中确实存在明显不同的G6PD选择
+
+## 2.1 非洲：G6PD A−
+
+经典变异：
+
+**G6PD A−**
+
+主要涉及：
+
+* p.Asn126Asp（rs1050829）
+* p.Val68Met（rs1050828）
+
+在非洲人群中非常经典。
+
+早期《Nature》研究发现，非洲G6PD A−与严重疟疾风险降低有关；在两个大型病例-对照研究中，男性半合子和女性杂合子都观察到明显保护效应。([PubMed][2])
+
+但是后续研究发现情况并没有那么简单。
+
+例如马里研究发现：
+
+> G6PD A−对男性半合子保护明显，而女性杂合子的保护并不明显。
+
+([PubMed][3])
+
+而坦桑尼亚研究则发现：
+
+> 不同G6PD SNP/单倍型的保护效应具有性别差异，并提出G6PD位点存在balancing selection。([PubMed][4])
+
+所以：
+
+**G6PD是X-linked selection的经典模型。**
+
+---
+
+# 3. 地中海地区：G6PD Mediterranean
+
+另一个经典的是：
+
+**G6PD Mediterranean**
+
+主要变异：
+
+> p.Ser188Phe
+
+它在：
+
+* 地中海
+* 中东
+* 部分西亚/北非
+
+人群中频率较高。
+
+特别有意思的是：
+
+> **A−和Mediterranean并不是同一个突变扩散出去。**
+
+2001年Tishkoff等人在《Science》发表经典研究，通过单倍型和LD分析发现：
+
+* G6PD A−
+* G6PD Mediterranean
+
+具有独立的进化历史，并且两者的扩增速度无法很好地用随机遗传漂变解释。研究估计A−大约起源于数千至一万年前，而Mediterranean更年轻。([PubMed][5])
+
+这就是非常经典的：
+
+> **convergent evolution / parallel adaptation**
+
+也就是说：
+
+```text
+非洲
+   ↓
+一种G6PD deficiency mutation
+   ↓
+疟疾选择
+   ↓
+高频
+
+地中海
+   ↓
+另一种G6PD deficiency mutation
+   ↓
+疟疾选择
+   ↓
+高频
+```
+
+**相同的选择压力 → 不同的遗传解决方案。**
+
+这个概念非常适合进一步做创新。
+
+---
+
+# 4. 东亚/中国同样存在非常有意思的选择
+
+中国尤其值得研究。
+
+常见G6PD变异包括：
+
+| Variant   | 常见名称    |
+| --------- | ------- |
+| c.1376G>T | Canton  |
+| c.1388G>A | Kaiping |
+| c.95A>G   | Gaohe   |
+| c.1024C>T | 部分中国人群  |
+| c.1311T>C | 常见多态    |
+
+一项包含**15,690人、12个中国民族群体**的研究发现，G6PD缺乏频率从0%到11.6%不等，并与历史疟疾流行、纬度和海拔存在关系；对Canton和Kaiping等变异检测到了近期正选择信号。([PubMed Central (PMC)][6])
+
+研究估计：
+
+* Canton：约3,125–3,750年前
+* Kaiping：约5,000–6,000年前
+
+存在选择扩张的历史。([PubMed Central (PMC)][6])
+
+这非常有意思，因为它把：
+
+> **水稻农业扩张 → 南方疟疾环境 → G6PD选择**
+
+联系了起来。
+
+---
+
+# 5. 所以不同人群并不是“同一个G6PD突变被选择”
+
+这是研究G6PD时非常重要的地方。
+
+可以画成：
+
+```text
+                   malaria
+                      │
+       ┌──────────────┼──────────────┐
+       ↓              ↓              ↓
+     Africa       Mediterranean      Asia
+       │              │              │
+      A−             Med        Canton/Kaiping
+       │              │              │
+       ↓              ↓              ↓
+   G6PD activity   G6PD activity   G6PD activity
+       ↓              ↓              ↓
+    selection      selection      selection
+```
+
+这是典型的：
+
+### **Population-specific convergent adaptation**
+
+所以如果你有大量人群WGS，这是一个非常值得重新研究的基因。
+
+---
+
+# 6. G6PD领域最经典、最值得看的高水平文章
+
+我建议你按照“历史经典 → 群体遗传 → 临床转化”三个层次看。
+
+## 第一梯队：一定要看
+
+### ① Ruwende et al., Nature, 1995
+
+**Natural selection of hemi- and heterozygotes for G6PD deficiency in Africa by resistance to severe malaria**
+
+这是G6PD自然选择研究的经典论文。
+
+核心：
+
+> G6PD A−与严重疟疾保护相关。
+
+([PubMed][2])
+
+---
+
+### ② Tishkoff et al., Science, 2001
+
+**Haplotype diversity and linkage disequilibrium at human G6PD: recent origin of alleles that confer malarial resistance**
+
+这篇对你做群体遗传特别重要。
+
+研究：
+
+* haplotype
+* LD
+* allele age
+* geographic population
+* A−
+* Mediterranean
+
+并证明不同G6PD缺乏等位基因具有相对独立的起源和近期选择扩张。([PubMed][5])
+
+[Science论文信息](https://doi.org/10.1126/science.1061573?utm_source=chatgpt.com)
+
+---
+
+### ③ Sabeti et al., Nature, 2002
+
+**Detecting recent positive selection in the human genome from haplotype structure**
+
+这是更重要的一篇方法学经典。
+
+提出基于：
+
+* EHH
+* iHS思想
+* long-range haplotype
+
+识别近期正选择。
+
+G6PD是经典案例之一。([Nature][7])
+
+[Nature论文信息](https://doi.org/10.1038/nature01140?utm_source=chatgpt.com)
+
+---
+
+### ④ Saunders et al., Genetics, 2005
+
+**The Extent of Linkage Disequilibrium Caused by Selection on G6PD in Humans**
+
+这篇特别适合你现在做WGS的人群遗传分析。
+
+研究发现G6PD A−选择信号可以延伸到大约1.6 Mb区域，并估计较强的选择系数。([PubMed Central (PMC)][8])
+
+---
+
+### ⑤ Malaria Genomic Epidemiology Network, Nature Genetics, 2014
+
+**Reappraisal of known malaria resistance loci in a large multicenter study**
+
+这是非常重要的大规模验证。
+
+样本：
+
+* 11,890 severe malaria cases
+* 17,441 controls
+* 12个地点
+* Africa/Asia/Oceania
+
+G6PD是能够被重复验证的主要疟疾抗性位点之一。
+
+而且非常有意思：
+
+> G6PD可能降低cerebral malaria风险，但增加severe malarial anemia风险。
+
+([Nature][9])
+
+这其实已经开始从：
+
+**单纯“保护”**
+
+进入：
+
+**trade-off / antagonistic effects**
+
+---
+
+# 7. 最近最值得你看的：Nature Medicine 2024
+
+这是我认为你现在最应该重点阅读的一篇。
+
+### Breeyear et al., Nature Medicine, 2024
+
+**Adaptive selection at G6PD and disparities in diabetes complications**
+
+[Nature Medicine论文](https://www.nature.com/articles/s41591-024-03089-1?utm_source=chatgpt.com)
+
+它做的事情已经完全超越传统：
+
+> G6PD → malaria
+
+而是：
+
+```text
+historical malaria
+       ↓
+positive selection
+       ↓
+G6PD deficiency allele
+       ↓
+现代人群
+       ↓
+glucose metabolism
+       ↓
+HbA1c measurement
+       ↓
+diabetic retinopathy
+       ↓
+diabetic neuropathy
+```
+
+这就是一个非常漂亮的：
+
+# Evolutionary medicine
+
+故事。
+
+研究发现rs1050828-T与更高血糖以及糖尿病视网膜病变等风险相关，而且HbA1c会受到红细胞寿命缩短影响，因此单纯使用HbA1c可能低估部分G6PD缺乏患者的血糖负担。([Nature][1])
+
+---
+
+# 8. 这个方向现在最大的创新空间在哪里？
+
+我认为真正有价值的不是再证明：
+
+> “G6PD受到疟疾选择。”
+
+这个已经非常成熟。
+
+真正可以创新的是：
+
+# 从“G6PD选择”走向“G6PD evolutionary medicine”
+
+即：
+
+```text
+过去
+malaria
+  ↓
+selection
+  ↓
+G6PD allele
+
+现在
+  ↓
+diabetes
+  ↓
+drug response
+  ↓
+hemolysis
+  ↓
+infection
+  ↓
+oxidative stress
+  ↓
+cancer?
+  ↓
+aging?
+```
+
+---
+
+# 9. 创新方向一：做“全球G6PD选择图谱”
+
+这个我认为与你现有的人群基因组工作**最匹配**。
+
+收集：
+
+* 1000 Genomes
+* gnomAD
+* HGDP
+* SGDP
+* H3Africa
+* GenomeAsia
+* HPRC
+* HGSVC
+* 中国人群WGS
+* 东南亚人群
+* 中东人群
+
+然后：
+
+```text
+Population
+   ↓
+G6PD variants
+   ↓
+haplotypes
+   ↓
+allele frequency
+   ↓
+LD
+   ↓
+selection
+   ↓
+allele age
+```
+
+最终做：
+
+### Global G6PD Evolution Atlas
+
+比如：
+
+| Population    | Variant |  AF | Haplotype | Selection | Estimated age |
+| ------------- | ------: | --: | --------- | --------: | ------------: |
+| West Africa   |      A− | ... | ...       |         + |           ... |
+| Mediterranean |     Med | ... | ...       |         + |           ... |
+| South China   |  Canton | ... | ...       |         + |           ... |
+| South China   | Kaiping | ... | ...       |         + |           ... |
+| SE Asia       | Mahidol | ... | ...       |         + |           ... |
+
+重点不是简单画AF，而是比较：
+
+> **不同人群是否采用不同G6PD等位基因解决相同的环境压力？**
+
+---
+
+# 10. 创新方向二：不要只研究单个SNP，要研究“G6PD haplotype”
+
+这个特别适合你的WGS数据。
+
+因为G6PD位于X chromosome。
+
+因此可以研究：
+
+```text
+G6PD variant
+     +
+cis variants
+     +
+haplotype
+     +
+ancestry
+     +
+LD
+```
+
+例如：
+
+```text
+            G6PD
+              │
+       ┌──────┼──────┐
+       ↓      ↓      ↓
+     SNP1   SNP2    SNP3
+       └──────┼──────┘
+              ↓
+         functional
+          haplotype
+```
+
+进一步：
+
+### ancient haplotype → modern haplotype
+
+研究：
+
+* mutation age
+* haplotype expansion
+* recombination
+* gene flow
+* population migration
+
+这样可以把G6PD研究从医学遗传学提升到：
+
+> **人类群体历史 + 自然选择**
+
+---
+
+# 11. 创新方向三：研究“同一个基因，不同人群为什么选择不同突变”
+
+这个我认为特别有潜力。
+
+例如：
+
+```text
+Africa
+G6PD A−
+
+Mediterranean
+G6PD Med
+
+China
+G6PD Canton
+G6PD Kaiping
+
+SE Asia
+G6PD Mahidol
+```
+
+问题：
+
+> 为什么同样是降低G6PD活性的突变，不同地区却出现不同的遗传解决方案？
+
+可以研究：
+
+```text
+variant
+ ↓
+protein stability
+ ↓
+enzyme activity
+ ↓
+NADPH
+ ↓
+ROS
+ ↓
+RBC physiology
+ ↓
+Plasmodium fitness
+```
+
+然后比较：
+
+**不同variant的生物学效应是否完全相同？**
+
+这比“哪个variant频率高”深入得多。
+
+---
+
+# 12. 创新方向四：G6PD的“进化代价”
+
+这个方向非常值得做。
+
+可以提出：
+
+> **被历史疟疾选择保留下来的G6PD变异，在现代环境下是否产生新的疾病风险？**
+
+形成：
+
+```text
+Ancient selection
+       ↓
+G6PD deficiency
+       ↓
+malaria protection
+       ↓
+allele persists
+       ↓
+modern environment
+       ↓
+metabolic disease
+drug toxicity
+hemolysis
+infection
+```
+
+2024 Nature Medicine已经提供了一个很强的例子：
+
+**malaria protection ↔ diabetes complications**
+
+([Nature][1])
+
+你可以进一步做PheWAS：
+
+```text
+G6PD variant
+    ↓
+┌───────────────────┐
+│ Diabetes           │
+│ Retinopathy        │
+│ Neuropathy         │
+│ Kidney disease     │
+│ Stroke             │
+│ Infection          │
+│ Drug toxicity      │
+│ Hemolysis          │
+│ Cancer              │
+│ Aging               │
+└───────────────────┘
+```
+
+比较不同祖源：
+
+```text
+AFR
+EAS
+SAS
+EUR
+AMR
+```
+
+这就可以形成：
+
+# Evolutionary trade-off map of G6PD
+
+---
+
+# 13. 创新方向五：G6PD × 药物基因组学
+
+这是非常容易转化的一条路线。
+
+G6PD缺乏最直接的问题就是：
+
+> 某些药物可能诱发严重溶血。
+
+尤其是抗疟药相关治疗。
+
+因此可以研究：
+
+```text
+G6PD genotype
+      ↓
+enzyme activity
+      ↓
+drug exposure
+      ↓
+oxidative stress
+      ↓
+hemolysis
+```
+
+进一步建立：
+
+### Genotype → Drug response model
+
+特别适合：
+
+* malaria treatment
+* antimalarial drugs
+* oxidative drugs
+* sulfonamides等
+
+然后做：
+
+> **不同人群的G6PD基因型—药物风险预测模型。**
+
+---
+
+# 14. 创新方向六：G6PD × 长读长测序
+
+这与你目前的技术体系非常契合。
+
+传统G6PD研究多数是：
+
+```text
+target SNP genotyping
+```
+
+你可以升级为：
+
+```text
+PacBio HiFi WGS
+       ↓
+complete G6PD locus
+       ↓
+phasing
+       ↓
+rare variants
+       ↓
+structural variants
+       ↓
+haplotypes
+       ↓
+ancestry-specific haplotypes
+```
+
+尤其是：
+
+### 完整G6PD locus haplotype
+
+而不是：
+
+> rs1050828 = T/C
+
+研究：
+
+> **整个G6PD单倍型究竟是什么？**
+
+---
+
+# 15. 创新方向七：G6PD × 长读长RNA
+
+如果你已经有PacBio RNA数据，这个方向更有意思。
+
+可以研究：
+
+```text
+G6PD genotype
+       ↓
+haplotype
+       ↓
+isoform
+       ↓
+expression
+       ↓
+splicing
+       ↓
+enzyme activity
+```
+
+例如寻找：
+
+* alternative transcript
+* allele-specific expression
+* alternative splicing
+* RNA modification
+* transcript stability
+
+进一步做：
+
+### isoQTL
+
+```text
+G6PD variants
+       ↓
+G6PD expression
+       ↓
+G6PD isoform
+```
+
+或者：
+
+### sQTL
+
+```text
+G6PD genotype
+       ↓
+splice junction
+       ↓
+isoform
+```
+
+你的100个人长读长RNA数据可以作为一个很好的基础。
+
+---
+
+# 16. 创新方向八：G6PD × eQTL/sQTL × PheWAS
+
+这可能是最适合你现有数据结构的分析方案。
+
+最终建立：
+
+```text
+             WGS
+              │
+              ↓
+          G6PD variants
+              │
+       ┌──────┼──────┐
+       ↓      ↓      ↓
+     eQTL    sQTL   pQTL
+       │      │      │
+       └──────┼──────┘
+              ↓
+        molecular phenotype
+              │
+              ↓
+            PheWAS
+              │
+       ┌──────┼──────┐
+       ↓      ↓      ↓
+   malaria  diabetes  drug
+```
+
+这会比单纯做selection scan有明显更强的机制深度。
+
+---
+
+# 17. 创新方向九：G6PD × ancient DNA
+
+这个方向非常有意思。
+
+因为G6PD选择发生时间大致与农业和疟疾生态扩张有关。
+
+可以收集：
+
+```text
+Ancient DNA
+     ↓
+G6PD alleles
+     ↓
+allele frequency
+     ↓
+time series
+```
+
+形成：
+
+### Temporal allele-frequency trajectory
+
+例如：
+
+```text
+8000 BP
+  ↓
+4000 BP
+  ↓
+2000 BP
+  ↓
+1000 BP
+  ↓
+modern
+```
+
+直接观察：
+
+> **G6PD风险/保护等位基因什么时候开始增加？**
+
+这比单纯利用现代LD估计allele age更直接。
+
+---
+
+# 18. 创新方向十：做“人群特异性G6PD风险评分”
+
+最终可以形成临床转化。
+
+例如：
+
+```text
+G6PD genotype
+      +
+ancestry
+      +
+haplotype
+      +
+enzyme activity
+      +
+drug
+      ↓
+individual hemolysis risk
+```
+
+而不是简单：
+
+> G6PD deficient / normal
+
+而是：
+
+### Quantitative G6PD functional score
+
+例如：
+
+```text
+G6PD activity
+     ↓
+0–10%
+10–30%
+30–60%
+60–100%
+```
+
+再与：
+
+* genotype
+* ancestry
+* sex
+* drug
+* infection
+* age
+
+结合。
+
+---
+
+# 19. 如果你有WGS + 长读长RNA，我最推荐的一套研究设计
+
+其实可以把G6PD做成一个非常漂亮的“小而深”的项目：
+
+## Aim 1：全球人群进化
+
+```text
+1000G
+HGDP
+SGDP
+HPRC
+HGSVC
+GenomeAsia
+中国人群
+        ↓
+G6PD variation
+        ↓
+haplotype
+        ↓
+LD
+        ↓
+FST
+        ↓
+iHS
+        ↓
+XP-EHH
+        ↓
+PBS
+        ↓
+SDS
+        ↓
+selection
+```
+
+---
+
+## Aim 2：不同人群的独立适应
+
+重点比较：
+
+```text
+A−
+Med
+Canton
+Kaiping
+Mahidol
+其他G6PD deficiency alleles
+```
+
+判断：
+
+> 是否存在multiple independent adaptive origins？
+
+---
+
+## Aim 3：WGS + long-read RNA
+
+```text
+G6PD genotype
+       ↓
+phasing
+       ↓
+allele-specific expression
+       ↓
+isoform
+       ↓
+splicing
+       ↓
+expression
+```
+
+建立：
+
+> **G6PD genotype → transcriptome mechanism**
+
+---
+
+## Aim 4：现代疾病代价
+
+使用大型biobank：
+
+```text
+G6PD variant
+       ↓
+PheWAS
+       ↓
+diabetes
+retinopathy
+neuropathy
+kidney disease
+infection
+hemolysis
+drug response
+```
+
+重点比较：
+
+```text
+AFR
+EAS
+SAS
+EUR
+```
+
+---
+
+# 20. 最终可以形成一个很漂亮的科学故事
+
+我会把整个项目概括成：
+
+> **“从古代疟疾选择到现代疾病风险：G6PD人群适应的基因组、转录组与医学后果研究”**
+
+英文甚至可以叫：
+
+> **From malaria adaptation to modern disease: population-specific evolution, functional genomics and clinical consequences of G6PD variation**
+
+整个逻辑：
+
+```text
+                 Ancient malaria
+                       │
+                       ↓
+              Natural selection
+                       │
+           ┌───────────┼───────────┐
+           ↓           ↓           ↓
+        Africa    Mediterranean   East Asia
+           ↓           ↓           ↓
+          A−          Med       Canton/Kaiping
+           └───────────┼───────────┘
+                       ↓
+                G6PD haplotypes
+                       ↓
+                 modern humans
+                       ↓
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+   transcriptome    metabolism     drug response
+        ↓              ↓              ↓
+      isoform       diabetes       hemolysis
+        └──────────────┼──────────────┘
+                       ↓
+             Evolutionary medicine
+```
+
+**特别值得强调的是，2024年Nature Medicine已经把G6PD从经典的“疟疾适应基因”推进到了“历史自然选择影响现代疾病差异”的层面。**([Nature][1]) 因此如果现在再做G6PD，最好不要重复“G6PD是否受疟疾选择”这个已经相当成熟的问题，而应该回答：
+
+> **不同人群为什么选择了不同G6PD变异？这些不同单倍型是否具有不同的分子功能？历史上有利的G6PD变异在现代环境中产生了哪些疾病代价？这些效应能否通过WGS + 长读长RNA + PheWAS建立从“选择—单倍型—分子表型—疾病表型”的因果链？**
+
+这条路线与你现有的**人群WGS、长读长RNA、isoform/pan-transcriptome和群体遗传分析能力**衔接得非常好，而且比单纯做一个G6PD频率/selection分析更有机会形成高水平文章。
+
+[1]: https://www.nature.com/articles/s41591-024-03089-1?utm_source=chatgpt.com "Adaptive selection at G6PD and disparities in diabetes complications | Nature Medicine"
+[2]: https://pubmed.ncbi.nlm.nih.gov/7617034/?utm_source=chatgpt.com "Natural selection of hemi- and heterozygotes for G6PD deficiency in Africa by resistance to severe malaria - PubMed"
+[3]: https://pubmed.ncbi.nlm.nih.gov/17355169/?utm_source=chatgpt.com "X-linked G6PD deficiency protects hemizygous males but not heterozygous females against severe malaria - PubMed"
+[4]: https://pubmed.ncbi.nlm.nih.gov/25671784/?utm_source=chatgpt.com "African glucose-6-phosphate dehydrogenase alleles associated with protection from severe malaria in heterozygous females in Tanzania - PubMed"
+[5]: https://pubmed.ncbi.nlm.nih.gov/11423617/?utm_source=chatgpt.com "Haplotype diversity and linkage disequilibrium at human G6PD: recent origin of alleles that confer malarial resistance - PubMed"
+[6]: https://pmc.ncbi.nlm.nih.gov/articles/PMC7767544/?utm_source=chatgpt.com "Epidemiology, evolutionary origin, and malaria‐induced positive selection effects of G6PD‐deficient alleles in Chinese populations - PMC"
+[7]: https://www.nature.com/articles/nature01140?utm_source=chatgpt.com "Detecting recent positive selection in the human genome from haplotype structure | Nature"
+[8]: https://pmc.ncbi.nlm.nih.gov/articles/PMC1456824/?utm_source=chatgpt.com "The Extent of Linkage Disequilibrium Caused by Selection on G6PD in Humans - PMC"
+[9]: https://www.nature.com/articles/ng.3107?utm_source=chatgpt.com "Reappraisal of known malaria resistance loci in a large multicenter study | Nature Genetics"
+
+
