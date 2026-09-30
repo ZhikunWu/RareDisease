@@ -477,3 +477,830 @@ early eukaryote
 [8]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11969637/?utm_source=chatgpt.com "detectEVE : Fast, Sensitive and Precise Detection of Endogenous Viral Elements in Genomic Data - PMC"
 [9]: https://www.nature.com/articles/s41467-024-45024-5?utm_source=chatgpt.com "ContScout: sensitive detection and removal of contamination from annotated genomes | Nature Communications"
 
+---
+
+# 总结在基因组中鉴定病毒或者其他微生物基因组的方法
+
+可以把“**在真核生物基因组中鉴定病毒或其他微生物来源 DNA**”归纳成一个比较完整的 **Genome Mining → 外源序列鉴定 → 整合验证 → 演化与功能分析** 流程。
+
+最关键的一点是：**不要把“BLAST 到病毒/细菌序列”直接当作整合事件。** 一个可靠的研究通常需要同时证明 **来源、基因组位置、宿主-微生物边界、结构完整性、群体存在以及排除污染**。
+
+## 一、总体技术路线
+
+```text
+真核生物基因组
+WGS / PacBio HiFi / ONT
+        │
+        ↓
+高质量 genome assembly
+        │
+        ├───────────────┐
+        ↓               ↓
+蛋白/核酸数据库搜索   assembly QC
+        │               │
+        ↓               ↓
+候选病毒/微生物序列   contamination检查
+        │
+        ↓
+Candidate foreign sequences
+        │
+        ├──────────────┬──────────────┐
+        ↓              ↓              ↓
+Virus EVE          Bacterial DNA    Other HGT
+        │              │              │
+        └──────────────┼──────────────┘
+                       ↓
+             Host–microbe junction
+                       ↓
+             Integration validation
+                       ↓
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+      长度/结构       SV/PAV        Repeat/context
+        │              │              │
+        └──────────────┼──────────────┘
+                       ↓
+                  群体基因组
+                       ↓
+                 Phylogeny
+                       ↓
+             Integration age
+                       ↓
+             Functional analysis
+```
+
+---
+
+# 二、第一步：准备高质量真核基因组
+
+这是整个分析最容易被忽略、但非常重要的一步。
+
+### 1. Short-read WGS
+
+例如：
+
+```text
+Illumina WGS
+   ↓
+BWA
+   ↓
+variant calling
+   ↓
+foreign sequence search
+```
+
+优点是：
+
+* 样本多
+* 群体频率容易计算
+* 成本低
+
+缺点是：
+
+* 很难解决大型病毒插入
+* 重复区域容易错配
+* 很难解析 host–virus junction
+* 很难确定完整插入结构
+
+---
+
+### 2. PacBio HiFi
+
+如果目标是：
+
+> **发现真核基因组中的病毒/细菌整合片段**
+
+PacBio HiFi 非常适合。
+
+```text
+HiFi reads
+    ↓
+hifiasm
+    ↓
+haplotype-resolved assembly
+    ↓
+foreign DNA discovery
+```
+
+尤其适合：
+
+* EVE
+* Wolbachia insertion
+* giant virus insertion
+* 大型 HGT
+* SV
+* haplotype-specific insertion
+
+---
+
+### 3. ONT ultra-long
+
+如果插入很大，例如：
+
+```text
+virus → host
+    500 kb
+    1 Mb
+    5 Mb
+```
+
+ONT ultra-long 可以直接跨越：
+
+```text
+host ───── foreign DNA ───── host
+```
+
+因此对于确定整合位置非常有价值。
+
+---
+
+# 三、第二步：寻找“外源序列”
+
+这是核心。
+
+基本上有 **5 类方法**。
+
+---
+
+## 方法 1：BLAST / DIAMOND
+
+最经典。
+
+### DNA → DNA
+
+```bash
+blastn \
+    -query genome.fa \
+    -db virus_nt \
+    -out virus_hits.tsv \
+    -evalue 1e-10 \
+    -outfmt 6
+```
+
+或者：
+
+```bash
+blastn \
+    -query genome.fa \
+    -db nt \
+    -outfmt 6 \
+    -evalue 1e-10
+```
+
+但是对于大型基因组：
+
+> **不推荐直接用整个 genome 对 NT 做 BLASTN 作为唯一方法。**
+
+计算量太大。
+
+---
+
+### Protein-level search
+
+通常更敏感：
+
+```text
+genome
+ ↓
+gene prediction
+ ↓
+protein
+ ↓
+DIAMOND
+ ↓
+viral/bacterial protein database
+```
+
+例如：
+
+```bash
+diamond blastp \
+    --query proteins.fa \
+    --db virus_proteins.dmnd \
+    --evalue 1e-5 \
+    --outfmt 6 \
+    --out viral_hits.tsv
+```
+
+对于远缘病毒，protein-level search 往往比 nucleotide BLAST 更有效。
+
+---
+
+# 四、方法 2：HMM / profile-based detection
+
+这是比 BLAST 更重要的一层。
+
+例如很多病毒蛋白非常保守的是：
+
+```text
+RNA-dependent RNA polymerase
+reverse transcriptase
+integrase
+capsid protein
+helicase
+protease
+```
+
+可以建立：
+
+```text
+HMM database
+       ↓
+HMMER
+       ↓
+candidate viral proteins
+```
+
+例如：
+
+```bash
+hmmsearch \
+    --cpu 32 \
+    --domtblout viral.domtblout \
+    virus_profiles.hmm \
+    proteins.fa
+```
+
+优点：
+
+> 可以发现已经高度发散、BLAST 相似性很低的病毒来源序列。
+
+所以比较理想的是：
+
+```text
+BLAST/DIAMOND
+       +
+HMMER
+       ↓
+Candidate EVE
+```
+
+---
+
+# 五、方法 3：基于 k-mer / composition 的病毒序列识别
+
+这一类方法不要求非常强的序列同源性。
+
+例如：
+
+```text
+k-mer
+GC content
+codon usage
+dinucleotide frequency
+sequence composition
+```
+
+然后使用机器学习：
+
+```text
+sequence
+   ↓
+k-mer features
+   ↓
+classifier
+   ↓
+viral / bacterial / host
+```
+
+典型用途：
+
+> 从未知序列中寻找可能的病毒来源区域。
+
+但是：
+
+**它适合 discovery，不适合单独作为最终证据。**
+
+---
+
+# 六、方法 4：Assembly graph / read-level evidence
+
+这是长读长时代非常重要的方法。
+
+假设：
+
+```text
+Host genome
+
+chr1
+──────────────────────────────
+              │
+              │
+              ▼
+          virus DNA
+          ─────────
+```
+
+如果 assembly graph 中出现：
+
+```text
+Host ─────┐
+          ├──── Viral
+Host ─────┘
+```
+
+就可以直接寻找：
+
+> **host–virus junction**
+
+---
+
+对于 PacBio/ONT：
+
+```text
+long read
+────────────────────────────────────
+host──────virus──────host
+```
+
+一条 read 如果跨越两侧：
+
+```text
+host sequence
+       │
+       ↓
+───────┼──────── virus
+       │
+       ↓
+host sequence
+```
+
+这是非常强的整合证据。
+
+---
+
+# 七、方法 5：直接比对病毒/微生物数据库
+
+可以建立：
+
+### Virus database
+
+```text
+NCBI Virus
+RVDB
+RefSeq Viral
+IMG/VR
+GVD
+GVD-derived giant virus database
+```
+
+### Bacteria database
+
+```text
+GTDB
+RefSeq
+NCBI nt
+MAG databases
+```
+
+然后：
+
+```text
+host genome
+      ↓
+minimap2 / DIAMOND / BLAST
+      ↓
+microbial hits
+```
+
+---
+
+# 八、最重要：如何判断是真正的“基因组整合”
+
+找到：
+
+```text
+chr5:1000000-1020000
+```
+
+有病毒相似序列还远远不够。
+
+建议至少满足下面几个证据。
+
+## Evidence 1：定位在宿主染色体
+
+```text
+chr5
+────────────────────────────────
+host────viral────host
+```
+
+而不是：
+
+```text
+separate viral contig
+```
+
+---
+
+## Evidence 2：host–foreign junction
+
+例如：
+
+```text
+Read1:
+host | virus
+
+Read2:
+host | virus
+
+Read3:
+virus | host
+```
+
+最好有多个独立 reads 支持。
+
+---
+
+## Evidence 3：双端/长读长证据
+
+Short-read：
+
+```text
+R1 → host
+R2 → virus
+```
+
+Long-read：
+
+```text
+host ───── viral ───── host
+```
+
+后者更强。
+
+---
+
+## Evidence 4：多个样本中可以重复观察
+
+例如：
+
+```text
+Sample1  +
+Sample2  +
+Sample3  -
+Sample4  +
+Sample5  -
+```
+
+可以进一步研究：
+
+> insertion polymorphism
+
+即：
+
+```text
+PAV
+Presence / Absence Variation
+```
+
+---
+
+# 九、一定要排除 contamination
+
+这是整个领域非常关键的问题。
+
+例如你的 genome：
+
+```text
+Host assembly
+       │
+       ├── bacterial contamination
+       ├── fungal contamination
+       ├── virus contamination
+       └── true HGT
+```
+
+仅仅发现：
+
+```text
+chr1:50000000
+```
+
+有 bacterial sequence 不够。
+
+---
+
+## 常见假阳性来源
+
+### 1. 实验污染
+
+```text
+DNA extraction
+    ↓
+bacteria
+fungi
+virus
+```
+
+---
+
+### 2. Assembly contamination
+
+例如：
+
+```text
+contig_12345
+```
+
+实际上是：
+
+```text
+bacterial chromosome
+```
+
+而不是 host chromosome。
+
+---
+
+### 3. 共生菌
+
+例如：
+
+```text
+Wolbachia
+```
+
+如果 DNA extraction 是 whole insect：
+
+```text
+insect
++
+Wolbachia
+```
+
+那么 assembly 中出现 Wolbachia 序列并不意味着它已经整合。
+
+---
+
+### 4. Haplotig / duplicated contig
+
+两个 haplotype：
+
+```text
+hap1
+hap2
+```
+
+可能被错误当作两个独立基因组区域。
+
+---
+
+# 十、因此推荐使用 contamination filtering
+
+可以采用：
+
+```text
+Assembly
+   ↓
+BUSCO
+   ↓
+BlobToolKit / BlobTools
+   ↓
+GC + coverage + taxonomy
+   ↓
+foreign contig detection
+```
+
+尤其推荐：
+
+**BlobToolKit / BlobTools**
+
+因为它可以同时观察：
+
+```text
+GC
+coverage
+taxonomy
+```
+
+例如：
+
+```text
+                coverage
+                    ↑
+                    │
+ bacteria ●         │
+                    │
+                    │       ● host
+                    │
+ virus ●            │
+                    └────────────→ GC
+```
+
+可以快速发现异常 contig。
+
+---
+
+# 十一、病毒 EVE 的标准分析流程
+
+如果目标专门是：
+
+> **Endogenous Viral Elements**
+
+可以采用：
+
+```text
+Genome
+   ↓
+Repeat masking
+   ↓
+Gene prediction
+   ↓
+BLAST/DIAMOND
+   ↓
+HMMER
+   ↓
+viral protein hits
+   ↓
+candidate EVE
+   ↓
+genomic context
+   ↓
+host-virus junction
+   ↓
+read support
+   ↓
+phylogenetic analysis
+   ↓
+EVE classification
+```
+
+最终输出：
+
+```text
+EVE_ID
+Chromosome
+Start
+End
+Length
+Virus_family
+Virus_species
+Identity
+Coverage
+E_value
+Supporting_reads
+Integration_status
+```
+
+---
+
+# 十二、细菌/微生物基因组整合的流程
+
+对于：
+
+```text
+Wolbachia
+mitochondria
+fungi
+protists
+bacteria
+archaea
+```
+
+可以：
+
+```text
+Eukaryotic genome
+        ↓
+DIAMOND / BLAST
+        ↓
+GTDB / RefSeq
+        ↓
+candidate microbial DNA
+        ↓
+taxonomy assignment
+        ↓
+contamination filtering
+        ↓
+host junction detection
+        ↓
+long-read validation
+        ↓
+HGT candidate
+```
+
+然后再判断：
+
+```text
+真正 HGT
+vs
+endosymbiont DNA
+vs
+contamination
+```
+
+---
+
+# 十三、如果是你的长读长数据，我最推荐的方案
+
+结合你目前主要做的 **PacBio HiFi / ONT / WGS / SV / pangenome**，我会优先采用：
+
+```text
+                 PacBio HiFi / ONT
+                         │
+                         ↓
+                 haplotype-resolved
+                    genome assembly
+                         │
+             ┌───────────┴───────────┐
+             ↓                       ↓
+       Virus database          Microbe database
+       RVDB/RefSeq              GTDB/RefSeq
+             │                       │
+             └───────────┬───────────┘
+                         ↓
+                  DIAMOND / BLAST
+                         +
+                       HMMER
+                         ↓
+                Foreign DNA candidates
+                         ↓
+              ┌──────────┴──────────┐
+              ↓                     ↓
+          Virus EVE              Microbial HGT
+              │                     │
+              └──────────┬──────────┘
+                         ↓
+                  minimap2 / BLAST
+                         ↓
+               Host–foreign junction
+                         ↓
+                 PacBio/ONT reads
+                         ↓
+                    SV validation
+                         ↓
+                   contamination
+                     filtering
+                         ↓
+                High-confidence set
+                         ↓
+        ┌────────────────┼────────────────┐
+        ↓                ↓                ↓
+      PAV              SV              Haplotype
+        │                │                │
+        └────────────────┼────────────────┘
+                         ↓
+                   Population
+                    genomics
+                         ↓
+                    Phylogeny
+                         ↓
+                  Integration age
+                         ↓
+              Functional annotation
+```
+
+---
+
+# 十四、如果进一步做成一个“系统性研究”，可以分成 4 个层次
+
+| 层次             | 核心问题           | 主要方法                              |
+| -------------- | -------------- | --------------------------------- |
+| **Discovery**  | 有没有病毒/微生物 DNA？ | BLAST、DIAMOND、HMMER、k-mer         |
+| **Validation** | 是不是真整合？        | Long-read、junction、assembly graph |
+| **Evolution**  | 什么时候、从哪里来的？    | phylogeny、molecular clock、synteny |
+| **Population** | 是否存在群体多态性？     | PAV、SV、haplotype、AF、FST           |
+
+最终可以得到一个非常有价值的：
+
+> **Eukaryotic Foreign DNA Atlas**
+
+例如：
+
+```text
+Foreign element
+      │
+      ├── Virus
+      │    ├── Retrovirus
+      │    ├── DNA virus
+      │    ├── RNA virus
+      │    └── Giant virus
+      │
+      └── Microbe
+           ├── Bacteria
+           ├── Archaea
+           ├── Fungi
+           └── Protists
+```
+
+再结合：
+
+```text
+Species
+Population
+Chromosome
+Insertion age
+Insertion frequency
+Structure
+Gene content
+Expression
+Selection
+```
+
+就可以从单纯的 **“发现病毒序列”** 上升到 **“研究病毒/微生物如何塑造真核生物基因组演化”**。
+
+对于你目前的研究基础，尤其值得做的是 **PacBio HiFi/ONT + pangenome + SV + population genetics** 这一组合，因为短读长研究通常很难可靠解析大型、重复丰富或复杂结构的外源 DNA 插入。
+
+
+
