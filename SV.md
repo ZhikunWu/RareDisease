@@ -40,6 +40,485 @@ Wham
 
 gridss
 
+---
+
+# 有哪些比较优秀的基于二代WGS检测germline SV的工具
+
+如果限定为**二代 Illumina WGS + germline SV**，我会优先考虑下面这些工具。对于你这种人类 WGS、尤其是后续还要和 PacBio HiFi SV 做交叉验证的场景，建议不要只跑一个 caller，而是采用 **Manta + DELLY + LUMPY/GRIDSS + 专门的 MEI/CNV caller，再做 ensemble**。
+
+近期针对 GIAB/HGSVC 的比较仍然把 **Manta、DELLY、LUMPY、GRIDSS、SvABA**列为代表性的短读长 SV caller；其中 Manta 在 deletion/overall 实用性方面表现尤其稳定。([PMC][1])
+
+### 1. 我最推荐的几个
+
+| 工具              | 主要证据                     |   DEL |   DUP |   INV |       INS | BND/TRA | Germline |        推荐度 |
+| --------------- | ------------------------ | ----: | ----: | ----: | --------: | ------: | -------: | ---------: |
+| **Manta**       | PE + SR + 局部组装           | ★★★★★ |  ★★★★ |  ★★★★ |      ★★★★ |    ★★★★ |        ✓ |      ⭐⭐⭐⭐⭐ |
+| **DELLY**       | PE + SR                  | ★★★★★ |  ★★★★ |  ★★★★ |       ★★★ |   ★★★★★ |        ✓ |      ⭐⭐⭐⭐⭐ |
+| **LUMPY**       | PE + SR                  |  ★★★★ |  ★★★★ |  ★★★★ |       ★★★ |    ★★★★ |        ✓ |       ⭐⭐⭐⭐ |
+| **GRIDSS**      | break-end assembly + SR  |  ★★★★ |  ★★★★ | ★★★★★ |      ★★★★ |   ★★★★★ |        ✓ |      ⭐⭐⭐⭐⭐ |
+| **SvABA**       | local assembly           |  ★★★★ |   ★★★ |   ★★★ |      ★★★★ |    ★★★★ |        ✓ |       ⭐⭐⭐⭐ |
+| **GenomeSTRiP** | read-depth + PE/SR       |  ★★★★ | ★★★★★ |     — |         — |       — |        ✓ |       ⭐⭐⭐⭐ |
+| **MELT**        | mobile-element insertion |     — |     — |     — | **★★★★★** |       — |        ✓ | ⭐⭐⭐⭐⭐（MEI） |
+| **Wham**        | PE/SR                    |  ★★★★ |  ★★★★ |  ★★★★ |       ★★★ |    ★★★★ |        ✓ |        ⭐⭐⭐ |
+| **CNVnator**    | read depth               |   ★★★ | ★★★★★ |     — |         — |       — |        ✓ |  ⭐⭐⭐⭐（CNV） |
+| **GATK-SV**     | 多caller ensemble         | ★★★★★ | ★★★★★ |  ★★★★ |      ★★★★ |   ★★★★★ |        ✓ |      ⭐⭐⭐⭐⭐ |
+
+不同 benchmark 对工具的排名会有所不同，但一个比较一致的结论是：**没有单一 caller 能很好地覆盖所有 SV 类型**；Manta、GRIDSS、DELLY、LUMPY 等各自存在互补性。([PubMed][2])
+
+---
+
+# 2. Manta：如果只选一个，我首先选它
+
+**Manta** 是二代 WGS germline SV 中非常实用的选择。
+
+它主要利用：
+
+* discordant paired-end reads
+* split reads
+* 局部组装
+* breakpoint refinement
+
+因此对于：
+
+* deletion
+* insertion
+* inversion
+* duplication
+* translocation
+
+都有较好的覆盖。
+
+近期短读长 benchmark 中，Manta 对 deletion 的综合表现较好，同时计算资源需求相对低；在一些比较中也是非商业工具中 recall 较好的工具。([PMC][1])
+
+典型输入：
+
+```text
+WGS FASTQ
+   ↓
+BWA-MEM/BWA-MEM2
+   ↓
+sorted BAM
+   ↓
+Manta
+   ↓
+candidateSV.vcf.gz
+diploidSV.vcf.gz
+```
+
+对于 germline，最终比较重要的是：
+
+```text
+diploidSV.vcf.gz
+```
+
+---
+
+# 3. DELLY：非常适合做高可信 germline SV
+
+**DELLY** 是另一个我非常推荐的工具。
+
+核心证据：
+
+```text
+discordant paired-end
+        +
+split-read
+```
+
+特别适合：
+
+* DEL
+* DUP
+* INV
+* BND/TRA
+
+尤其是**大片段 deletion 和染色体重排**。
+
+DELLY 与 Manta 的算法机制不同，因此两者非常适合组合。
+
+例如：
+
+```text
+Manta
+   \
+    → merge/overlap → high-confidence SV
+   /
+DELLY
+```
+
+在很多 germline/短读长 benchmark 中，DELLY 都属于主流高质量 caller。([PMC][1])
+
+---
+
+# 4. GRIDSS：如果你特别关注 breakpoint，值得加入
+
+GRIDSS 和 Manta/DELLY 的思路不完全一样。
+
+它更加偏向：
+
+> **break-end assembly**
+
+因此对复杂 breakpoint、重排以及一些复杂 SV 比较有价值。
+
+特别适合：
+
+* complex rearrangement
+* inversion
+* translocation
+* breakpoint
+* microhomology
+* non-templated insertion
+
+早期全面 benchmark 也特别指出，使用 breakpoint assembly、同时利用多种 alignment evidence 的工具通常更有优势，GRIDSS 和 Manta 是其中比较突出的代表。([Nature][3])
+
+缺点是：
+
+**比较吃计算资源。**
+
+近期 benchmark 中 GRIDSS 的运行时间和内存需求通常高于 Manta。([PMC][1])
+
+---
+
+# 5. LUMPY：经典、稳定，适合作为第二/第三 caller
+
+LUMPY 的特点是把多种 alignment signatures 综合起来：
+
+```text
+paired-end
+    +
+split-read
+    +
+discordant alignment
+```
+
+它的优势不是“单项一定第一”，而是：
+
+> **和 Manta、DELLY 的结果具有较好的互补性。**
+
+因此如果你要做：
+
+```text
+Manta
+DELLY
+LUMPY
+      ↓
+SV intersection / union
+      ↓
+high-confidence SV
+```
+
+是一个比较经典的设计。
+
+---
+
+# 6. SvABA：复杂 SV / 局部组装可以考虑
+
+SvABA 的核心是：
+
+> **windowed local assembly**
+
+也就是说，它会针对异常区域进行局部组装，然后寻找 breakpoint。
+
+因此在一些：
+
+* complex SV
+* insertion
+* breakpoint
+* microhomology
+
+场景有价值。
+
+不过如果是普通的人群 germline WGS，我一般不会把 SvABA 作为唯一 caller，而是作为补充。
+
+---
+
+# 7. GenomeSTRiP：CNV/大型 SV 很值得考虑
+
+如果你的“SV”包括：
+
+> **large CNV / duplication / deletion**
+
+那么 GenomeSTRiP 值得加入。
+
+它和 Manta/DELLY 的一个重要区别是：
+
+```text
+Manta / DELLY
+        ↓
+PE + SR
+```
+
+而 GenomeSTRiP 更强调：
+
+```text
+read depth
++
+population information
++
+genotype
+```
+
+所以对于：
+
+* large deletion
+* large duplication
+* CNV
+* multi-sample germline SV
+
+尤其有价值。
+
+---
+
+# 8. MELT：如果研究 MEI，一定考虑
+
+如果你的研究涉及：
+
+* Alu
+* LINE-1
+* SVA
+* mobile element insertion
+
+那么不要指望 Manta/DELLY 单独解决得很好。
+
+可以单独跑：
+
+**MELT**
+
+它是专门针对：
+
+> **Mobile Element Insertion, MEI**
+
+设计的。
+
+GATK-SV 的官方流程本身也是一个 ensemble framework，其中包含 Manta、Wham、Scramble，以及 read-depth 的 GATK-gCNV/cn.MOPS；历史 joint callset 中也大量使用 MELT 进行 MEI 检测。([Broad Institute][4])
+
+---
+
+# 9. GATK-SV：如果你有较大的人群队列，我反而最推荐这个思路
+
+如果你不是：
+
+> 一个样本 → 得到 SV
+
+而是：
+
+> **100、500、1000+ 个 WGS 样本 → 建立 germline SV population callset**
+
+那么可以考虑 **GATK-SV**。
+
+它不是单纯一个 caller，而是：
+
+```text
+             Manta
+               │
+             Wham
+               │
+            Scramble
+               │
+          GATK-gCNV
+               │
+            cn.MOPS
+               ↓
+       ┌────────────────┐
+       │ GATK-SV ensemble│
+       └────────────────┘
+               ↓
+       filtering/refinement
+               ↓
+        final SV callset
+```
+
+官方文档明确把它定义为：
+
+> ensemble of SV discovery tools → integration → filtering → refinement → annotation → final callset。([Broad Institute][4])
+
+因此：
+
+### 小队列
+
+```text
+Manta
+DELLY
+GRIDSS
+```
+
+就很好。
+
+### 中大型 population WGS
+
+```text
+GATK-SV
+```
+
+会更加系统。
+
+---
+
+# 10. 如果是你现在这种研究，我建议这样组合
+
+结合你前面一直在做的 **PacBio HiFi + WGS + SV/CNV + population genomics**，我不会只使用一个二代 caller。
+
+我会设计成：
+
+```text
+                 Illumina WGS
+                      │
+                      ↓
+                 BWA-MEM2
+                      │
+                      ↓
+                 sorted BAM
+                      │
+        ┌─────────────┼─────────────┐
+        ↓             ↓             ↓
+      Manta          DELLY        GRIDSS
+        │             │             │
+        └─────────────┼─────────────┘
+                      ↓
+                 SV merge
+                      │
+             ┌────────┴────────┐
+             ↓                 ↓
+          MELT             CNVnator/
+        (MEI)              GenomeSTRiP
+             │                 │
+             └────────┬────────┘
+                      ↓
+              high-confidence
+                 germline SV
+                      │
+          ┌───────────┴───────────┐
+          ↓                       ↓
+   Illumina-supported       PacBio HiFi
+                              SV caller
+          │                       │
+          └───────────┬───────────┘
+                      ↓
+              integrated SV set
+```
+
+这里尤其适合你后面做：
+
+* **SNV/Indel**
+* **germline SV**
+* **CNV**
+* **MEI**
+* **PacBio HiFi SV**
+* **population frequency**
+* **SV-QTL**
+* **基因/转录本影响**
+
+的整合分析。
+
+---
+
+## 11. 如果只让我给你一个推荐组合
+
+### 普通 germline WGS
+
+我会选择：
+
+> **Manta + DELLY + GRIDSS**
+
+然后：
+
+```text
+Manta ∩ DELLY
+```
+
+作为高可信核心集，
+
+再用：
+
+```text
+GRIDSS
+```
+
+补充复杂 breakpoint。
+
+---
+
+### 如果是 30× 人群 WGS
+
+推荐：
+
+> **Manta + DELLY + GRIDSS + GenomeSTRiP/CNVnator + MELT**
+
+因为不同工具解决的是不同问题：
+
+| 类型            | 首选                     |
+| ------------- | ---------------------- |
+| DEL           | Manta / DELLY          |
+| DUP           | Manta / GenomeSTRiP    |
+| INV           | Manta / DELLY / GRIDSS |
+| INS           | Manta / GRIDSS         |
+| BND/TRA       | DELLY / GRIDSS         |
+| Large CNV     | GenomeSTRiP / CNVnator |
+| Alu/L1/SVA    | MELT                   |
+| Complex SV    | GRIDSS                 |
+| Population SV | GATK-SV                |
+
+---
+
+### 12. 一个非常重要的区别
+
+如果你的数据是：
+
+**Illumina 30× WGS**
+
+那么上述工具非常合适。
+
+但是如果你的最终研究目标是：
+
+> **准确获得人类 germline SV，特别是 50 bp–100 kb 的 insertion、复杂 SV、重复区 SV**
+
+那么**不要把二代 WGS caller 当成最终金标准**。
+
+短读长对重复区域、复杂 insertion 和较大的复杂重排存在明显限制；近期短读长与长读长比较也显示，两者在非重复区域的部分 SV 上可以有相近表现，但重复区域的 SV 检测明显更依赖长读长。([Nature][5])
+
+因此，如果你手里同时有 **Illumina WGS + PacBio HiFi**，非常推荐做：
+
+```text
+Illumina
+Manta
+DELLY
+GRIDSS
+MELT
+GenomeSTRiP
+        │
+        ↓
+   Short-read SV
+        │
+        ├──────────────┐
+        │              │
+        ↓              ↓
+   PacBio HiFi     population
+   Sniffles2       frequency
+   pbsv
+   cuteSV
+        │
+        ↓
+   SV harmonization
+        │
+        ↓
+ High-confidence germline SV
+```
+
+这会比单纯跑 3 个 short-read caller 更有研究价值。
+
+如果你的目标是**“100个人 WGS，建立一个高质量的人群 germline SV catalog，并进一步和你现在的100个 PacBio长读长转录组/WGS数据结合”**，我可以进一步给你设计一套 **Manta + DELLY + GRIDSS + MELT + GenomeSTRiP → Jasmine/Truvari → SV VCF → population AF → PacBio验证** 的完整流程，包括每一步的命令、输入输出文件和过滤标准。
+
+[1]: https://pmc.ncbi.nlm.nih.gov/articles/PMC11801633/?utm_source=chatgpt.com "Comparisons of performances of structural variants detection algorithms in solitary or combination strategy - PMC"
+[2]: https://pubmed.ncbi.nlm.nih.gov/31159850/?utm_source=chatgpt.com "Comprehensive evaluation of structural variation detection algorithms for whole genome sequencing - PubMed"
+[3]: https://www.nature.com/articles/s41467-019-11146-4?utm_source=chatgpt.com "Comprehensive evaluation and characterisation of short read general-purpose structural variant calling software | Nature Communications"
+[4]: https://broadinstitute.github.io/gatk-sv/docs/gs/sv_callers/?utm_source=chatgpt.com "SV/CNV callers | GATK-SV"
+[5]: https://www.nature.com/articles/s41439-024-00276-x?utm_source=chatgpt.com "Comparative evaluation of SNVs, indels, and structural variations detected with short- and long-read sequencing data | Human Genome Variation"
+
+
+
+
+---
+
 # 基于pacbio hifi 测序数据检测germline和somatic CNV的工具有哪些
 
 基于 **PacBio HiFi WGS** 做 CNV，我建议把工具分成两类来看：**germline CNV** 和 **tumor/normal somatic CNV**。目前两者的最佳工具并不完全相同。
