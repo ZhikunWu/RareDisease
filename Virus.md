@@ -1,3 +1,231 @@
+# 如何基于三代测序数据检测组装基因组中插入的病毒或者微生物基因组
+
+下面给出一个更适用于已经组装好的宿主基因组中寻找外源病毒或微生物 DNA 插入序列的分析框架。需要先区分两种任务：
+
+1. 整合型插入（integration）：病毒或微生物 DNA 已经插入宿主染色体，需要识别宿主—外源序列连接点。
+2. 游离或污染序列（contamination / episome）：外源 DNA 可能存在于独立 contig、质粒、游离病毒基因组或混合样本中，并不一定整合进宿主染色体。
+
+这两类问题不能只依靠一个病毒分类工具解决。长读长数据最大的优势是可以让单条读段跨越宿主—外源序列连接点，并帮助还原插入结构；但组装过程中也可能出现污染、嵌合读段或错误连接，因此必须回到原始 reads 验证。
+
+## 一、推荐的整体分析流程
+
+对于已经组装好的宿主基因组，建议采用“外源序列筛查 → 分类鉴定 → 宿主插入定位 → 原始长读段验证 → 插入结构重建 → 生物学证据评估”的流程。
+
+Step 1. 宿主基因组组装
+
+PacBio HiFi / ONT → FASTA contigs
+
+Step 2. 外源序列筛查
+
+Kraken2 / BLASTn / DIAMOND / MMseqs2
+
+Step 3. 病毒或微生物分类鉴定
+
+NCBI nt、RefSeq、病毒数据库；检查分类一致性与序列覆盖度
+
+Step 4. 宿主—外源序列连接点识别
+
+Minimap2、联合参考比对、断点和组装图检查
+
+Step 5. 原始长读段验证
+
+跨越连接点的 reads、断点两侧支持、覆盖深度及独立证据
+
+Step 6. 插入结构与功能分析
+
+插入方向、拷贝数、宿主基因破坏、调控区域和进化来源
+
+## 二、每个步骤推荐哪些工具？
+
+| 分析任务              | 推荐工具               | 主要用途                                              |
+| ----------------- | ------------------ | ------------------------------------------------- |
+| 组装 contig 分类      | Kraken2、Centrifuge | 快速筛查病毒、细菌、真菌及其他分类群                                |
+| 核酸序列同源性           | BLASTn、MMseqs2     | 确认候选 contig 与已知病毒或微生物基因组的相似性                      |
+| 蛋白质层面的鉴定          | DIAMOND、BLASTx     | 发现核酸同源性较弱但蛋白质保守的外源序列                              |
+| 病毒 contig 识别与质量评估 | CheckV、viralVerify | 判断候选病毒序列、完整度和潜在污染                                 |
+| 长读段与组装比对          | minimap2           | 定位 reads 对应的宿主和外源序列区域                             |
+| 结构变异辅助检测          | Sniffles2 等        | 在合适的联合参考或自定义比对结果中寻找候选断点；不能直接把普通宿主参考下的所有 SV 当作整合事件 |
+| 连接点及组装结构验证        | IGV、BLAST、组装图查看工具  | 检查跨越宿主—外源序列的读段、断点方向和重复结构                          |
+
+其中，viralFlye 是针对长读长宏基因组数据进行病毒组装和宿主关联分析的代表性工具，但它不是专门用于证明病毒已经整合进宿主染色体的工具。
+
+[image](https://www.google.com/s2/favicons?domain=https://pmc.ncbi.nlm.nih.gov\&sz=32)
+
+PMC
+
++1
+
+
+
+## 三、具体怎么从组装基因组中找出插入的病毒或微生物？
+
+### 1. 首先筛查疑似外源 contig
+
+假设你有：
+
+- `assembly.fa`：宿主组装基因组；
+- `reads.fastq.gz`：PacBio HiFi 或 ONT 原始 reads；
+- 宿主参考基因组（如果存在）。
+
+可以先用 Kraken2 对 contig 进行分类：
+
+```
+kraken2 \
+  --db /path/to/kraken2_db \
+  --fasta-input \
+  --threads 32 \
+  --report contigs.kraken2.report \
+  --output contigs.kraken2.out \
+  assembly.fa
+```
+
+随后筛选被分类为病毒、细菌、真菌或其他非目标宿主分类群的 contig。
+
+注意： Kraken2 将一个 contig 分类为细菌或病毒，并不等于这段序列真的插入了宿主基因组。宿主基因组中可能存在与微生物同源的保守序列、污染序列或分类错误。因此建议用 BLASTn 对候选 contig 进一步检查。
+
+例如：
+
+```
+makeblastdb \
+  -in microbial_virus_db.fa \
+  -dbtype nucl \
+  -out microbial_virus_db
+
+blastn \
+  -query candidate_contigs.fa \
+  -db microbial_virus_db \
+  -outfmt '6 qseqid sseqid pident length qstart qend sstart send evalue bitscore' \
+  -evalue 1e-10 \
+  -num_threads 32 \
+  -out candidate_contigs.blast.tsv
+```
+
+这里的 `microbial_virus_db.fa` 应根据研究对象构建，包含相关病毒、细菌、真菌及其他候选微生物参考序列。若研究的是未知微生物，建议结合更广泛的 NCBI nt 数据库或蛋白质数据库，而不是只搜索有限的病原体列表。
+
+### 2. 判断外源序列是否真正插入宿主染色体
+
+这是整个分析中最关键的一步。
+
+假设组装得到如下 contig：
+
+```
+宿主染色体左侧序列 ── 病毒序列 ── 宿主染色体右侧序列
+```
+
+若该 contig 左右两侧分别与宿主染色体某个位置匹配，中间片段与病毒基因组匹配，就形成了一个候选整合事件。
+
+可以先用 minimap2 将组装 contig 比对到宿主参考基因组：
+
+```
+minimap2 -ax asm5 host_reference.fa assembly.fa \
+  > assembly_to_host.sam
+```
+
+同时，将候选 contig 比对到病毒或微生物参考序列，检查是否存在连续的外源同源片段，以及两侧宿主序列的位置和方向是否合理。
+
+对于更可靠的断点分析，可以建立包含宿主与候选外源基因组的联合参考序列，再将原始长读段比对到联合参考，寻找跨越宿主—外源序列边界的 reads。
+
+### 3. 用原始长读段验证插入事件
+
+对每个候选事件，建议至少检查以下证据：
+
+- 跨断点 reads： 单条原始长读段是否覆盖宿主—外源连接点。
+- 两侧断点支持： 插入结构的左、右连接点是否都有独立读段支持。
+- 覆盖度： 插入片段的覆盖深度是否与预期一致，是否可能来自高拷贝污染或重复序列。
+- 结构一致性： 原始 reads 是否支持组装 contig 中的片段顺序、方向和拷贝数。
+- 独立证据： 是否能在独立样本、短读长数据、PCR/Sanger 或其他技术中得到支持。
+
+如果外源序列只出现在独立 contig 中，没有任何可信的宿主—外源连接证据，那么更合理的结论是“检测到候选外源序列”，而不是“检测到宿主基因组整合”。
+
+## 四、最值得参考的高水平研究
+
+[Long-read sequencing unveils high-resolution HPV integration and its oncogenic progression in cervical cancer | Nature Communications](https://images.openai.com/static-rsc-4/YeOFDK18WJjDeQxvJU45xNUB7yG865IS7bovxf77hef05OnGGeWlr7QwI_tONgDH0tWoEEN0aDb2KVyWGcL6y13gxGaVIsTgX1M2RtYlElpLneIUthJK1jB22tF2XvcSRtD5VuGHNRKxjML0bcc_HNqOpmTPfJAZZ02ovWE0P54?purpose=inline)
+
+1\. Long-read sequencing unveils high-resolution HPV integration and its oncogenic progression in cervical cancer
+
+Nature Communications, 2022
+
+利用 ONT 长读长解析 HPV16 在宫颈癌中的整合断点、不同插入结构、染色体易位和病毒—宿主环状 DNA。研究展示了短读长难以完整还原的复杂病毒—宿主结构。
+
+[image](https://www.google.com/s2/favicons?domain=https://www.nature.com\&sz=32)
+
+Nature Communications
+
++1
+
+
+
+[论文全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC9091225/)
+
+[PCIP-seq: simultaneous sequencing of integrated viral genomes and their insertion sites with long reads | Genome Biology | Springer Nature Link](https://images.openai.com/static-rsc-4/OO-7nAwxeQkviCa3IXi0SR1f3JOPhEFLIBhoCQ0O3ThCul7ZMxJqXDMSbKNyv9LHkY09nTcFkzylmNiOLlHF9kKyk1dhineJOdFKvp_q65_QxrIn-RKiPFzFCN8PNUN35VSf7dKPxuqKq628uzEaJD1hOBin02KPbg-aSw2hFjg?purpose=inline)
+
+2\. PCIP-seq: simultaneous sequencing of integrated viral genomes and their insertion sites with long reads
+
+Genome Biology, 2021
+
+通过长读长同时分析病毒整合位点及插入病毒的序列，应用于 HIV、HTLV-1、BLV、HPV 和内源性逆转录病毒等场景。适合理解整合位点检测与病毒序列重建的联合策略。
+
+[image](https://www.google.com/s2/favicons?domain=https://pmc.ncbi.nlm.nih.gov\&sz=32)
+
+PMC
+
+
+
+[论文全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC8025556/)
+
+[viralFlye: assembling viruses and identifying their hosts from long-read metagenomics data | Genome Biology | Springer Nature Link](https://images.openai.com/static-rsc-4/MFdwCbRkwixUjkaOPT3991pJGJohd1IpalcJ9z5Q5f6ZjP4mJVtDyv_e2vujqvQ3CI6o6wed1UJHpNW7C5nd31PacPSog0ai6wdFq_Xw3dj0SE-lPD15hg1DbnzdjPlbn_kuI-2lhw1IRbM3Ei4CWE8BfrLDNqX5MhGZHRbUBS4?purpose=inline)
+
+3\. viralFlye: assembling viruses and identifying their hosts from long-read metagenomics data
+
+Bioinformatics, 2022
+
+研究长读长宏基因组中病毒组装、病毒多样性以及病毒—宿主关联。适合发现未知病毒或处理混合微生物样本，但其核心任务不是宿主染色体整合断点鉴定。
+
+[image](https://www.google.com/s2/favicons?domain=https://pmc.ncbi.nlm.nih.gov\&sz=32)
+
+PMC
+
++1
+
+
+
+[论文全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC8862349/)
+
+[Detecting virus integration sites based on multiple related sequencing data by VirTect | BMC Medical Genomics | Springer Nature Link](https://images.openai.com/static-rsc-4/tqE0TsSLRVaXoJPfWJ1PwbjQPce0PJRJRs-piCV5hKo8xXqLTHa6_-oqLSiJlvT6Svoj7eYwYSq4RShpg3FvNEtusUjylP24_dMzF3LYbAx9AmFzXWOBJuuTR3rMLaPk6i1vQwYZt1Aq5BwNKmBcQFlSNcVq9OP9tiMxUMnPyPw?purpose=inline)
+
+4\. VirusFinder: Software for Efficient and Accurate Detection of Viruses and Their Integration Sites in Host Genomes through Next Generation Sequencing Data
+
+PLOS ONE, 2013
+
+经典的病毒检测与整合位点识别流程，整合未比对 reads、病毒序列筛查、组装及宿主—病毒断点检测。主要针对较早期的 NGS 数据，使用于长读长时需重新评估其兼容性。
+
+[image](https://www.google.com/s2/favicons?domain=https://pmc.ncbi.nlm.nih.gov\&sz=32)
+
+PMC
+
++1
+
+
+
+[论文全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC3663743/)
+
+## 五、针对你的研究，最值得做的扩展
+
+如果你研究的是已经完成组装的肿瘤或正常真核生物基因组，我建议不仅筛查病毒，还要系统识别细菌、真菌、质粒及其他微生物来源的候选插入序列，并将其分成三个层次：
+
+1. 序列来源证据： 候选插入片段是否确实与病毒或微生物基因组同源。
+2. 整合结构证据： 是否存在可信的宿主—外源序列连接点，并由原始长读段支持。
+3. 生物学证据： 插入是否影响宿主基因、调控元件、染色体结构或表达；是否存在正常样本、其他个体或公共数据库中的对应序列。
+
+其中，最容易被忽视的是第三点之外的基础问题：微生物同源序列不一定来自近期微生物整合，也可能是古老的水平基因转移、内源性病毒序列、样本污染或组装错误。 这些情况应在结果中分别标注，避免将所有候选序列都解释成新近发生的整合事件。
+
+如果你提供以下两个信息，我可以进一步给出适用于你数据的完整命令行流程：
+
+- 宿主是人类、其他动物、植物，还是肿瘤基因组？
+- 你目前有原始 PacBio HiFi / ONT reads，还是只有组装完成的 FASTA？
+
+---
+
 # 近五年关于真核生物基因组中鉴定病毒或者微生物基因组的高水平的文章有哪些，举出30个文献，列出文献名，发表杂志，时间等
 
 可以。你这个方向实际上对应一个很有潜力的研究主题：**eukaryotic genome 中的外源/内源病毒与微生物 DNA（endogenous viral elements, EVEs；endogenous bacterial elements, EBEs；horizontal gene transfer, HGT）**。
