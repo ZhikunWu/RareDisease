@@ -1,3 +1,50 @@
+## 列出GWAS研究中川崎病相关的基因及其文章全称
+
+严格来说，川崎病（Kawasaki disease，KD）遗传学研究中，需要区分两类结果：KD 发病易感性 GWAS 和 KD 患者冠状动脉瘤（CAA）/冠状动脉损伤（CAL）GWAS。两类研究的表型不同，不能把所有相关基因都当作 KD 发病的 GWAS 命中基因。
+
+下面按原始研究整理文章的英文全称、涉及基因和文献链接。我会将较经典的 KD 易感性研究与 CAA 研究分开，并对证据强度作必要说明。
+1. 川崎病发病易感性相关 GWAS
+相关基因或位点	文章英文全称	发表信息
+ITPKC、CASP3	A genome-wide association study identifies three new risk loci for Kawasaki disease	2009，Nature Genetics
+FCGR2A	Genome-wide association study identifies FCGR2A as a susceptibility locus for Kawasaki disease	2011，Nature Genetics
+BLK、CD40、FCGR2A 等	Identification of B-cell-related HSPG2 and CDSN as susceptibility loci for Kawasaki disease	2023，Human Immunology；这是后续关联与验证研究，并非这些早期位点的原始发现论文。 ScienceDirect +1
+其中，2023 年的 HSPG2/CDSN 研究使用既往 GWAS 数据筛选候选 SNP，并开展新样本验证；其合并分析报告 HSPG2 的 rs2270699 与 KD 相关（\(P=8.61\times10^{-6}\)），以及 CDSN/PSORS1C1 区域 rs3130992 与 KD 相关（\(P=1.34\times10^{-6}\)）。这属于后续关联证据，不能仅凭这些 P 值认定其达到了标准 GWAS 全基因组显著性阈值 \(P<5\times10^{-8}\)。
+
+
+ScienceDirect
++1
+
+
+
+2. 其他重要的 KD GWAS 原始研究
+相关基因或位点	文章英文全称	发表信息及链接
+FAM167A–BLK、HLA、CD40	A genome-wide association study identifies three new risk loci for Kawasaki disease	2012，Nature Genetics；DOI: 10.1038/ng.2220。研究在日本队列中发现 FAM167A–BLK、HLA 和 CD40 区域的关联信号。 PubMed +1
+KD 易感性相关多个位点	A Genome-Wide Association Study Identifies Novel and Functionally Related Susceptibility Loci for Kawasaki Disease	2009，PLOS Genetics；DOI: 10.1371/journal.pgen.1000319。 PLOS Genetics
+FCGR2A、ITPKC 及邻近区域	Genome-wide association study identifies FCGR2A as a susceptibility locus for Kawasaki disease	2011，Nature Genetics；DOI: 10.1038/ng.981。研究纳入 2,173 例 KD 病例及 9,383 名对照，验证了 FCGR2A 区域，并支持 ITPKC 相关信号。 PubMed +1
+NEBL、TUBA3C	Genome-Wide Association Study Identifies Novel Susceptibility Genes Associated with Coronary Artery Aneurysm Formation in Kawasaki Disease	2016，PLOS ONE；DOI: 10.1371/journal.pone.0154943。研究重点是 KD 患者的冠状动脉瘤，而非 KD 发病易感性。 PubMed +1
+HSPG2、CDSN/PSORS1C1	Identification of B-cell-related HSPG2 and CDSN as susceptibility loci for Kawasaki disease	2023，Human Immunology；DOI: 10.1016/j.humimm.2023.07.001。属于候选位点筛选和独立样本验证研究。 ScienceDirect +1
+3. 适合优先引用的核心基因列表
+如果你要在论文中介绍 GWAS 发现的 KD 易感性基因，建议优先关注：
+
+ITPKC，CASP3，FCGR2A，BLK，FAM167A，CD40，HLA，MIA，RAB4B
+
+其中，MIA、RAB4B 是 FCGR2A 研究中邻近区域涉及的基因，不应将该区域的所有基因都视为独立因果基因。不同研究所报告的位点及其关联强度也会受到人群、样本量和表型定义的影响。
+
+
+PubMed
++2
+
+
+
+如果研究重点是 CAL/CAA 风险，可以单独整理 NEBL、TUBA3C 等候选位点，但需要注意其独立队列重复验证情况。
+
+
+PubMed
++1
+
+
+---
+
 ## LCWE是什么
 
 在生物医学和生命科学领域，**LCWE** 通常指代 **干酪乳杆菌细胞壁提取物**（*Lactobacillus casei* cell wall extract）。
