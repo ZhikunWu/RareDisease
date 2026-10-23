@@ -1,4 +1,5 @@
 
+
 ## [v5.0q GIAB HG002](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/v5.0q/NIST_HG002_v5.0q_variant-benchmarksets_README.md)
 
 ## [v5.0q GIAB HG002 Assembly-Based Small & Structural Variant Draft Sets](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/v5.0q/NIST_HG002_v5.0q_variant-benchmarksets_README.md)
@@ -39,6 +40,145 @@ lumpy
 Wham
 
 gridss
+
+
+---
+
+# 基于二代WGS数据检测STR的工具有哪些
+
+基于二代短读长 WGS（通常为 Illumina paired-end 150 bp）检测 STR（short tandem repeat，短串联重复序列），主要有两类任务：
+
+1. 全基因组 STR 分型（genotyping）：对大量已知 STR 位点估计两个等位基因的重复次数，适合人群遗传分析、STR-GWAS 和亲缘分析。
+2. STR 扩增检测（repeat expansion detection）：寻找异常扩增的重复序列，包括部分已知疾病位点及参考目录中没有预先定义的候选扩增位点。
+
+人类短读长 WGS 中，最值得优先考虑的工具是 GangSTR、ExpansionHunter、HipSTR、ExpansionHunter Denovo（EHdn）和 STRling。2024 年的人类基准比较研究发现，前三者适合全基因组 STR 分型，而 EHdn 和 STRling 等工具更适合发现异常重复扩增。
+
+[image](https://www.google.com/s2/favicons?domain=https://pmc.ncbi.nlm.nih.gov\&sz=32)
+
+PMC
+
++1
+
+
+
+## 一、主流 STR 检测工具
+
+[Advances in the discovery and analyses of human tandem repeats - PMC](https://images.openai.com/static-rsc-4/Ovfio7OxLS3d1MdibRuFUK6g2V14CG6QWjkKaHHEXNmk83bpTzcUOTpHUJ3RUVlcZhVp2RDp1Ac4u478gPH-GHioHGnzXJ-NCKwANF4o8jM3IriIZ3fzK5LlxLIG6xlxUFGAeNatrs77YGwVvtUu5RUvmQMtpeHvD96QQ8-0pCw?purpose=inline)
+
+### 1. GangSTR
+
+推荐：全基因组 STR 分型
+
+- 用途： 对大量已知 STR 位点进行基因型估计，综合利用 spanning、flanking 和其他支持读段的信息。
+- 优势： 适合大规模人群数据，可分析部分长度超过单条 reads 的重复序列。
+- 适用： STR-GWAS、群体遗传分析、亲子传递和遗传分离分析。
+- [GitHub](https://github.com/gymrek-lab/GangSTR?utm_source=chatgpt.com)
+
+[(PDF) ExpansionHunter: A sequence-graph based tool to analyze variation in short tandem repeat regions](https://images.openai.com/static-rsc-4/Vk09_oV9RYxpqIG2Myq6pCWpJ7_sZy84GmC6SVU-twI4Fk7o1pzix1cQj6-W0Qk9AiVkhYPT0dkgavIHJiyJi7ZyYTijmiVfH0vftUNt1GtKeAtRvPEmI7O-loUMTpexttUAx4nw3AjA8UhdfPrOcgxF_Xc_1lu0XAjNzdcHzkA?purpose=inline)
+
+### 2. ExpansionHunter
+
+推荐：已知疾病相关 STR
+
+- 用途： 针对指定 STR 目录估计重复长度和基因型。
+- 优势： 特别适合已知致病性重复扩增位点的筛查与验证。
+- 适用： 罕见病诊断、神经系统重复扩增疾病、候选位点分型。
+- [GitHub](https://github.com/Illumina/ExpansionHunter?utm_source=chatgpt.com)
+
+[Checking your browser - reCAPTCHA](https://images.openai.com/static-rsc-4/pYFBFdStRlJmulwalIKTQFMLL3bwyPctI2fagTImPRHcnWM6_njIVTM-JThMg2HgA3k7ryM8gW4JRSZfDc4KATbiu-8BiHbJLvt4Uk96VE2Z4XwbfJHEuruPKPGQVNCElFBH_f9nOvWOUeRTacYZyyDPDdpv2vzG3OImdzSvtHE?purpose=inline)
+
+### 3. HipSTR
+
+- 用途： 全基因组 STR 分型，同时能够估计重复序列的具体等位基因序列。
+- 优势： 适合分析常见 STR、多态性和家系遗传；可结合 stutter 模型处理 PCR 扩增偏差。
+- 局限： 对远超 reads 长度的扩增长等位基因，通常不如专门的扩增检测工具。
+- [GitHub](https://github.com/HipSTR-Tool/HipSTR?utm_source=chatgpt.com)
+
+[ExpansionHunter Denovo: a computational method for locating known and novel repeat expansions in short-read sequencing data | Genome Biology | Springer Nature Link](https://images.openai.com/static-rsc-4/4KCphmEJln8Mz3qOAfp3kg3dB-xTXrIUjg8GCTuBtgYGK6kfKa92BmDpXnzdh0hHAZEeQ3Jbsn1afYPpQ5-mfTkdCqREnQDDKlDXV5-nIjNEUHyEgxrpnAtiuTQQML3i7U2dsL6lwOTIM7KXXoVvr2UT0YJ_iCo2EEpRM2wvICw?purpose=inline)
+
+### 4. ExpansionHunter Denovo (EHdn)
+
+推荐：未知扩增位点筛查
+
+- 用途： 利用异常重复序列相关的 reads 信号，发现已知或新候选重复扩增。
+- 优势： 不要求所有候选位点都预先出现在 STR 目录中。
+- 局限： 主要用于扩增信号检测和候选发现，不等同于精确估计所有位点的两个等位基因重复长度。
+- [GitHub](https://github.com/Illumina/ExpansionHunterDenovo?utm_source=chatgpt.com)
+
+[STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci | Genome Biology | Springer Nature Link](https://images.openai.com/static-rsc-4/N_tI0VelvojTQtOfWRH0fu-0DeqYkQTBSldE41wKRvHDMZLJ2pROfWfGqvLIZAMcvWUx2NkSUBwoS7qW9c9YlzSdN6qWVhIZJGfLhzkotSzlnUPM_BXsLmE2OH-Updtll9V6E6r9OLKvoXKgCEyeordRmqYjZXxvNaYYBwxcpt8?purpose=inline)
+
+### 5. STRling
+
+- 用途： 检测短读长 WGS 中异常的重复扩增，可用于单样本候选发现和病例—对照分析。
+- 优势： 可发现参考目录之外的候选扩增，适合罕见病和病例队列筛查。
+- 局限： 对候选位点的精确长度分型及致病性判定，通常还需要进一步分析。
+- [GitHub](https://github.com/quinlan-lab/STRling?utm_source=chatgpt.com)
+
+[Checking your browser - reCAPTCHA](https://images.openai.com/static-rsc-4/WPz6zp3Tn_5fjiTkP9Z6-0XnLOz8yGM7mcZRH0iLGgkHHTLSyQQGWaijcIY-7BVp2K6y1jmDX0BkhU8G1VHdj40-57KSGlzpDjk6AnSvy7fQgK6i_i0Mo5kAwaLbQcwP9gCccPPmaTP3rpILXpFrxDcERSjYdFkUXSk-GDym7GM?purpose=inline)
+
+### 6. STRetch
+
+- 用途： 通过异常重复相关的 reads 信号，识别相对于对照群体异常扩增的 STR。
+- 优势： 适合病例—对照的全基因组重复扩增筛查。
+- 局限： 通常需要对照样本或对照分布；不是所有位点都能直接得到精确的双等位基因长度。
+- [GitHub](https://github.com/Oshlack/STRetch?utm_source=chatgpt.com)
+
+以上工具的功能定位和性能比较可参考 2024 年发表的人类短读长 WGS STR 工具基准研究。
+
+[image](https://www.google.com/s2/favicons?domain=https://pmc.ncbi.nlm.nih.gov\&sz=32)
+
+PMC
+
++1
+
+
+
+## 二、其他值得关注的工具
+
+| 工具         | 主要功能                    | 适用场景            |
+| ---------- | ----------------------- | --------------- |
+| adVNTR     | 针对 VNTR（可变数目串联重复）进行靶向分型 | 特定基因或已知 VNTR 位点 |
+| LobSTR     | 基于短读长数据进行 STR 分型        | 传统全基因组 STR 分析   |
+| exSTRa     | 检测相对于对照群体异常的重复扩增信号      | 病例—对照扩增筛查       |
+| MergeSTR   | 合并和整理不同样本的 STR 分型结果     | 多样本结果整合         |
+| TRTools    | STR 数据 QC、统计分析与可视化      | 分型后的质量控制与群体分析   |
+| EnsembleTR | 综合多个分型工具的结果，构建共识基因型     | 大规模 STR-GWAS    |
+
+近期发表于 Nature Protocols 的流程专门介绍了 HipSTR、GangSTR、adVNTR 和 ExpansionHunter 的分型结果，结合 TRTools 进行质量控制，并使用 EnsembleTR 整合共识基因型。
+
+[image](https://www.google.com/s2/favicons?domain=https://www.nature.com\&sz=32)
+
+Nature Protocols
+
++1
+
+
+
+## 三、根据研究目标选择工具
+
+选择你的研究目标，查看建议组合：
+
+大队列 STR-GWAS（1,000–10,000 人或更多）
+
+罕见病诊断与已知致病 STR 扩增
+
+发现未知 STR 扩增位点
+
+Trio-WGS，研究 STR 的遗传传递和 de novo 变异
+
+推荐：GangSTR + ExpansionHunter + HipSTR
+
+统一参考 STR 目录和变异表示，使用 TRTools 进行 QC，再通过 EnsembleTR 构建共识基因型，随后开展群体结构校正、亲缘关系控制及 STR-GWAS。
+
+[image](https://www.google.com/s2/favicons?domain=https://www.nature.com\&sz=32)
+
+Nature Protocols
+
++1
+
+
+
+如果你的目标是之前提到的 1,000–10,000 人大队列 STR-GWAS，建议重点考虑 GangSTR、ExpansionHunter 和 HipSTR 的联合分型与共识基因型流程。 如果研究重点是罕见病中的致病性重复扩增，则应另外加入 EHdn 或 STRling，而不是只依赖常规 STR 分型工具。
 
 ---
 
