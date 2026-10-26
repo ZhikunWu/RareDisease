@@ -41,6 +41,339 @@ Wham
 
 gridss
 
+---
+
+##　请针对我的 STR-GWAS 设计可执行分析流程。表型类型：病例–对照二分类；重点遗传效应：重复长度加性效应；样本规模：超过10000例；基因型数据：已整合的统一 VCF。请提供推荐工具、统计模型、质量控制、可执行命令或 R/Python 代码及结果解读
+
+下面给出可以落地执行的版本。先强调一个会影响整个方案的关键事实：TRTools 的 `associaTR` 目前不支持二分类表型。它采用普通最小二乘回归，适用于连续型表型，不能直接把病例/对照标签交给它当作标准的 Logistic STR-GWAS。
+
+[image](https://www.google.com/s2/favicons?domain=https://trtools.readthedocs.io\&sz=32)
+
+TRTools documentation
+
++1
+
+
+
+因此，你的主分析建议使用 Python/R 对每个位点提取重复长度，执行 Logistic 回归；TRTools 用于基因型 QC、位点统计和工具间比较。这样能直接实现你需要的重复长度加性效应，并保留后续扩展到多等位基因效应的能力。
+
+## 一、推荐软件与分析模型
+
+| 环节        | 推荐工具                                                     | 用途                                |
+| --------- | -------------------------------------------------------- | --------------------------------- |
+| VCF 检查与整理 | `bcftools`、`htslib`                                      | 排序、索引、检查样本与位点                     |
+| TR 基因型 QC | `TRTools`                                                | `dumpSTR`、`qcSTR`、`statSTR`       |
+| 关联分析      | Python `cyvcf2` + `statsmodels`，或 R `data.table` + `glm` | 二分类 Logistic 回归                   |
+| 多重检验      | Python `statsmodels` / R                                 | Bonferroni、Benjamini–Hochberg FDR |
+| 结果可视化     | R `qqman` / `ggplot2`                                    | Manhattan plot、QQ plot            |
+| 关联结果注释    | TR 区域注释 + SNP GWAS 结果                                    | 基因、功能区域、邻近 SNP                    |
+
+这里有一个需要提前确认的技术细节：如果你所谓的“统一 VCF”只是把不同工具的结果合并成同一个文件，并不代表所有 FORMAT 字段都已统一成可比较的重复长度单位。ExpansionHunter 和 GangSTR 对等位基因的编码方式可能不同，必须检查 VCF 的 `##INFO`、`##FORMAT` 定义及实际 `GT` 值。
+
+## 二、建立项目目录与软件环境
+
+以下示例以 Linux、GRCh38、病例/对照样本均来自 WGS 为假设。所有文件名和阈值都可以根据你的实际数据修改。
+
+```
+mkdir -p STR_GWAS/{input,qc,genotypes,assoc,plots,logs}
+cd STR_GWAS
+
+conda create -n str_gwas -c conda-forge -c bioconda \
+    python=3.11 trtools bcftools htslib tabix -y
+
+conda activate str_gwas
+
+python -m pip install numpy pandas scipy statsmodels cyvcf2 matplotlib
+```
+
+建议保存软件版本：
+
+```
+bcftools --version > logs/software_versions.txt
+python --version >> logs/software_versions.txt
+dumpSTR --version >> logs/software_versions.txt 2>&1
+```
+
+准备以下输入文件：
+
+| 文件                              | 内容                         |
+| ------------------------------- | -------------------------- |
+| `input/consensus.vcf.gz`        | 已整合的 TR 基因型 VCF            |
+| `input/phenotype.tsv`           | 样本 ID 和病例/对照状态             |
+| `input/covariates.tsv`          | 样本 ID、年龄、性别、PC1–PC10、测序批次等 |
+| `input/tr_locus_annotation.tsv` | 每个 TR 的染色体、坐标、重复基序、重复单位长度等 |
+
+表型文件格式：
+
+```
+IID	PHENO
+S001	1
+S002	0
+S003	1
+```
+
+这里 `PHENO=1` 表示病例，`PHENO=0` 表示对照。协变量文件示例：
+
+```
+IID	AGE	SEX	PC1	PC2	PC3	BATCH
+S001	45	1	0.012	-0.006	0.004	B1
+S002	52	0	-0.008	0.003	0.001	B2
+S003	39	1	0.004	0.009	-0.002	B1
+```
+
+实际数据中需要确保 IID 与 VCF 样本 ID 完全一致。性别编码应固定，例如 `SEX=1` 为男性、`SEX=0` 为女性；批次作为分类变量处理。
+
+## 三、第一阶段：统一 VCF 检查与质量控制
+
+### 3.1 检查文件完整性
+
+```
+bcftools quickcheck -v input/consensus.vcf.gz
+
+bcftools index -f -t input/consensus.vcf.gz
+
+# 查看样本数
+bcftools query -l input/consensus.vcf.gz | wc -l
+
+# 查看位点数
+bcftools index -n input/consensus.vcf.gz
+
+# 查看 INFO / FORMAT 字段定义
+bcftools view -h input/consensus.vcf.gz | grep -E '^##(INFO|FORMAT)='
+
+# 查看前 3 个位点
+bcftools view -H input/consensus.vcf.gz | head -n 3
+```
+
+尤其要检查：
+
+- `GT` 是否保留两个等位基因的真实长度信息。
+- `INFO` 或 `FORMAT` 中是否有 `REPCN`、`GB`、`Q`、`DP`、`GQ` 等字段。
+- 每个等位基因究竟表示重复次数、重复片段长度，还是 VCF 的 ALT 索引。
+- 统一 VCF 是否把不同工具的等位基因都转换成了同一套重复长度定义。
+
+不能直接把 `GT=0/1` 中的 `0` 和 `1` 当作重复次数。 它们通常只是 REF/ALT 等位基因索引。你需要使用统一 VCF 中对应的真实等位基因长度或重复次数字段来构建关联分析变量。
+
+### 3.2 使用 TRTools 进行 QC
+
+TRTools 提供 `dumpSTR`、`qcSTR`、`statSTR` 等工具，分别用于基因型过滤、质量控制图和位点统计。
+
+[image](https://www.google.com/s2/favicons?domain=https://trtools.readthedocs.io\&sz=32)
+
+TRTools documentation
+
++1
+
+
+
+如果你的统一 VCF 兼容 GangSTR 原生格式，可以先运行：
+
+```
+dumpSTR \
+    --vcf input/consensus.vcf.gz \
+    --out qc/consensus.filtered.vcf \
+    --vcftype gangstr \
+    --min-locus-callrate 0.90
+```
+
+如果实际统一文件兼容的是 ExpansionHunter，则需要改为：
+
+```
+dumpSTR \
+    --vcf input/consensus.vcf.gz \
+    --out qc/consensus.filtered.vcf \
+    --vcftype eh \
+    --min-locus-callrate 0.90
+```
+
+注意：以上两个命令是二选一的条件示例，不是建议把同一文件分别当作两种工具的原生 VCF 处理。如果是 EnsembleTR 或其他自定义共识 VCF，应先检查其格式兼容性；不能仅通过修改 `--vcftype` 参数就保证字段解释正确。
+
+对兼容的 VCF 生成 QC 图：
+
+```
+qcSTR \
+    --vcf qc/consensus.filtered.vcf \
+    --out qc/consensus \
+    --vcftype gangstr
+```
+
+建议进一步检查每个样本的检出率、各染色体的位点分布、等位基因长度与测序质量之间的关系。具体过滤参数应结合测序深度和基因型质量分布制定，避免过度过滤长重复区域。
+
+### 3.3 建议采用的初始过滤标准
+
+| 指标       | 建议起始值            | 说明                      |
+| -------- | ---------------- | ----------------------- |
+| 位点检出率    | ≥90%             | 先进行全样本检出率过滤             |
+| 样本检出率    | ≥95%             | 排除低质量样本                 |
+| 次要等位基因计数 | ≥20 条染色体         | 初筛时减少极罕见等位基因的不稳定结果      |
+| 基因型质量    | 按工具字段与校准结果设置     | 不同 caller 的质量值不能直接视为等价  |
+| 群体结构     | 10 个左右 SNP PC 起步 | PC 数量应根据数据和群体结构确定       |
+| HWE      | 主要在对照中评估         | STR 的多等位基因和重复长度特性需要专门计算 |
+
+其中，MAF 和次要等位基因计数的概念不能混为一谈：一个位点可能存在多个低频等位基因，因此需要按重复长度等位基因统计频率，并额外检查每个位点的总有效样本数。
+
+对病例–对照数据，不建议不加区分地在病例中使用 HWE 阈值剔除位点；病例中的偏离可能来自真实疾病关联。
+
+## 四、核心步骤：把多等位基因转换为重复长度剂量
+
+对于你的目标——重复长度加性效应——推荐每个样本、每个位点构建一个数值型剂量：
+
+\\[ G\_{ij}=L\_{ij,1}+L\_{ij,2} \\]
+
+其中 \\(L\_{ij,1}\\) 和 \\(L\_{ij,2}\\) 是样本 \\(i\\) 在位点 \\(j\\) 的两条等位基因的重复次数。
+
+例如：
+
+| 样本   | 两条等位基因的重复次数 | 剂量 \\(G\\) |
+| ---- | ----------- | ---------- |
+| S001 | 10、10       | 20         |
+| S002 | 10、12       | 22         |
+| S003 | 12、12       | 24         |
+| S004 | 12、15       | 27         |
+
+对于二倍体常染色体，剂量使用两条等位基因重复次数之和。每增加 1 个重复单位，模型估计疾病风险的变化。如果重复单位是 3 bp，则每增加 1 次重复对应增加 3 bp。
+
+需要注意：
+
+- 不要把 VCF 的 `GT` 索引相加当作剂量。
+- 对非二倍体区域、男性 X 染色体非 PAR 区域，以及存在单倍型缺失或不确定扩增的位点，需要单独处理。
+- 如果某个 TR 存在复杂重复基序、长度变化或不规则中断，优先使用可靠的重复次数字段，而不是简单用 ALT 序列长度除以 motif 长度。
+
+### 4.1 建议的中间文件格式
+
+为了避免不同 caller 的字段差异影响关联分析，我建议把经过验证的统一 VCF 转成以下中间文件：
+
+`genotypes/chr1_dosage.tsv`
+
+```
+IID	TR1	TR2	TR3
+S001	20	14	8
+S002	22	15	8
+S003	24	13	10
+S004	27	16	9
+```
+
+这里的 `TR1`、`TR2`、`TR3` 是唯一的 TR 位点 ID，数值是两条等位基因的重复次数之和；无法可靠判定的基因型填为 `NA`。
+
+同时保留位点注释文件 `input/tr_locus_annotation.tsv`：
+
+```
+ID	CHROM	POS	MOTIF	PERIOD	REF_LEN
+TR1	1	123456	CA	2	10
+TR2	1	234567	CAG	3	7
+TR3	1	345678	A	1	4
+```
+
+重要： 上述 dosage 文件是统一基因型解析后的中间格式，不是直接对 VCF 的 GT 列进行数值转换。生成它的脚本必须根据你实际统一 VCF 的字段定义解析真实重复次数。由于你还没有提供 VCF 的 INFO/FORMAT 字段定义，当前不能安全地给出一个适用于所有 EnsembleTR、GangSTR 和 ExpansionHunter 文件的通用解析命令。
+
+## 五、可执行的 Python 关联分析代码
+
+下面的脚本实现每个位点的 Logistic 回归：
+
+\\[ \operatorname{logit}P(Y_i=1)= \beta_0+\beta_G G_i+\beta_A\mathrm{Age}\_i+ \beta_S\mathrm{Sex}\_i+ \sum\_{k=1}^{10}\beta_k PC\_{ik}+ \beta_B\mathrm{Batch}\_i \\]
+
+其中，\\(\exp(\beta_G)\\) 是重复长度剂量每增加一个重复单位对应的疾病 OR。
+
+代码假设剂量矩阵的行是样本、列是位点；建议按染色体或每 500–1,000 个位点拆分文件，避免一次性将整个大队列的所有位点读入内存。
+
+```
+        results.append({            "ID": locus,            "CHROM": ann.loc[locus, "CHROM"],            "POS": ann.loc[locus, "POS"],            "MOTIF": ann.loc[locus, "MOTIF"],            "PERIOD": ann.loc[locus, "PERIOD"],            "N": n,            "N_CASE": n_case,            "N_CTRL": n_ctrl,            "BETA": beta,            "SE": se,            "OR": np.exp(beta),            "CI95_LOW": np.exp(beta - 1.96 * se),            "CI95_HIGH": np.exp(beta + 1.96 * se),            "P": p,            "STATUS": "OK"        })    except Exception as e:        results.append({            "ID": locus,            "CHROM": ann.loc[locus, "CHROM"],            "POS": ann.loc[locus, "POS"],            "N": n,            "N_CASE": n_case,            "N_CTRL": n_ctrl,            "P": np.nan,            "STATUS": "FIT_FAILED: " + str(e)[:100]        })res = pd.DataFrame(results)if len(res):    valid = res["P"].notna()    res["FDR"] = np.nan    res["P_BONF"] = np.nan    res.loc[valid, "FDR"] = multipletests(        res.loc[valid, "P"], method="fdr_bh"    )[1]    res.loc[valid, "P_BONF"] = np.minimum(        res.loc[valid, "P"] * valid.sum(), 1.0    )    res = res.sort_values("P", na_position="last")res.to_csv(args.out, sep="\t", index=False)print(f"Tested loci: {res['P'].notna().sum() if len(res) else 0}")print(f"Results written to {args.out}")
+```
+
+保存为 `assoc_str.py`。
+
+### 代码运行前需要注意的两处
+
+1. 当前代码适用于常染色体二倍体 TR 的长度剂量矩阵；性染色体和其他特殊倍性区域应独立建模。
+2. `--min-mac` 部分是用于初步剔除低变异度位点的简化规则，不等同于标准 SNP-MAC。正式分析应根据实际等位基因长度分布计算每个重复长度等位基因的频数，并制定 STR 专属过滤标准。对于罕见长度等位基因，建议将主分析和罕见等位基因的补充分析分开。
+
+此外，如果病例和对照数量差异很大，或者个别位点出现完全分离、估计 OR 极端的情况，应对该位点使用 Firth Logistic 回归或其他适合稀疏数据的模型进行补充验证，而不是直接接受普通 Logistic 回归的极端结果。
+
+## 六、运行关联分析
+
+先对一个染色体或一批位点运行：
+
+```
+python assoc_str.py \
+    --dosage genotypes/chr1_dosage.tsv \
+    --pheno input/phenotype.tsv \
+    --covar input/covariates.tsv \
+    --annot input/tr_locus_annotation.tsv \
+    --out assoc/chr1_assoc.tsv \
+    --min-n 5000 \
+    --min-mac 20
+```
+
+如果有 22 条常染色体的剂量矩阵，可以批量执行：
+
+```
+for chr in $(seq 1 22); do
+    python assoc_str.py \
+        --dosage "genotypes/chr${chr}_dosage.tsv" \
+        --pheno input/phenotype.tsv \
+        --covar input/covariates.tsv \
+        --annot input/tr_locus_annotation.tsv \
+        --out "assoc/chr${chr}_assoc.tsv" \
+        --min-n 5000 \
+        --min-mac 20 \
+        > "logs/chr${chr}.log" 2>&1
+done
+```
+
+这里的 `--min-n 5000` 是每个位点实际参与分析的最小样本数，并非整个队列的样本数。若你的队列超过 10,000 例，但某个位点只有 4,000 例有可靠基因型，该位点将被跳过。
+
+正式运行前建议先用 100–500 个位点测试，确认样本对齐、病例/对照编码、剂量方向、缺失率及模型收敛均正确。
+
+## 七、关联结果如何解读？
+
+假设结果中出现以下示例数据（仅用于解释，不代表真实分析结果）：
+
+| TR 位点 | OR   | 95% CI    | P 值                  | FDR  |
+| ----- | ---- | --------- | -------------------- | ---- |
+| TR001 | 1.08 | 1.04–1.12 | \\(2\times10^{-5}\\) | 0.01 |
+| TR002 | 0.94 | 0.90–0.98 | \\(3\times10^{-4}\\) | 0.04 |
+| TR003 | 1.02 | 0.97–1.07 | 0.45                 | 0.80 |
+
+- OR = 1.08： 重复长度剂量每增加一个重复单位，疾病的优势比增加约 8%，不是绝对患病概率增加 8%。
+- OR = 0.94： 重复长度增加与较低的疾病优势比相关。
+- 95% CI 跨越 1： 通常意味着在常用的双侧 5% 显著性水平下，没有足够证据证明存在关联。
+- FDR： 在同一批纳入检验的位点中进行 Benjamini–Hochberg 校正；FDR 小于 0.05 可作为候选发现标准，但仍需独立验证。
+- P_BONF： 对实际完成检验的位点数进行 Bonferroni 校正。需要在研究方案中预先明确多重检验的定义及主要报告标准。
+
+注意，代码中的 OR 对应的是两条等位基因重复次数之和每增加一个单位。若希望表达为平均等位基因长度每增加一个重复单位，可将剂量改为 \\(G/2\\)，此时对应的 OR 为原 OR 的平方根。
+
+## 八、正式发表前还需要完成的分析
+
+1\. Manhattan plot 与 QQ plot
+
+画出全基因组关联结果，并检查 P 值分布是否存在群体结构、技术批次或系统性偏差。不能只根据 QQ 图判断模型正确性，还需要结合病例/对照的祖源和样本质量检查。
+
+2\. 附近 SNP 的条件分析
+
+对显著 TR 位点，检查邻近 SNP GWAS 结果及局部 LD，并在适当模型中加入附近 SNP 剂量，判断 TR 信号是否可能独立于已知 SNP 信号。
+
+3\. 稳健性与独立验证
+
+对主要信号进行 Firth Logistic 回归、不同质量控制阈值、不同祖源调整策略和分层分析；如果有独立队列，使用相同的位点定义、剂量单位和效应方向进行验证。
+
+## 九、针对你的数据，我最建议先做的一件事
+
+目前整个流程中最容易出错的并不是 Logistic 回归，而是从统一 VCF 正确解析重复次数。如果剂量转换有误，后续即使得到极小的 P 值也没有可靠的生物学解释。
+
+请提供统一 VCF 的以下输出：
+
+```
+bcftools view -h input/consensus.vcf.gz | \
+    grep -E '^##(INFO|FORMAT)=' | head -n 40
+
+bcftools view -H input/consensus.vcf.gz | head -n 3
+```
+
+如果文件非常大，只需提供前几个代表性位点及完整的对应 INFO/FORMAT 字段定义，并将样本 ID 替换成匿名 ID 即可。我就可以根据你实际使用的共识 VCF 格式，进一步给出从原始统一 VCF 自动生成重复长度剂量矩阵、完成 QC、运行全基因组 Logistic STR-GWAS 并输出 Manhattan/QQ 图的一套完整脚本。
+
+
+
+
 
 ---
 
