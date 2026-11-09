@@ -1,3 +1,196 @@
+# 基于三代RNA测序检测融合基因的工具有哪些
+
+有，而且截至2026年11月，已经有几项比较有价值的长读长 RNA-seq 融合基因检测 benchmark。如果以检测准确性、灵敏度和假阳性率综合考虑，我建议重点比较 CTAT-LR-Fusion、GFSeeker、JAFFAL、LongGF 和 FusionSeeker，而不是简单采用两个工具的交集。
+
+目前有两个特别值得关注的 benchmark：
+1. 2026 年的长读长融合检测综合 benchmark，比较了多种工具及不同测序平台。
+2. GFSeeker 的系统 benchmark，使用模拟数据比较了6种工具，在其模拟条件下取得了很高的 F1 值。
+下面具体介绍数据集、性能结果和我的推荐。
+1. 最值得参考的 Benchmark 研究
+Benchmark 1：2026年长读长融合检测综合评估
+优先推荐阅读
+论文：A comprehensive benchmark of transcriptome-wide fusion detection using long-read RNA sequencing
+- 发表时间：2026年8月（bioRxiv 预印本）
+- 数据：模拟数据 + MCF7、K562 等细胞系真实数据。
+- 模拟数据包括：
+  - 100个染色体间融合。
+  - 100个染色体内融合。
+  - 100个 read-through。
+  - 100个三基因融合。
+- 比较了 JAFFAL、LongGF、Genion、FusionSeeker、CTAT-LR-Fusion 等工具。
+主要结果：
+工具	Benchmark 主要结果
+CTAT-LR-Fusion	总体 recall 最高，约28%
+JAFFAL	唯一正确检测出模拟三基因融合的工具
+FusionSeeker	read-through 检测表现较好，但假阳性需要注意
+Genion	对部分 read-through 有较好检测能力
+LongGF	运行速度快，计算资源需求较低
+
+特别值得注意的是，该研究发现，六种工具的交集仅检测到400个模拟融合事件中的1个。
+
+这说明：直接取所有工具交集会严重损失灵敏度。
+
+因此，更合理的方式是采用一个主检测工具，再结合其他工具补充候选。
+
+BioRxiv+2
+
+论文及数据：
+- Benchmark 论文
+- Benchmark GitHub 仓库及分析脚本
+- Benchmark 数据与结果汇总
+Benchmark 2：GFSeeker 系统评估
+论文：GFSeeker: a splicing-graph-based approach for accurate gene fusion detection from long-read RNA sequencing data
+
+发表期刊：Briefings in Bioinformatics，2026年。
+
+该研究比较了：
+- GFSeeker
+- JAFFAL
+- GFHunter
+- LongGF
+- CTAT-LR-Fusion
+- FusionSeeker
+模拟数据设计：
+- PacBio 和 ONT 两种测序错误模型。
+- 10×、30×、50×测序深度。
+- 5%、10%、15%错误率。
+- 146个已知肿瘤融合事件作为阳性对照。
+- 非肿瘤转录组作为阴性对照。
+主要结果：
+
+GFSeeker 在其模拟数据中，gene-pair level 平均 F1：
+- PacBio：超过95%。
+- ONT：超过96%。
+在18种模拟条件下，GFSeeker 均表现出较好的 gene-pair 检测性能。
+
+DOI+1
+
+论文及资源：
+- GFSeeker 论文全文（PMC）
+- GFSeeker DOI 页面
+注意：GFSeeker 的高 F1 是特定模拟数据和评价定义下的结果，不应直接与其他研究中不同数据集、不同匹配标准下的 F1 横向比较。
+2. Benchmark 文件在哪里下载？
+我建议优先下载下面三个资源。
+首选资源
+1. LRFusionBenchmark（2026）
+
+包含模拟数据分析、真实细胞系数据、已知融合基因参考集、工具运行脚本和性能统计表。
+GitHub：LRFusionBenchmark
+重点目录：
+LRFusionBenchmark/
+├── SimulatedData/
+├── CellLineData/
+├── Known_Fusions/
+├── Fusions/
+└── Figures/Input_dataframes/
+
+
+特别值得下载：
+- Known_Fusions/：已知融合基因参考集。
+- SimulatedData/：模拟数据评估。
+- Fusions/：融合检测结果。
+- Figures/Input_dataframes/：性能统计数据。
+
+
+2. CTAT-LR-Fusion benchmark
+
+包含模拟 PacBio、ONT 数据，以及融合检测性能比较。
+CTAT-LR-Fusion 原始论文及补充材料CTAT-LR-Fusion GitHub
+
+3. FusionSeeker benchmark
+
+包含模拟融合转录本、PacBio Iso-Seq 和 ONT 数据的比较结果。
+FusionSeeker 原始论文FusionSeeker GitHub
+
+其中第一个资源最适合你直接开展多工具 benchmark。它不仅有性能结果，还包含 Huh7、K562、MCF7 等数据的融合参考信息和分析脚本。
+
+RDorney/LRFusionBenchmark · GitHub+2
+
+3. 哪个工具最好？综合推荐
+结合上述两项2026年研究，我的建议如下：
+排名/用途	工具	推荐程度	主要理由
+综合检测	CTAT-LR-Fusion	优先推荐	2026综合 benchmark 中整体表现最好
+高精度检测	GFSeeker	优先测试	新型剪接图算法，模拟数据 F1 很高
+复杂融合	JAFFAL	建议保留	三基因融合识别优势明显
+快速检测	LongGF	推荐	速度快，资源需求低
+高灵敏度补充	FusionSeeker	推荐	对部分 intronic fusion 有较好的检测能力
+多工具整合	GFvoter	推荐	对多个融合检测工具进行整合
+
+这里有两点值得特别注意：
+- CTAT-LR-Fusion 在2026综合 benchmark 中总体表现最好，但其模拟数据总体 recall 仍只有28%，说明长读长融合检测仍存在较大的漏检问题。
+- GFSeeker 的 F1 超过95%，但这是其自身模拟数据条件下的 gene-pair level 评价结果，不能据此认定它在真实肿瘤数据中一定优于 CTAT-LR-Fusion。
+  
+  BioRxiv+1
+4. 如果自己做 Benchmark，推荐采用什么数据？
+我建议采用三类数据，而不是只用模拟数据。
+数据类型	推荐数据	用途
+模拟阳性数据	PBSIM3 模拟融合转录本	计算 Precision、Recall、F1
+已知阳性细胞系	K562、MCF7、Huh7	验证真实融合基因检出率
+阴性数据	正常组织或非肿瘤细胞系	评估假阳性率
+
+建议模拟以下融合场景：
+1. 染色体间融合（Inter-chromosomal）。
+2. 染色体内融合（Intra-chromosomal）。
+3. 正向融合与反向融合。
+4. Intron–exon 融合。
+5. Read-through。
+6. 三基因融合。
+7. 低表达融合基因。
+8. 高同源基因之间的融合。
+性能指标建议包括：
+\[
+Precision=\frac{TP}{TP+FP}
+\]
+
+\[
+Recall=\frac{TP}{TP+FN}
+\]
+
+\[
+F1=\frac{2\times Precision\times Recall}{Precision+Recall}
+\]
+
+还应单独评估：
+- Gene-pair accuracy：融合基因配对准确性。
+- Breakpoint accuracy：融合断点定位准确性。
+- Fusion transcript reconstruction：完整融合转录本重建准确性。
+- Isoform quantification：融合转录本定量相关性。
+尤其需要注意：gene-pair 匹配和精确断点匹配是两个不同的评价标准，不能混为一谈。
+5. 针对你的 PacBio HiFi 长读长转录组，我的最终建议
+考虑到你有约100个长读长 RNA-seq 样本，而且还涉及肿瘤和正常组织比较，我建议实际运行以下4个工具：
+推荐的实际分析组合
+CTAT-LR-Fusion
+主分析工具
+
+负责主要融合基因发现。
+
+GFSeeker
+高精度补充
+
+补充发现复杂融合，重点比较 gene-pair 准确性。
+
+JAFFAL
+结构验证
+
+补充识别复杂融合和三基因融合。
+
+LongGF
+独立验证
+
+作为快速、独立的候选发现工具。
+
+最终不要简单取四个工具的交集，而是建立分级证据体系：
+- Tier 1： 多工具支持，且有多条独立长读长支持，断点一致。
+- Tier 2： 单个高性能工具支持，但有充分的 reads、结构和表达证据。
+- Tier 3： 仅有单条 read 或存在异常比对，需要进一步验证。
+另外，将 RNA 融合结果与 DNA 层面的 SV 进行整合，能够区分基因组结构重排产生的融合和转录层面的嵌合事件。
+
+我认为最值得你先做的一步，是下载 LRFusionBenchmark，利用其中的真实细胞系数据和已知融合基因参考集，对 CTAT-LR-Fusion、GFSeeker、JAFFAL 和 LongGF 进行同一数据集上的比较。 这样获得的结论比直接引用不同论文中的 F1 值更有说服力。
+
+
+
+----
+
 # 如何识别microexon
 
 Microexon（微外显子）的识别，核心是从 RNA-seq 或长读长转录组数据中，准确鉴定长度通常为 3–30 bp 的短外显子，确定其基因组位置、剪接位点、表达量及不同样本中的包含比例（PSI）。
